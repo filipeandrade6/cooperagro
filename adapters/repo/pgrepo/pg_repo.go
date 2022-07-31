@@ -56,7 +56,7 @@ type ProductsRepo struct {
 	db ksql.Provider
 }
 
-// NewProducts instantiates a new UsersRepo
+// NewProducts instantiates a new ProductsRepo
 func NewProducts(ctx context.Context, postgresURL string) (ProductsRepo, error) {
 	db, err := kpgx.New(ctx, postgresURL, ksql.Config{})
 	if err != nil {
