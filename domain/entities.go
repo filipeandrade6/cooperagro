@@ -47,3 +47,6 @@ type Product struct {
 	CreatedAt *time.Time `ksql:"created_at"`
 	UpdatedAt *time.Time `ksql:"updated_at"`
 }
+
+type ProdutoBase struct {
+}
