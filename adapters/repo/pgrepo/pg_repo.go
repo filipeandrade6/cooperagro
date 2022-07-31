@@ -3,7 +3,11 @@ package pgrepo
 import (
 	"context"
 
-	"github.com/filipeandrade6/cooperativa-go/adapters/log"
+	"github.com/filipeandrade6/cooperagro-go/adapters/log"
+	"github.com/filipeandrade6/cooperagro-go/domain"
+
+	"github.com/vingarcia/ksql"
+	"github.com/vingarcia/ksql/adapters/kpgx"
 )
 
 // UsersRepo implements the repo.Users interface by using the ksql database.

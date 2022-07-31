@@ -2,100 +2,119 @@ package main
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
-	"github.com/filipeandrade6/cooperativa-go/foundation/logger"
-	"github.com/filipeandrade6/cooperativa-go/handlers"
+	"github.com/gofiber/fiber/v2"
 
-	"github.com/ardanlabs/conf/v3"
-	_ "go.uber.org/automaxprocs"
-	"go.uber.org/zap"
+	"github.com/filipeandrade6/cooperagro-go/assets"
+
+	"github.com/filipeandrade6/cooperagro-go/cmd/api/middlewares"
+	"github.com/filipeandrade6/cooperagro-go/cmd/api/usersctrl"
+	"github.com/filipeandrade6/cooperagro-go/cmd/api/venuesctrl"
+
+	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro-go/domain/users"
+	"github.com/filipeandrade6/cooperagro-go/domain/venues"
+
+	"github.com/filipeandrade6/cooperagro-go/adapters/cache"
+	"github.com/filipeandrade6/cooperagro-go/adapters/cache/memorycache"
+	"github.com/filipeandrade6/cooperagro-go/adapters/cache/redis"
+	"github.com/filipeandrade6/cooperagro-go/adapters/log"
+	"github.com/filipeandrade6/cooperagro-go/adapters/log/jsonlogs"
+	"github.com/filipeandrade6/cooperagro-go/adapters/rest/http"
+	"github.com/filipeandrade6/cooperagro-go/helpers/env"
+
+	"github.com/filipeandrade6/cooperagro-go/adapters/repo"
+	"github.com/filipeandrade6/cooperagro-go/adapters/repo/pgrepo"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	log, err := logger.New("COOPERAGRO")
+	ctx := context.Background()
+
+	// Read all configs at once so its easy to spot all of them:
+	port := env.GetString("PORT", "80")
+	logLevel := env.GetString("LOG_LEVEL", "INFO")
+	foursquareBaseURL := env.MustGetString("FOURSQUARE_BASE_URL")
+	foursquareClientID := env.MustGetString("FOURSQUARE_CLIENT_ID")
+	foursquareSecret := env.MustGetString("FOURSQUARE_SECRET")
+	redisURL := env.GetString("REDIS_URL", "")
+	redisPassword := env.GetString("REDIS_PASSWORD", "")
+	dbURL := env.MustGetString("DATABASE_URL")
+
+	// Dependency Injection goes here:
+	logger := jsonlogs.New(logLevel, domain.GetCtxValues)
+
+	restClient := http.New(30 * time.Second)
+
+	var cacheClient cache.Provider
+	if redisURL != "" {
+		cacheClient = redis.New(redisURL, redisPassword, 24*time.Hour)
+	} else {
+		cacheClient = memorycache.New(24*time.Hour, 10*time.Minute)
+	}
+
+	venuesService := venues.NewService(
+		logger,
+		restClient,
+		cacheClient,
+		foursquareBaseURL,
+		foursquareClientID,
+		foursquareSecret,
+	)
+
+	// The controllers handle HTTP stuff so the services can be kept as simple as possible
+	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
+	venuesController := venuesctrl.NewController(venuesService)
+
+	var usersRepo repo.Users
+	usersRepo, err := pgrepo.New(ctx, dbURL)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	defer log.Sync()
-
-	if err := run(log); err != nil {
-		log.Error("startup", zap.Error(err))
-		log.Sync()
-		os.Exit(1)
-	}
-}
-
-func run(log *zap.Logger) error {
-	log.Info("initializing API support")
-
-	// Create a configuration struct with default values.
-	cfg := struct {
-		ReadTimeout     time.Duration `conf:"default:5s"`
-		WriteTimeout    time.Duration `conf:"default:10s"`
-		IdleTimeout     time.Duration `conf:"default:120s"`
-		ShutdownTimeout time.Duration `conf:"default:20s"`
-		APIHost         string        `conf:"default:0.0.0.0:8080,env:API_HOST"`
-	}{}
-
-	// Parse the configuration.
-	const prefix = "COOPERAGRO"
-	help, err := conf.Parse(prefix, &cfg)
-	if err != nil {
-		if errors.Is(err, conf.ErrHelpWanted) {
-			fmt.Println(help)
-			return nil
-		}
-		return fmt.Errorf("parsing config: %w", err)
+		logger.Fatal(ctx, "unable to start database", log.Body{
+			"db_url": dbURL,
+			"error":  err.Error(),
+		})
 	}
 
-	// Make a channel to listen for INTERRUPT/TERMINATE signal from user.
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
+	usersService := users.NewService(logger, usersRepo)
 
-	// Construct the API.
-	api := handlers.NewAPI(log)
+	usersController := usersctrl.NewController(usersService)
 
-	// Construct the server to service the requests.
-	srv := &http.Server{
-		Addr:         cfg.APIHost,
-		Handler:      api,
-		ReadTimeout:  cfg.ReadTimeout,
-		WriteTimeout: cfg.WriteTimeout,
-		IdleTimeout:  cfg.IdleTimeout,
-		ErrorLog:     zap.NewStdLog(log),
+	// Any framework you need for serving HTTP or GRPC goes in the main package,
+	//
+	// It should be kept here because the main package is the only one that is allowed
+	// to depend on anything, and also because this logic is unique to this endpoint,
+	// so you won't reuse it anywhere else.
+	app := fiber.New()
+
+	app.Use(middlewares.HandleRequestID())
+	app.Use(middlewares.HandleError(logger))
+	app.Use(middlewares.RequestLogger(logger))
+
+	app.Get("/ping", func(c *fiber.Ctx) error {
+		return c.SendString("pong")
+	})
+
+	app.Post("/users", usersController.UpsertUser)
+	app.Get("/users/:id", usersController.GetUser)
+
+	app.Get("/venues/:latitude,:longitude", venuesController.GetVenuesByCoordinates)
+	app.Get("/venues/details/:id", venuesController.GetDetails)
+
+	// Just an example on how to serve html templates using the embed library
+	// and explicit arguments with a "builder function":
+	app.Get("/example-html", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return assets.WriteExamplePage(c, "username", "user address", 42)
+	})
+
+	logger.Info(ctx, "server-starting-up", log.Body{
+		"port": port,
+	})
+	if err := app.Listen(":" + port); err != nil {
+		logger.Error(ctx, "server-stopped-with-an-error", log.Body{
+			"error": err.Error(),
+		})
 	}
-
-	// Make a channel to listen for errors coming from the listener. Use a
-	// buffered channel so the goroutine can exit if we don't collect this error.
-	serverErrors := make(chan error, 1)
-	go func() {
-		log.Info("API router started", zap.String("host", cfg.APIHost))
-		serverErrors <- srv.ListenAndServe()
-	}()
-
-	select {
-	case err := <-serverErrors:
-		return fmt.Errorf("server error: %w", err)
-
-	case sig := <-shutdown:
-		log.Info("shutdown started", zap.String("signal", sig.String()))
-		defer log.Info("shutdown complete", zap.String("signal", sig.String()))
-
-		ctx, cancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
-		defer cancel()
-
-		if err := srv.Shutdown(ctx); err != nil {
-			return fmt.Errorf("could not stop server gracefully: %w", err)
-		}
-	}
-
-	return nil
 }

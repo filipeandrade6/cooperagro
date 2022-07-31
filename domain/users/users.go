@@ -1,8 +1,11 @@
 package users
 
 import (
+	"context"
+
 	"github.com/filipeandrade6/cooperagro-go/adapters/log"
 	"github.com/filipeandrade6/cooperagro-go/adapters/repo"
+	"github.com/filipeandrade6/cooperagro-go/domain"
 )
 
 // Usually its here where the business logic complexity builds up,
@@ -23,4 +26,24 @@ func NewService(
 		logger:    logger,
 		usersRepo: usersRepo,
 	}
+}
+
+func (s Service) UpsertUser(ctx context.Context, user domain.User) (userID int, _ error) {
+	userID, err := s.usersRepo.UpsertUser(ctx, user)
+	if err != nil {
+		return 0, err
+	}
+
+	s.logger.Info(ctx, "user created", log.Body{
+		"user_id": userID,
+	})
+	return userID, nil
+}
+
+func (s Service) GetUser(ctx context.Context, userID int) (domain.User, error) {
+	user, err := s.usersRepo.GetUser(ctx, userID)
+	if err != nil {
+		return domain.User{}, err
+	}
+	return user, nil
 }
