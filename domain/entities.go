@@ -43,20 +43,20 @@ type User struct {
 // Meus
 
 type User2 struct {
-	ID        int
-	FirstName string
-	LastName  string
-	Email     string
-	Phone     string
+	ID        int    `ksql:"id"`
+	FirstName string `ksql:"first_name"`
+	LastName  string `ksql:"last_name"`
+	Email     string `ksql:"email"`
+	Phone     string `ksql:"phone"`
 
-	CreatedAt *time.Time
-	UpdateAt  *time.Time
+	CreatedAt *time.Time `ksql:"created_at"`
+	UpdateAt  *time.Time `ksql:"update_at"`
 }
 
 type Product struct {
-	ID   int
-	Name string
+	ID   int    `ksql:"id"`
+	Name string `ksql:"name"`
 
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
+	CreatedAt *time.Time `ksql:"created_at"`
+	UpdatedAt *time.Time `ksql:"updated_at"`
 }

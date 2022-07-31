@@ -9,10 +9,12 @@ import (
 	"github.com/filipeandrade6/cooperagro-go/assets"
 
 	"github.com/filipeandrade6/cooperagro-go/cmd/api/middlewares"
+	"github.com/filipeandrade6/cooperagro-go/cmd/api/productsctrl"
 	"github.com/filipeandrade6/cooperagro-go/cmd/api/usersctrl"
 	"github.com/filipeandrade6/cooperagro-go/cmd/api/venuesctrl"
 
 	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro-go/domain/products"
 	"github.com/filipeandrade6/cooperagro-go/domain/users"
 	"github.com/filipeandrade6/cooperagro-go/domain/venues"
 
@@ -78,6 +80,22 @@ func main() {
 		})
 	}
 
+	var productsRepo repo.Products
+	productsRepo, err = pgrepo.NewProducts(ctx, dbURL)
+	if err != nil {
+		logger.Fatal(ctx, "unable to start database", log.Body{
+			"db_url": dbURL,
+			"error":  err.Error(),
+		})
+	}
+
+	productsService := products.NewService(
+		logger,
+		productsRepo,
+	)
+
+	productsController := productsctrl.NewController(productsService)
+
 	usersService := users.NewService(logger, usersRepo)
 
 	usersController := usersctrl.NewController(usersService)
@@ -96,6 +114,8 @@ func main() {
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
 	})
+
+	app.Get("/products/:id", productsController.GetProduct)
 
 	app.Post("/users", usersController.UpsertUser)
 	app.Get("/users/:id", usersController.GetUser)
