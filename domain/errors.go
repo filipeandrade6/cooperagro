@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/log"
+	"github.com/filipeandrade6/cooperagro/adapters/log"
 )
 
 type DomainErr struct {

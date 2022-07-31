@@ -11,7 +11,7 @@ package domain
 import (
 	"context"
 
-	"github.com/filipeandrade6/cooperagro-go/helpers/maps"
+	"github.com/filipeandrade6/cooperagro/helpers/maps"
 )
 
 // Declaring a unique private type for the ctx key

@@ -3,8 +3,8 @@ package productsctrl
 import (
 	"encoding/json"
 
-	"github.com/filipeandrade6/cooperagro-go/domain"
-	"github.com/filipeandrade6/cooperagro-go/domain/products"
+	"github.com/filipeandrade6/cooperagro/domain"
+	"github.com/filipeandrade6/cooperagro/domain/products"
 	"github.com/gofiber/fiber/v2"
 )
 

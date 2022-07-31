@@ -1,4 +1,4 @@
-module github.com/filipeandrade6/cooperagro-go
+module github.com/filipeandrade6/cooperagro
 
 go 1.18
 

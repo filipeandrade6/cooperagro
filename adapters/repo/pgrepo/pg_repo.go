@@ -3,8 +3,8 @@ package pgrepo
 import (
 	"context"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/log"
-	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro/adapters/log"
+	"github.com/filipeandrade6/cooperagro/domain"
 
 	"github.com/vingarcia/ksql"
 	"github.com/vingarcia/ksql/adapters/kpgx"

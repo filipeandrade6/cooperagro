@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 
-	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro/domain"
 )
 
 // Users represents the operations we use for

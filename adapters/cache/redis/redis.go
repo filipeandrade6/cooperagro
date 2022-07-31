@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro/domain"
 	redis "github.com/go-redis/redis/v8"
 )
 

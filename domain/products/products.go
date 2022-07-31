@@ -3,9 +3,9 @@ package products
 import (
 	"context"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/log"
-	"github.com/filipeandrade6/cooperagro-go/adapters/repo"
-	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro/adapters/log"
+	"github.com/filipeandrade6/cooperagro/adapters/repo"
+	"github.com/filipeandrade6/cooperagro/domain"
 )
 
 // Usually its here where the business logic complexity builds up,

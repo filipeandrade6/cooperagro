@@ -2,32 +2,25 @@ package main
 
 import (
 	"context"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/filipeandrade6/cooperagro-go/assets"
+	"github.com/filipeandrade6/cooperagro/assets"
 
-	"github.com/filipeandrade6/cooperagro-go/cmd/api/middlewares"
-	"github.com/filipeandrade6/cooperagro-go/cmd/api/productsctrl"
-	"github.com/filipeandrade6/cooperagro-go/cmd/api/usersctrl"
-	"github.com/filipeandrade6/cooperagro-go/cmd/api/venuesctrl"
+	"github.com/filipeandrade6/cooperagro/cmd/api/middlewares"
+	"github.com/filipeandrade6/cooperagro/cmd/api/productsctrl"
+	"github.com/filipeandrade6/cooperagro/cmd/api/usersctrl"
 
-	"github.com/filipeandrade6/cooperagro-go/domain"
-	"github.com/filipeandrade6/cooperagro-go/domain/products"
-	"github.com/filipeandrade6/cooperagro-go/domain/users"
-	"github.com/filipeandrade6/cooperagro-go/domain/venues"
+	"github.com/filipeandrade6/cooperagro/domain"
+	"github.com/filipeandrade6/cooperagro/domain/products"
+	"github.com/filipeandrade6/cooperagro/domain/users"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/cache"
-	"github.com/filipeandrade6/cooperagro-go/adapters/cache/memorycache"
-	"github.com/filipeandrade6/cooperagro-go/adapters/cache/redis"
-	"github.com/filipeandrade6/cooperagro-go/adapters/log"
-	"github.com/filipeandrade6/cooperagro-go/adapters/log/jsonlogs"
-	"github.com/filipeandrade6/cooperagro-go/adapters/rest/http"
-	"github.com/filipeandrade6/cooperagro-go/helpers/env"
+	"github.com/filipeandrade6/cooperagro/adapters/log"
+	"github.com/filipeandrade6/cooperagro/adapters/log/jsonlogs"
+	"github.com/filipeandrade6/cooperagro/helpers/env"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/repo"
-	"github.com/filipeandrade6/cooperagro-go/adapters/repo/pgrepo"
+	"github.com/filipeandrade6/cooperagro/adapters/repo"
+	"github.com/filipeandrade6/cooperagro/adapters/repo/pgrepo"
 
 	_ "github.com/lib/pq"
 )
@@ -39,37 +32,37 @@ func main() {
 	// Configuration
 	port := env.GetString("PORT", "80")
 	logLevel := env.GetString("LOG_LEVEL", "INFO")
-	foursquareBaseURL := env.MustGetString("FOURSQUARE_BASE_URL")
-	foursquareClientID := env.MustGetString("FOURSQUARE_CLIENT_ID")
-	foursquareSecret := env.MustGetString("FOURSQUARE_SECRET")
-	redisURL := env.GetString("REDIS_URL", "")
-	redisPassword := env.GetString("REDIS_PASSWORD", "")
+	// foursquareBaseURL := env.MustGetString("FOURSQUARE_BASE_URL")
+	// foursquareClientID := env.MustGetString("FOURSQUARE_CLIENT_ID")
+	// foursquareSecret := env.MustGetString("FOURSQUARE_SECRET")
+	// redisURL := env.GetString("REDIS_URL", "")
+	// redisPassword := env.GetString("REDIS_PASSWORD", "")
 	dbURL := env.MustGetString("DATABASE_URL")
 
 	// Dependency Injection goes here:
 	logger := jsonlogs.New(logLevel, domain.GetCtxValues)
 
-	restClient := http.New(30 * time.Second)
+	// restClient := http.New(30 * time.Second)
 
-	var cacheClient cache.Provider
-	if redisURL != "" {
-		cacheClient = redis.New(redisURL, redisPassword, 24*time.Hour)
-	} else {
-		cacheClient = memorycache.New(24*time.Hour, 10*time.Minute)
-	}
+	// var cacheClient cache.Provider
+	// if redisURL != "" {
+	// 	cacheClient = redis.New(redisURL, redisPassword, 24*time.Hour)
+	// } else {
+	// 	cacheClient = memorycache.New(24*time.Hour, 10*time.Minute)
+	// }
 
-	venuesService := venues.NewService(
-		logger,
-		restClient,
-		cacheClient,
-		foursquareBaseURL,
-		foursquareClientID,
-		foursquareSecret,
-	)
+	// venuesService := venues.NewService(
+	// 	logger,
+	// 	restClient,
+	// 	cacheClient,
+	// 	foursquareBaseURL,
+	// 	foursquareClientID,
+	// 	foursquareSecret,
+	// )
 
-	// The controllers handle HTTP stuff so the services can be kept as simple as possible
-	// only working on top of the domain language, i.e. types and interfaces from the domain package
-	venuesController := venuesctrl.NewController(venuesService)
+	// // The controllers handle HTTP stuff so the services can be kept as simple as possible
+	// // only working on top of the domain language, i.e. types and interfaces from the domain package
+	// venuesController := venuesctrl.NewController(venuesService)
 
 	var usersRepo repo.Users
 	usersRepo, err := pgrepo.New(ctx, dbURL)
@@ -120,8 +113,8 @@ func main() {
 	app.Post("/users", usersController.UpsertUser)
 	app.Get("/users/:id", usersController.GetUser)
 
-	app.Get("/venues/:latitude,:longitude", venuesController.GetVenuesByCoordinates)
-	app.Get("/venues/details/:id", venuesController.GetDetails)
+	// app.Get("/venues/:latitude,:longitude", venuesController.GetVenuesByCoordinates)
+	// app.Get("/venues/details/:id", venuesController.GetDetails)
 
 	// Just an example on how to serve html templates using the embed library
 	// and explicit arguments with a "builder function":

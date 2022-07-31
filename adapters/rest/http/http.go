@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/rest"
+	"github.com/filipeandrade6/cooperagro/adapters/rest"
 )
 
 // Client contains methods for making rest requests

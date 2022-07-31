@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/filipeandrade6/cooperagro-go/adapters/log"
-	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro/adapters/log"
+	"github.com/filipeandrade6/cooperagro/domain"
 	"github.com/gofiber/fiber/v2"
 )
 

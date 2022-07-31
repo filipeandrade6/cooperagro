@@ -3,8 +3,8 @@ package usersctrl
 import (
 	"encoding/json"
 
-	"github.com/filipeandrade6/cooperagro-go/domain"
-	"github.com/filipeandrade6/cooperagro-go/domain/users"
+	"github.com/filipeandrade6/cooperagro/domain"
+	"github.com/filipeandrade6/cooperagro/domain/users"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -31,9 +31,11 @@ func (c Controller) UpsertUser(ctx *fiber.Ctx) error {
 	// Intermediary structure so I don't expose my internal
 	// user representation to the outside world:
 	var user struct {
-		UserID int    `json:"user_id"`
-		Name   string `json:"name"`
-		Age    int    `json:"age"`
+		UserID    int    `json:"user_id"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Email     string `json:"email"`
+		Phone     string `json:"phone"`
 	}
 	err := json.Unmarshal(ctx.Body(), &user)
 	if err != nil {
@@ -46,9 +48,11 @@ func (c Controller) UpsertUser(ctx *fiber.Ctx) error {
 	userID, err := c.usersService.UpsertUser(ctx.Context(), domain.User{
 		// Showcasing that my internal model might differ from the API,
 		// in this case the internal name for the ID attribute is just ID not `UserID`:
-		ID:   user.UserID,
-		Name: user.Name,
-		Age:  user.Age,
+		ID:        user.UserID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Phone:     user.Phone,
 	})
 	if err != nil {
 		return err
@@ -76,8 +80,10 @@ func (c Controller) GetUser(ctx *fiber.Ctx) error {
 	// Again using intermediary structs (or a map) is useful for decoupling
 	// the internal entities from what is exposed on the web:
 	return ctx.JSON(map[string]interface{}{
-		"id":   userID,
-		"name": user.Name,
-		"age":  user.Age,
+		"id":         userID,
+		"first_name": user.FirstName,
+		"last_name":  user.LastName,
+		"email":      user.Email,
+		"phone":      user.Phone,
 	})
 }

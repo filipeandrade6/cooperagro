@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro/domain"
 	"github.com/vingarcia/ksql"
 )
 

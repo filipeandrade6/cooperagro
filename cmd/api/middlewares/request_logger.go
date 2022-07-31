@@ -3,7 +3,7 @@ package middlewares
 import (
 	"time"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/log"
+	"github.com/filipeandrade6/cooperagro/adapters/log"
 	"github.com/gofiber/fiber/v2"
 )
 

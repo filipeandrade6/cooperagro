@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro-go/adapters/log"
-	"github.com/filipeandrade6/cooperagro-go/helpers/maps"
+	"github.com/filipeandrade6/cooperagro/adapters/log"
+	"github.com/filipeandrade6/cooperagro/helpers/maps"
 )
 
 // Client is the logger client, to instantiate it call `New()`

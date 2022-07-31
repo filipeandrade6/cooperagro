@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/filipeandrade6/cooperagro-go/domain"
+	"github.com/filipeandrade6/cooperagro/domain"
 	"github.com/gofiber/fiber/v2"
 )
 
