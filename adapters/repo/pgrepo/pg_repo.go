@@ -48,3 +48,44 @@ func (u UsersRepo) GetUser(ctx context.Context, userID int) (domain.User, error)
 func (u UsersRepo) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
 	return getUserByEmail(ctx, u.db, email)
 }
+
+// ============================================================================
+// Meu
+
+type ProductsRepo struct {
+	db ksql.Provider
+}
+
+// NewProducts instantiates a new UsersRepo
+func NewProducts(ctx context.Context, postgresURL string) (ProductsRepo, error) {
+	db, err := kpgx.New(ctx, postgresURL, ksql.Config{})
+	if err != nil {
+		return ProductsRepo{}, domain.InternalErr("unable to start database", log.Body{
+			"error": err.Error(),
+		})
+	}
+
+	return ProductsRepo{
+		db: db,
+	}, nil
+}
+
+// ChangeProductName implements the repo.Products interface
+func (p ProductsRepo) ChangeProductName(ctx context.Context, productID int, newProductName string) error {
+	return changeProductName(ctx, p.db, productID, newProductName)
+}
+
+// UpsertProduct implements the repo.Products interface
+func (p ProductsRepo) UpsertProduct(ctx context.Context, product domain.Product) (productID int, _ error) {
+	return upsertProduct(ctx, p.db, product)
+}
+
+// GetProduct implements the repo.Products interface
+func (p ProductsRepo) GetProduct(ctx context.Context, productID int) (domain.Product, error) {
+	return getProduct(ctx, p.db, productID)
+}
+
+// GetProductByName implements the repo.Products interface
+func (p ProductsRepo) GetProductByName(ctx context.Context, email string) (domain.Product, error) {
+	return getProductByName(ctx, p.db, email)
+}

@@ -38,3 +38,25 @@ type User struct {
 	CreatedAt *time.Time `ksql:"created_at"`
 	UpdatedAt *time.Time `ksql:"updated_at"`
 }
+
+// ============================================================================
+// Meus
+
+type User2 struct {
+	ID        int
+	FirstName string
+	LastName  string
+	Email     string
+	Phone     string
+
+	CreatedAt *time.Time
+	UpdateAt  *time.Time
+}
+
+type Product struct {
+	ID   int
+	Name string
+
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+}

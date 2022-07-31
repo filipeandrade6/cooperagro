@@ -33,7 +33,8 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// Read all configs at once so its easy to spot all of them:
+	// ========================================================================
+	// Configuration
 	port := env.GetString("PORT", "80")
 	logLevel := env.GetString("LOG_LEVEL", "INFO")
 	foursquareBaseURL := env.MustGetString("FOURSQUARE_BASE_URL")
@@ -65,7 +66,7 @@ func main() {
 	)
 
 	// The controllers handle HTTP stuff so the services can be kept as simple as possible
-	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
+	// only working on top of the domain language, i.e. types and interfaces from the domain package
 	venuesController := venuesctrl.NewController(venuesService)
 
 	var usersRepo repo.Users

@@ -3,7 +3,6 @@ module github.com/filipeandrade6/cooperagro-go
 go 1.18
 
 require (
-	github.com/filipeandrade6/cooperativa-go v0.0.0-20220731141938-9fcb918ff155
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofiber/fiber/v2 v2.35.0
 	github.com/google/uuid v1.3.0
@@ -12,7 +11,6 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/vingarcia/ksql v1.4.8
 	github.com/vingarcia/ksql/adapters/kpgx v1.4.8
-	go.uber.org/zap v1.21.0
 )
 
 require (
@@ -35,8 +33,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.38.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	go.uber.org/atomic v1.7.0 // indirect
-	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/text v0.3.7 // indirect
