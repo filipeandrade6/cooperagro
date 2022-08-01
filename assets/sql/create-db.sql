@@ -1,3 +1,10 @@
+INSERT INTO funcoes_usuarios (funcao) VALUES ('administrador');
+
+INSERT INTO usuarios (funcao_usuario_id, primeiro_nome, ultimo_nome, email, telefone, endereco, latitude, longitude, criado_em, atualizado_em)
+VALUES (1, 'filipe', 'andrade', 'filipe@email.com', '5511555554444', 'rua tal conjunto tal', -12.123123, -13.234234, now(), now());
+
+-- ----------------------------------------------------------
+
 CREATE TABLE unidades_de_medida (
 	id SERIAL PRIMARY KEY,
 	tipo VARCHAR(20) NOT NULL
@@ -15,9 +22,10 @@ CREATE TABLE produtos (
 	nome VARCHAR(30) NOT NULL,
 	criado_em TIMESTAMP NOT NULL,
 	atualizado_em TIMESTAMP NOT NULL,
-
-	FOREIGN KEY (produto_base_id) REFERENCES produtos_base(id),
-	FOREIGN KEY (unidade_de_medida_id) REFERENCES unidades_de_medida(id)
+	produto_base_id INTEGER NOT NULL,
+	unidade_de_medida_id INTEGER NOT NULL,
+	CONSTRAINT produto_base_id FOREIGN KEY (produto_base_id) REFERENCES produtos_base(id),
+	CONSTRAINT unidade_de_medida_id FOREIGN KEY (unidade_de_medida_id) REFERENCES unidades_de_medida(id)
 );
 
 CREATE TABLE funcoes_usuarios (
@@ -34,16 +42,15 @@ CREATE TABLE usuarios (
 	endereco VARCHAR(100),
 	latitude DECIMAL(8,6),
 	longitude DECIMAL(9,6),
-
 	criado_em TIMESTAMP NOT NULL,
 	atualizado_em TIMESTAMP NOT NULL,
-
-	FOREIGN KEY (funcao_usuario_id) REFERENCES funcoes_usuarios(id)
+	funcao_usuario_id INT NOT NULL,
+	CONSTRAINT funcao_usuario_id FOREIGN KEY (funcao_usuario_id) REFERENCES funcoes_usuarios(id)
 );
 
 CREATE TABLE inventario (
 	id SERIAL PRIMARY KEY,
 	quantidade INTEGER NOT NULL,
-
-	FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+	usuario_id INTEGER NOT NULL,
+	CONSTRAINT usuario_id FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
