@@ -57,6 +57,11 @@ func (r Repo) GetUserByEmail(ctx context.Context, email string) (domain.User, er
 // ============================================================================
 // Product
 
+// ChangeProductName implements the repo.Users interface
+func (r Repo) ChangeProductName(ctx context.Context, userID int, newProductName string) error {
+	return changeProductName(ctx, r.db, userID, newProductName)
+}
+
 // UpsertProduct implements the repo.Users interface
 func (r Repo) UpsertProduct(ctx context.Context, product domain.Product) (userID int, _ error) {
 	return upsertProduct(ctx, r.db, product)
@@ -75,17 +80,22 @@ func (r Repo) GetProductByName(ctx context.Context, name string) (domain.Product
 // ============================================================================
 // Base product
 
-// UpsertUser implements the repo.Users interface
+// ChangeBaseProductName implements the repo.Users interface
+func (r Repo) ChangeBaseProductName(ctx context.Context, userID int, newBaseProductName string) error {
+	return changeBaseProductName(ctx, r.db, userID, newBaseProductName)
+}
+
+// UpsertBaseProduct implements the repo.Users interface
 func (r Repo) UpsertBaseProduct(ctx context.Context, baseProduct domain.BaseProduct) (baseProductID int, _ error) {
 	return upsertBaseProduct(ctx, r.db, baseProduct)
 }
 
-// GetUserByID implements the repo.Users interface
+// GetBaseProductByID implements the repo.Users interface
 func (r Repo) GetBaseProductByID(ctx context.Context, userID int) (domain.BaseProduct, error) {
 	return getBaseProductByID(ctx, r.db, userID)
 }
 
-// GetUserByEmail implements the repo.Users interface
+// GetBaseProductByName implements the repo.Users interface
 func (r Repo) GetBaseProductByName(ctx context.Context, name string) (domain.BaseProduct, error) {
 	return getBaseProductByName(ctx, r.db, name)
 }
@@ -93,17 +103,22 @@ func (r Repo) GetBaseProductByName(ctx context.Context, name string) (domain.Bas
 // ============================================================================
 // Role
 
-// UpsertUser implements the repo.Users interface
+// ChangeRoleName implements the repo.Users interface
+func (r Repo) ChangeRoleName(ctx context.Context, userID int, newRoleName string) error {
+	return changeRoleName(ctx, r.db, userID, newRoleName)
+}
+
+// UpsertRole implements the repo.Users interface
 func (r Repo) UpsertRole(ctx context.Context, role domain.Role) (roleID int, _ error) {
 	return upsertRole(ctx, r.db, role)
 }
 
-// GetUserByID implements the repo.Users interface
+// GetRoleByID implements the repo.Users interface
 func (r Repo) GetRoleByID(ctx context.Context, roleID int) (domain.Role, error) {
 	return getRoleByID(ctx, r.db, roleID)
 }
 
-// GetUserByEmail implements the repo.Users interface
+// GetRoleByName implements the repo.Users interface
 func (r Repo) GetRoleByName(ctx context.Context, name string) (domain.Role, error) {
 	return getRoleByName(ctx, r.db, name)
 }
@@ -111,17 +126,22 @@ func (r Repo) GetRoleByName(ctx context.Context, name string) (domain.Role, erro
 // ============================================================================
 // Unit of measure
 
-// UpsertUser implements the repo.Users interface
+// ChangeUnitOfMeasureName implements the repo.Users interface
+func (r Repo) ChangeUnitOfMeasureName(ctx context.Context, userID int, newUnitOfMeasureName string) error {
+	return changeUnitOfMeasureName(ctx, r.db, userID, newUnitOfMeasureName)
+}
+
+// UpsertUnitOfMeasure implements the repo.Users interface
 func (r Repo) UpsertUnitOfMeasure(ctx context.Context, unitOfMeasure domain.UnitOfMeasure) (unitOfMeasureID int, _ error) {
 	return upsertUnitOfMeasure(ctx, r.db, unitOfMeasure)
 }
 
-// GetUserByID implements the repo.Users interface
+// GetUnitOfMeasureByID implements the repo.Users interface
 func (r Repo) GetUnitOfMeasureByID(ctx context.Context, unitOfMeasureID int) (domain.UnitOfMeasure, error) {
 	return getUnitOfMeasureByID(ctx, r.db, unitOfMeasureID)
 }
 
-// GetUserByEmail implements the repo.Users interface
+// GetUnitOfMeasureByName implements the repo.Users interface
 func (r Repo) GetUnitOfMeasureByName(ctx context.Context, name string) (domain.UnitOfMeasure, error) {
 	return getUnitOfMeasureByName(ctx, r.db, name)
 }
