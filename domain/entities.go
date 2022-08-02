@@ -2,42 +2,42 @@ package domain
 
 import "time"
 
-type UnidadeDeMedida struct {
+type UnitOfMeasure struct {
 	ID   int
-	Tipo string
+	Name string
 }
 
-type ProdutoBase struct {
-	ID           int
-	Nome         string
-	CriadoEm     *time.Time
-	AtualizadoEm *time.Time
+type BaseProduct struct {
+	ID        int
+	Name      string
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 }
 
-type Produto struct {
-	ID                int
-	Nome              string
-	ProdutoBaseID     int
-	UnidadeDeMedidaID int
-	CriadoEm          *time.Time
-	AtualizadoEm      *time.Time
-}
-
-type FuncaoUsuario struct {
-	ID     int
-	Funcao string
-}
-
-type Usuario struct {
+type Product struct {
 	ID              int
-	PrimeiroNome    string
-	UltimoNome      string
-	Email           string
-	Telefone        string
-	Endereco        string
-	Latitude        float32
-	Longitude       float32
-	FuncaoUsuarioID int
-	CriadoEm        *time.Time
-	AtualizadoEm    *time.Time
+	Name            string
+	BaseProductID   int
+	UnitOfMeasureID int
+	CreatedAt       *time.Time
+	UpdatedAt       *time.Time
+}
+
+type Role struct {
+	ID   int
+	Role string
+}
+
+type User struct {
+	ID        int
+	FirstName string
+	LastName  string
+	Email     string
+	Phone     string
+	Address   string
+	Latitude  float32
+	Longitude float32
+	RoleID    int
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 }
