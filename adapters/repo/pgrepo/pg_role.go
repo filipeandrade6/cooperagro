@@ -10,7 +10,7 @@ import (
 
 func changeRoleName(ctx context.Context, db ksql.Provider, roleID int, newRoleName string) error {
 	return db.Transaction(ctx, func(db ksql.Provider) error {
-		role, err := getRole(ctx, db, roleID)
+		role, err := getRoleByID(ctx, db, roleID)
 		if err != nil {
 			return err
 		}
@@ -51,38 +51,38 @@ func upsertRole(ctx context.Context, db ksql.Provider, role domain.Role) (roleID
 	return roleID, nil
 }
 
-func getRole(ctx context.Context, db ksql.Provider, RoleID int) (domain.Role, error) {
-	var Role domain.Role
-	err := db.QueryOne(ctx, &Role, "FROM Roles WHERE id = $1", RoleID)
+func getRoleByID(ctx context.Context, db ksql.Provider, roleID int) (domain.Role, error) {
+	var role domain.Role
+	err := db.QueryOne(ctx, &role, "FROM roles WHERE id = $1", roleID)
 	if err == ksql.ErrRecordNotFound {
-		return domain.Role{}, domain.NotFoundErr("no Role found with provided id", map[string]interface{}{
-			"Role_id": RoleID,
+		return domain.Role{}, domain.NotFoundErr("no role found with provided id", map[string]interface{}{
+			"role_id": roleID,
 		})
 	}
 	if err != nil {
-		return domain.Role{}, domain.InternalErr("unexpected error when fetching Role", map[string]interface{}{
-			"Role_id": RoleID,
+		return domain.Role{}, domain.InternalErr("unexpected error when fetching role", map[string]interface{}{
+			"role_id": roleID,
 			"error":   err.Error(),
 		})
 	}
 
-	return Role, nil
+	return role, nil
 }
 
 func getRoleByName(ctx context.Context, db ksql.Provider, name string) (domain.Role, error) {
-	var Role domain.Role
-	err := db.QueryOne(ctx, &Role, "FROM Roles WHERE name = $1", name)
+	var role domain.Role
+	err := db.QueryOne(ctx, &role, "FROM roles WHERE name = $1", name)
 	if err == ksql.ErrRecordNotFound {
-		return domain.Role{}, domain.NotFoundErr("no Role found with provided name", map[string]interface{}{
+		return domain.Role{}, domain.NotFoundErr("no role found with provided name", map[string]interface{}{
 			"name": name,
 		})
 	}
 	if err != nil {
-		return domain.Role{}, domain.InternalErr("unexpected error when fetching Role by name", map[string]interface{}{
+		return domain.Role{}, domain.InternalErr("unexpected error when fetching role by name", map[string]interface{}{
 			"name":  name,
 			"error": err.Error(),
 		})
 	}
 
-	return Role, nil
+	return role, nil
 }
