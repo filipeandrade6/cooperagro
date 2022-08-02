@@ -57,7 +57,7 @@ func upsertProduct(ctx context.Context, db ksql.Provider, product domain.Product
 
 func getProduct(ctx context.Context, db ksql.Provider, productID int) (domain.Product, error) {
 	var product domain.Product
-	err := db.QueryOne(ctx, &product, "FROM products WHERE id =$1", productID)
+	err := db.QueryOne(ctx, &product, "FROM products WHERE id = $1", productID)
 	if err == ksql.ErrRecordNotFound {
 		return domain.Product{}, domain.NotFoundErr("no product found with provided id", map[string]interface{}{
 			"product_id": productID,
