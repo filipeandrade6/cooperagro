@@ -22,7 +22,7 @@ import (
 // to decide whether they will be used inside a transaction or not when we call them.
 func changeUserEmail(ctx context.Context, db ksql.Provider, userID int, newEmail string) error {
 	return db.Transaction(ctx, func(db ksql.Provider) error {
-		user, err := getUser(ctx, db, userID)
+		user, err := getUserByID(ctx, db, userID)
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func upsertUser(ctx context.Context, db ksql.Provider, user domain.User) (userID
 	return user.ID, nil
 }
 
-func getUser(ctx context.Context, db ksql.Provider, userID int) (domain.User, error) {
+func getUserByID(ctx context.Context, db ksql.Provider, userID int) (domain.User, error) {
 	var user domain.User
 	err := db.QueryOne(ctx, &user, "FROM users WHERE id = $1", userID)
 	if err == ksql.ErrRecordNotFound {

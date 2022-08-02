@@ -10,82 +10,118 @@ import (
 	"github.com/vingarcia/ksql/adapters/kpgx"
 )
 
-// UsersRepo implements the repo.Users interface by using the ksql database.
-type UsersRepo struct {
+// Repo implements the repo interface by using the ksql database.
+type Repo struct {
 	db ksql.Provider
 }
 
-// New instantiates a new UsersRepo
-func New(ctx context.Context, postgresURL string) (UsersRepo, error) {
+// New instantiates a new Repo
+func New(ctx context.Context, postgresURL string) (Repo, error) {
 	db, err := kpgx.New(ctx, postgresURL, ksql.Config{})
 	if err != nil {
-		return UsersRepo{}, domain.InternalErr("unable to start database", log.Body{
+		return Repo{}, domain.InternalErr("unable to start database", log.Body{
 			"error": err.Error(),
 		})
 	}
 
-	return UsersRepo{
+	return Repo{
 		db: db,
 	}, nil
 }
 
+// TODO arrumar a documentação
+
+// ============================================================================
+// User
+
 // ChangeUserEmail implements the repo.Users interface
-func (u UsersRepo) ChangeUserEmail(ctx context.Context, userID int, newEmail string) error {
-	return changeUserEmail(ctx, u.db, userID, newEmail)
+func (r Repo) ChangeUserEmail(ctx context.Context, userID int, newEmail string) error {
+	return changeUserEmail(ctx, r.db, userID, newEmail)
 }
 
 // UpsertUser implements the repo.Users interface
-func (u UsersRepo) UpsertUser(ctx context.Context, user domain.User) (userID int, _ error) {
-	return upsertUser(ctx, u.db, user)
+func (r Repo) UpsertUser(ctx context.Context, user domain.User) (userID int, _ error) {
+	return upsertUser(ctx, r.db, user)
 }
 
-// GetUser implements the repo.Users interface
-func (u UsersRepo) GetUser(ctx context.Context, userID int) (domain.User, error) {
-	return getUser(ctx, u.db, userID)
+// GetUserByID implements the repo.Users interface
+func (r Repo) GetUserByID(ctx context.Context, userID int) (domain.User, error) {
+	return getUserByID(ctx, r.db, userID)
 }
 
 // GetUserByEmail implements the repo.Users interface
-func (u UsersRepo) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
-	return getUserByEmail(ctx, u.db, email)
+func (r Repo) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
+	return getUserByEmail(ctx, r.db, email)
 }
 
 // ============================================================================
-// Meu
+// Product
 
-type ProductsRepo struct {
-	db ksql.Provider
+// UpsertProduct implements the repo.Users interface
+func (r Repo) UpsertProduct(ctx context.Context, product domain.Product) (userID int, _ error) {
+	return upsertProduct(ctx, r.db, product)
 }
 
-// NewProducts instantiates a new ProductsRepo
-func NewProducts(ctx context.Context, postgresURL string) (ProductsRepo, error) {
-	db, err := kpgx.New(ctx, postgresURL, ksql.Config{})
-	if err != nil {
-		return ProductsRepo{}, domain.InternalErr("unable to start database", log.Body{
-			"error": err.Error(),
-		})
-	}
-
-	return ProductsRepo{
-		db: db,
-	}, nil
+// GetProductByID implements the repo.Users interface
+func (r Repo) GetProductByID(ctx context.Context, productID int) (domain.Product, error) {
+	return getProductByID(ctx, r.db, productID)
 }
 
-// ChangeProductName implements the repo.Products interface
-func (p ProductsRepo) ChangeProductName(ctx context.Context, productID int, newProductName string) error {
-	return changeProductName(ctx, p.db, productID, newProductName)
+// GetProductByName implements the repo.Users interface
+func (r Repo) GetProductByName(ctx context.Context, name string) (domain.Product, error) {
+	return getProductByName(ctx, r.db, name)
 }
 
-// UpsertProduct implements the repo.Products interface
-func (p ProductsRepo) UpsertProduct(ctx context.Context, product domain.Product) (productID int, _ error) {
-	return upsertProduct(ctx, p.db, product)
+// ============================================================================
+// Base product
+
+// UpsertUser implements the repo.Users interface
+func (r Repo) UpsertBaseProduct(ctx context.Context, baseProduct domain.BaseProduct) (baseProductID int, _ error) {
+	return upsertBaseProduct(ctx, r.db, baseProduct)
 }
 
-// GetProduct implements the repo.Products interface
-func (p ProductsRepo) GetProduct(ctx context.Context, productID int) (domain.Product, error) {
-	return getProduct(ctx, p.db, productID)
+// GetUserByID implements the repo.Users interface
+func (r Repo) GetBaseProductByID(ctx context.Context, userID int) (domain.BaseProduct, error) {
+	return getBaseProductByID(ctx, r.db, userID)
 }
 
-// GetProductByName implements the repo.Products interface
-func (p ProductsRepo) GetProductByName(ctx context.Context, email string) (domain.Product, error) {
-	return getProductByName(ctx, p.db, email)
+// GetUserByEmail implements the repo.Users interface
+func (r Repo) GetBaseProductByName(ctx context.Context, name string) (domain.BaseProduct, error) {
+	return getBaseProductByName(ctx, r.db, name)
+}
+
+// ============================================================================
+// Role
+
+// UpsertUser implements the repo.Users interface
+func (r Repo) UpsertRole(ctx context.Context, role domain.Role) (roleID int, _ error) {
+	return upsertRole(ctx, r.db, role)
+}
+
+// GetUserByID implements the repo.Users interface
+func (r Repo) GetRoleByID(ctx context.Context, roleID int) (domain.Role, error) {
+	return getRoleByID(ctx, r.db, roleID)
+}
+
+// GetUserByEmail implements the repo.Users interface
+func (r Repo) GetRoleByName(ctx context.Context, name string) (domain.Role, error) {
+	return getRoleByName(ctx, r.db, name)
+}
+
+// ============================================================================
+// Unit of measure
+
+// UpsertUser implements the repo.Users interface
+func (r Repo) UpsertUnitOfMeasure(ctx context.Context, unitOfMeasure domain.UnitOfMeasure) (unitOfMeasureID int, _ error) {
+	return upsertUnitOfMeasure(ctx, r.db, unitOfMeasure)
+}
+
+// GetUserByID implements the repo.Users interface
+func (r Repo) GetUnitOfMeasureByID(ctx context.Context, unitOfMeasureID int) (domain.UnitOfMeasure, error) {
+	return getUnitOfMeasureByID(ctx, r.db, unitOfMeasureID)
+}
+
+// GetUserByEmail implements the repo.Users interface
+func (r Repo) GetUnitOfMeasureByName(ctx context.Context, name string) (domain.UnitOfMeasure, error) {
+	return getUnitOfMeasureByName(ctx, r.db, name)
 }

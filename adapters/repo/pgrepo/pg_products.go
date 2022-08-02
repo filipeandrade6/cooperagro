@@ -11,7 +11,7 @@ import (
 
 func changeProductName(ctx context.Context, db ksql.Provider, productID int, newProductName string) error {
 	return db.Transaction(ctx, func(db ksql.Provider) error {
-		product, err := getProduct(ctx, db, productID)
+		product, err := getProductByID(ctx, db, productID)
 		if err != nil {
 			return err
 		}
@@ -55,7 +55,7 @@ func upsertProduct(ctx context.Context, db ksql.Provider, product domain.Product
 	return productID, nil
 }
 
-func getProduct(ctx context.Context, db ksql.Provider, productID int) (domain.Product, error) {
+func getProductByID(ctx context.Context, db ksql.Provider, productID int) (domain.Product, error) {
 	var product domain.Product
 	err := db.QueryOne(ctx, &product, "FROM products WHERE id = $1", productID)
 	if err == ksql.ErrRecordNotFound {
