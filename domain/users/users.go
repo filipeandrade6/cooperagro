@@ -41,7 +41,7 @@ func (s Service) UpsertUser(ctx context.Context, user domain.User) (userID int, 
 }
 
 func (s Service) GetUser(ctx context.Context, userID int) (domain.User, error) {
-	user, err := s.usersRepo.GetUser(ctx, userID)
+	user, err := s.usersRepo.GetUserByID(ctx, userID)
 	if err != nil {
 		return domain.User{}, err
 	}

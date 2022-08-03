@@ -64,8 +64,8 @@ func main() {
 	// // only working on top of the domain language, i.e. types and interfaces from the domain package
 	// venuesController := venuesctrl.NewController(venuesService)
 
-	var usersRepo repo.Users
-	usersRepo, err := pgrepo.New(ctx, dbURL)
+	var repository repo.Repo
+	repository, err := pgrepo.New(ctx, dbURL)
 	if err != nil {
 		logger.Fatal(ctx, "unable to start database", log.Body{
 			"db_url": dbURL,
@@ -73,25 +73,11 @@ func main() {
 		})
 	}
 
-	var productsRepo repo.Products
-	productsRepo, err = pgrepo.NewProducts(ctx, dbURL)
-	if err != nil {
-		logger.Fatal(ctx, "unable to start database", log.Body{
-			"db_url": dbURL,
-			"error":  err.Error(),
-		})
-	}
-
-	productsService := products.NewService(
-		logger,
-		productsRepo,
-	)
-
-	productsController := productsctrl.NewController(productsService)
-
-	usersService := users.NewService(logger, usersRepo)
-
+	usersService := users.NewService(logger, repository)
 	usersController := usersctrl.NewController(usersService)
+
+	productsService := products.NewService(logger, repository)
+	productsController := productsctrl.NewController(productsService)
 
 	// Any framework you need for serving HTTP or GRPC goes in the main package,
 	//

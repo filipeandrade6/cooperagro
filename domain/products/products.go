@@ -42,7 +42,7 @@ func (s Service) UpsertProduct(ctx context.Context, product domain.Product) (pro
 }
 
 func (s Service) GetProduct(ctx context.Context, productID int) (domain.Product, error) {
-	product, err := s.productsRepo.GetProduct(ctx, productID)
+	product, err := s.productsRepo.GetProductByID(ctx, productID)
 	if err != nil {
 		return domain.Product{}, err
 	}
