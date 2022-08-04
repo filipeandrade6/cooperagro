@@ -23,13 +23,30 @@ type UserRepo interface {
 }
 
 type InventoryInteractor struct {
-	ProducerRepository      domain.Producer
-	BuyerRepository         domain.Buyer
-	BaseProductRepository   domain.BaseProduct
-	ProductRepository       domain.Product
-	UnitOfMeasureRepository domain.UnitOfMeasure
-	InventoryRepository     domain.Inventory
+	UserRepo          UserRepo
+	BaseProductRepo   domain.BaseProductRepo
+	ProductRepo       domain.ProductRepo
+	UnitOfMeasureRepo domain.UnitOfMeasureRepo
+	InventoryRepo     domain.InventoryRepo
 	// TODO logger
 }
 
-func(i *InventoryInteractor)
+func (i InventoryInteractor) Create(userID, productID, unitOfMeasereID, quantity int) (int, error) {
+	return 0, nil
+}
+
+func (i InventoryInteractor) Read(inventoryID int) (domain.Inventory, error) {
+	return domain.Inventory{}, nil
+}
+
+func (i InventoryInteractor) Update(userID int, inventory domain.Inventory) error {
+	return nil
+}
+
+func (i InventoryInteractor) Delete(inventoryID int) error {
+	return nil
+}
+
+type ManagerInventoryInteractor struct {
+	InventoryInteractor InventoryInteractor
+}
