@@ -5,15 +5,15 @@ import (
 )
 
 type Reader interface {
-	GetByID(id entities.ID) (*entities.UnitOfMeasure, error)
-	Search(query string) ([]*entities.UnitOfMeasure, error)
-	List() ([]*entities.UnitOfMeasure, error)
+	GetUnitOfMeasureByID(id entities.ID) (*entities.UnitOfMeasure, error)
+	SearchUnitOfMeasure(query string) ([]*entities.UnitOfMeasure, error)
+	ListUnitOfMeasure() ([]*entities.UnitOfMeasure, error)
 }
 
 type Writer interface {
-	Create(e *entities.UnitOfMeasure) (entities.ID, error)
-	Update(e *entities.UnitOfMeasure) error
-	Delete(id entities.ID) error
+	CreateUnitOfMeasure(e *entities.UnitOfMeasure) (entities.ID, error)
+	UpdateUnitOfMeasure(e *entities.UnitOfMeasure) error
+	DeleteUnitOfMeasure(id entities.ID) error
 }
 
 type Repository struct {

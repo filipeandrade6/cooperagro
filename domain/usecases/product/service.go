@@ -18,7 +18,7 @@ func NewService(r Repository) *Service {
 }
 
 func (s *Service) GetByID(id entities.ID) (*entities.Product, error) {
-	p, err := s.repo.GetByID(id)
+	p, err := s.repo.GetProductByID(id)
 	if p == nil {
 		return nil, entities.ErrNotFound
 	}
@@ -30,7 +30,7 @@ func (s *Service) GetByID(id entities.ID) (*entities.Product, error) {
 }
 
 func (s *Service) Search(query string) ([]*entities.Product, error) {
-	products, err := s.repo.Search(strings.ToLower(query))
+	products, err := s.repo.SearchProduct(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (s *Service) Search(query string) ([]*entities.Product, error) {
 }
 
 func (s *Service) List() ([]*entities.Product, error) {
-	products, err := s.repo.List()
+	products, err := s.repo.ListProduct()
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s *Service) Create(name string, baseProduct entities.ID) (entities.ID, err
 		return entities.NewID(), err
 	}
 
-	return s.repo.Create(p)
+	return s.repo.CreateProduct(p)
 }
 
 func (s *Service) Update(e *entities.Product) error {
@@ -69,7 +69,7 @@ func (s *Service) Update(e *entities.Product) error {
 
 	e.UpdatedAt = time.Now()
 
-	return s.repo.Update(e)
+	return s.repo.UpdateProduct(e)
 }
 
 func (s *Service) Delete(id entities.ID) error {
@@ -77,5 +77,5 @@ func (s *Service) Delete(id entities.ID) error {
 		return err
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.DeleteProduct(id)
 }

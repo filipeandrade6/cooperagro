@@ -18,7 +18,7 @@ func NewService(r Repository) *Service {
 }
 
 func (s *Service) GetByID(id entities.ID) (*entities.Inventory, error) {
-	i, err := s.repo.GetByID(id)
+	i, err := s.repo.GetInventoryByID(id)
 	if i == nil {
 		return nil, entities.ErrNotFound
 	}
@@ -30,7 +30,7 @@ func (s *Service) GetByID(id entities.ID) (*entities.Inventory, error) {
 }
 
 func (s *Service) Search(query string) ([]*entities.Inventory, error) {
-	inventories, err := s.repo.Search(strings.ToLower(query))
+	inventories, err := s.repo.SearchInventory(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (s *Service) Search(query string) ([]*entities.Inventory, error) {
 }
 
 func (s *Service) List() ([]*entities.Inventory, error) {
-	inventories, err := s.repo.List()
+	inventories, err := s.repo.ListInventory()
 	if err != nil {
 		return nil, err
 	}
@@ -65,13 +65,13 @@ func (s *Service) Create(
 		quantity,
 		unitOfMeasureID,
 	)
-	return s.repo.Create(i)
+	return s.repo.CreateInventory(i)
 }
 
 func (s *Service) Update(e *entities.Inventory) error {
 	e.UpdatedAt = time.Now()
 
-	return s.repo.Update(e)
+	return s.repo.UpdateInventory(e)
 }
 
 func (s *Service) Delete(id entities.ID) error {
@@ -79,5 +79,5 @@ func (s *Service) Delete(id entities.ID) error {
 		return err
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.DeleteInventory(id)
 }

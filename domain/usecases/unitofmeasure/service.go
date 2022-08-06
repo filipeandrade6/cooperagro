@@ -18,7 +18,7 @@ func NewService(r Repository) *Service {
 }
 
 func (s *Service) GetByID(id entities.ID) (*entities.UnitOfMeasure, error) {
-	u, err := s.repo.GetByID(id)
+	u, err := s.repo.GetUnitOfMeasureByID(id)
 	if u == nil {
 		return nil, entities.ErrNotFound
 	}
@@ -30,7 +30,7 @@ func (s *Service) GetByID(id entities.ID) (*entities.UnitOfMeasure, error) {
 }
 
 func (s *Service) Search(query string) ([]*entities.UnitOfMeasure, error) {
-	unitsOfMeasure, err := s.repo.Search(strings.ToLower(query))
+	unitsOfMeasure, err := s.repo.SearchUnitOfMeasure(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (s *Service) Search(query string) ([]*entities.UnitOfMeasure, error) {
 }
 
 func (s *Service) List() ([]*entities.UnitOfMeasure, error) {
-	unitsOfMeasure, err := s.repo.List()
+	unitsOfMeasure, err := s.repo.ListUnitOfMeasure()
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s *Service) Create(name string) (entities.ID, error) {
 		return entities.NewID(), err
 	}
 
-	return s.repo.Create(u)
+	return s.repo.CreateUnitOfMeasure(u)
 }
 
 func (s *Service) Update(e *entities.UnitOfMeasure) error {
@@ -69,7 +69,7 @@ func (s *Service) Update(e *entities.UnitOfMeasure) error {
 
 	e.UpdatedAt = time.Now()
 
-	return s.repo.Update(e)
+	return s.repo.UpdateUnitOfMeasure(e)
 }
 
 func (s *Service) Delete(id entities.ID) error {
@@ -77,5 +77,5 @@ func (s *Service) Delete(id entities.ID) error {
 		return err
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.DeleteUnitOfMeasure(id)
 }

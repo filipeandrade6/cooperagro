@@ -5,15 +5,15 @@ import (
 )
 
 type Reader interface {
-	GetByID(id entities.ID) (*entities.BaseProduct, error)
-	Search(query string) ([]*entities.BaseProduct, error)
-	List() ([]*entities.BaseProduct, error)
+	GetBaseProductByID(id entities.ID) (*entities.BaseProduct, error)
+	SearchBaseProduct(query string) ([]*entities.BaseProduct, error)
+	ListBaseProduct() ([]*entities.BaseProduct, error)
 }
 
 type Writer interface {
-	Create(e *entities.BaseProduct) (entities.ID, error)
-	Update(e *entities.BaseProduct) error
-	Delete(id entities.ID) error
+	CreateBaseProduct(e *entities.BaseProduct) (entities.ID, error)
+	UpdateBaseProduct(e *entities.BaseProduct) error
+	DeleteBaseProduct(id entities.ID) error
 }
 
 type Repository struct {
