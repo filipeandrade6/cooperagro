@@ -1,6 +1,6 @@
 package customer
 
-import "github.com/filipeandrade6/cooperagro/src/domain/entities"
+import "github.com/filipeandrade6/cooperagro/domain/entities"
 
 type Reader interface {
 	GetByID(id entities.ID) (*entities.Customer, error)

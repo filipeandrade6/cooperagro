@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro/src/domain/entities"
+	"github.com/filipeandrade6/cooperagro/domain/entities"
 )
 
 type Service struct {

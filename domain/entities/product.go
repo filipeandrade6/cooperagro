@@ -7,7 +7,7 @@ import (
 type Product struct {
 	ID          ID
 	Name        string
-	BaseProduct ID
+	BaseProduct ID // TODO utilizar BaseProductID?
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

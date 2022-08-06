@@ -1,6 +1,6 @@
 package inventory
 
-import "github.com/filipeandrade6/cooperagro/src/domain/entities"
+import "github.com/filipeandrade6/cooperagro/domain/entities"
 
 // TODO porquer duas interfaces e pq interface Reader e Writer separada?
 

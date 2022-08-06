@@ -1,7 +1,7 @@
 package baseproduct
 
 import (
-	"github.com/filipeandrade6/cooperagro/src/domain/entities"
+	"github.com/filipeandrade6/cooperagro/domain/entities"
 )
 
 type Reader interface {
