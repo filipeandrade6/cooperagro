@@ -7,10 +7,10 @@ type Customer struct {
 	FirstName string
 	LastName  string
 	Address   string
-	Latitude  float32
-	Longitude float32
 	Phone     string
 	Email     string
+	Latitude  float32
+	Longitude float32
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -18,21 +18,21 @@ type Customer struct {
 func NewCustomer(
 	firstName,
 	lastName,
-	address string,
-	latitude,
-	longitude float32,
+	address,
 	phone,
 	email string,
+	latitude,
+	longitude float32,
 ) (*Customer, error) {
 	c := &Customer{
 		ID:        NewID(),
 		FirstName: firstName,
 		LastName:  lastName,
 		Address:   address,
-		Latitude:  latitude,
-		Longitude: longitude,
 		Phone:     phone,
 		Email:     email,
+		Latitude:  latitude,
+		Longitude: longitude,
 		CreatedAt: time.Now(),
 	}
 
@@ -44,21 +44,21 @@ func NewCustomer(
 	return c, nil
 }
 
-func (p *Customer) Validate() error {
+func (c *Customer) Validate() error {
 	switch {
-	case p.FirstName == "":
+	case c.FirstName == "":
 		fallthrough
-	case p.LastName == "":
+	case c.LastName == "":
 		fallthrough
-	case p.Address == "":
+	case c.Address == "":
 		fallthrough
-	case p.Latitude == 0.0:
+	case c.Phone == "":
 		fallthrough
-	case p.Longitude == 0.0:
+	case c.Email == "": // TODO validar e-mail
 		fallthrough
-	case p.Phone == "":
+	case c.Latitude == 0.0:
 		fallthrough
-	case p.Email == "": // TODO validar e-mail
+	case c.Longitude == 0.0:
 		return ErrInvalidEntity
 	}
 

@@ -1,4 +1,4 @@
-package product
+package unitofmeasure
 
 import (
 	"strings"
@@ -17,52 +17,52 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetByID(id entities.ID) (*entities.Product, error) {
-	p, err := s.repo.GetByID(id)
-	if p == nil {
+func (s *Service) GetByID(id entities.ID) (*entities.UnitOfMeasure, error) {
+	u, err := s.repo.GetByID(id)
+	if u == nil {
 		return nil, entities.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return p, nil
+	return u, nil
 }
 
-func (s *Service) Search(query string) ([]*entities.Product, error) {
-	products, err := s.repo.Search(strings.ToLower(query))
+func (s *Service) Search(query string) ([]*entities.UnitOfMeasure, error) {
+	unitsOfMeasure, err := s.repo.Search(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
-	if len(products) == 0 {
+	if len(unitsOfMeasure) == 0 {
 		return nil, entities.ErrNotFound
 	}
 
-	return products, nil
+	return unitsOfMeasure, nil
 }
 
-func (s *Service) List() ([]*entities.Product, error) {
-	products, err := s.repo.List()
+func (s *Service) List() ([]*entities.UnitOfMeasure, error) {
+	unitsOfMeasure, err := s.repo.List()
 	if err != nil {
 		return nil, err
 	}
-	if len(products) == 0 {
+	if len(unitsOfMeasure) == 0 {
 		return nil, entities.ErrNotFound
 	}
 
-	return products, nil
+	return unitsOfMeasure, nil
 }
 
-func (s *Service) Create(name string, baseProduct entities.ID) (entities.ID, error) {
-	p, err := entities.NewProduct(name, baseProduct)
+func (s *Service) Create(name string) (entities.ID, error) {
+	u, err := entities.NewUnitOfMeasure(name)
 	if err != nil {
 		return entities.NewID(), err
 	}
 
-	return s.repo.Create(p)
+	return s.repo.Create(u)
 }
 
-func (s *Service) Update(e *entities.Product) error {
+func (s *Service) Update(e *entities.UnitOfMeasure) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}

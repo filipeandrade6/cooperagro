@@ -9,7 +9,7 @@ type BaseProduct struct {
 	UpdatedAt time.Time
 }
 
-func NewBaseProduct(name string, baseBaseProductID ID) (*BaseProduct, error) {
+func NewBaseProduct(name string) (*BaseProduct, error) {
 	bp := &BaseProduct{
 		ID:        NewID(),
 		Name:      name,
