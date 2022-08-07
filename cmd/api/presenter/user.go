@@ -2,7 +2,7 @@ package presenter
 
 import "github.com/filipeandrade6/cooperagro/domain/entities"
 
-type Customer struct {
+type User struct {
 	ID        entities.ID `json:"id"`
 	FirstName string      `json:"first_name"`
 	LastName  string      `json:"last_name"`
@@ -11,9 +11,10 @@ type Customer struct {
 	Email     string      `json:"email"`
 	Latitude  float32     `json:"latitude"`
 	Longitude float32     `json:"longitude"`
+	Role      string      `json:"role"`
 }
 
-type CreateCustomer struct {
+type CreateUser struct {
 	FirstName string  `json:"first_name" binding:"required"`
 	LastName  string  `json:"last_name" binding:"required"`
 	Address   string  `json:"address" binding:"required"`
@@ -21,9 +22,10 @@ type CreateCustomer struct {
 	Email     string  `json:"email" binding:"required"`
 	Latitude  float32 `json:"latitude" binding:"required"`
 	Longitude float32 `json:"longitude" binding:"required"`
+	Role      string  `json:"role"`
 }
 
-type UpdateCustomer struct {
+type UpdateUser struct {
 	FirstName string  `json:"first_name" binding:"required"`
 	LastName  string  `json:"last_name" binding:"required"`
 	Address   string  `json:"address" binding:"required"`
@@ -31,4 +33,5 @@ type UpdateCustomer struct {
 	Email     string  `json:"email" binding:"required"`
 	Latitude  float32 `json:"latitude" binding:"required"`
 	Longitude float32 `json:"longitude" binding:"required"`
+	Role      string  `json:"role"`
 }

@@ -1,4 +1,4 @@
-package customer
+package user
 
 import (
 	"strings"
@@ -17,8 +17,8 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetCustomerByID(id entities.ID) (*entities.Customer, error) {
-	c, err := s.repo.GetCustomerByID(id)
+func (s *Service) GetUserByID(id entities.ID) (*entities.User, error) {
+	c, err := s.repo.GetUserByID(id)
 	if c == nil {
 		return nil, entities.ErrNotFound
 	}
@@ -29,31 +29,31 @@ func (s *Service) GetCustomerByID(id entities.ID) (*entities.Customer, error) {
 	return c, nil
 }
 
-func (s *Service) SearchCustomer(query string) ([]*entities.Customer, error) {
-	customers, err := s.repo.SearchCustomer(strings.ToLower(query))
+func (s *Service) SearchUser(query string) ([]*entities.User, error) {
+	Users, err := s.repo.SearchUser(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
-	if len(customers) == 0 {
+	if len(Users) == 0 {
 		return nil, entities.ErrNotFound
 	}
 
-	return customers, nil
+	return Users, nil
 }
 
-func (s *Service) ListCustomer() ([]*entities.Customer, error) {
-	customers, err := s.repo.ListCustomer()
+func (s *Service) ListUser() ([]*entities.User, error) {
+	Users, err := s.repo.ListUser()
 	if err != nil {
 		return nil, err
 	}
-	if len(customers) == 0 {
+	if len(Users) == 0 {
 		return nil, entities.ErrNotFound
 	}
 
-	return customers, nil
+	return Users, nil
 }
 
-func (s *Service) CreateCustomer(
+func (s *Service) CreateUser(
 	firstName,
 	lastName,
 	address,
@@ -61,8 +61,9 @@ func (s *Service) CreateCustomer(
 	email string,
 	latitude,
 	logitude float32,
+	role string,
 ) (entities.ID, error) {
-	c, err := entities.NewCustomer(
+	c, err := entities.NewUser(
 		firstName,
 		lastName,
 		address,
@@ -70,28 +71,29 @@ func (s *Service) CreateCustomer(
 		email,
 		latitude,
 		logitude,
+		role,
 	)
 	if err != nil {
 		return entities.NewID(), err
 	}
 
-	return s.repo.CreateCustomer(c)
+	return s.repo.CreateUser(c)
 }
 
-func (s *Service) UpdateCustomer(e *entities.Customer) error {
+func (s *Service) UpdateUser(e *entities.User) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}
 
 	e.UpdatedAt = time.Now()
 
-	return s.repo.UpdateCustomer(e)
+	return s.repo.UpdateUser(e)
 }
 
-func (s *Service) DeleteCustomer(id entities.ID) error {
-	if _, err := s.GetCustomerByID(id); err != nil {
+func (s *Service) DeleteUser(id entities.ID) error {
+	if _, err := s.GetUserByID(id); err != nil {
 		return err
 	}
 
-	return s.repo.DeleteCustomer(id)
+	return s.repo.DeleteUser(id)
 }

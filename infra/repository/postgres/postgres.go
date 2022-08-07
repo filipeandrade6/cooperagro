@@ -137,11 +137,11 @@ func (r *Repo) DeleteBaseProduct(id entities.ID) error {
 	return nil
 }
 
-// -- Customer
+// -- User
 
-func (r *Repo) GetCustomerByID(id entities.ID) (*entities.Customer, error) {
+func (r *Repo) GetUserByID(id entities.ID) (*entities.User, error) {
 	ctx := context.Background()
-	c, err := r.db.GetCustomerByID(ctx, id)
+	c, err := r.db.GetUserByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, entities.ErrNotFound
 	}
@@ -149,7 +149,7 @@ func (r *Repo) GetCustomerByID(id entities.ID) (*entities.Customer, error) {
 		return nil, err
 	}
 
-	return &entities.Customer{
+	return &entities.User{
 		ID:        c.ID,
 		FirstName: c.FirstName,
 		LastName:  c.LastName,
@@ -163,9 +163,9 @@ func (r *Repo) GetCustomerByID(id entities.ID) (*entities.Customer, error) {
 	}, nil
 }
 
-func (r *Repo) SearchCustomer(query string) ([]*entities.Customer, error) {
+func (r *Repo) SearchUser(query string) ([]*entities.User, error) {
 	ctx := context.Background()
-	customers, err := r.db.SearchCustomer(ctx, query) // TODO SearchCustomer faz busca na coluna first_name -> alterar depois
+	users, err := r.db.SearchUser(ctx, query) // TODO SearchUser faz busca na coluna first_name -> alterar depois
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, entities.ErrNotFound
 	}
@@ -173,28 +173,28 @@ func (r *Repo) SearchCustomer(query string) ([]*entities.Customer, error) {
 		return nil, err
 	}
 
-	var customersOut []*entities.Customer
-	for _, customer := range customers {
-		customersOut = append(customersOut, &entities.Customer{
-			ID:        customer.ID,
-			FirstName: customer.FirstName,
-			LastName:  customer.LastName,
-			Address:   customer.Address,
-			Phone:     customer.Phone,
-			Email:     customer.Email,
-			Latitude:  customer.Latitude,
-			Longitude: customer.Longitude,
-			CreatedAt: customer.CreatedAt,
-			UpdatedAt: customer.UpdatedAt,
+	var usersOut []*entities.User
+	for _, user := range users {
+		usersOut = append(usersOut, &entities.User{
+			ID:        user.ID,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Address:   user.Address,
+			Phone:     user.Phone,
+			Email:     user.Email,
+			Latitude:  user.Latitude,
+			Longitude: user.Longitude,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 		})
 	}
 
-	return customersOut, nil
+	return usersOut, nil
 }
 
-func (r *Repo) ListCustomer() ([]*entities.Customer, error) {
+func (r *Repo) ListUser() ([]*entities.User, error) {
 	ctx := context.Background()
-	customers, err := r.db.ListCustomer(ctx)
+	users, err := r.db.ListUser(ctx)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, entities.ErrNotFound
 	}
@@ -202,28 +202,28 @@ func (r *Repo) ListCustomer() ([]*entities.Customer, error) {
 		return nil, err
 	}
 
-	var customersOut []*entities.Customer
-	for _, customer := range customers {
-		customersOut = append(customersOut, &entities.Customer{
-			ID:        customer.ID,
-			FirstName: customer.FirstName,
-			LastName:  customer.LastName,
-			Address:   customer.Address,
-			Phone:     customer.Phone,
-			Email:     customer.Email,
-			Latitude:  customer.Latitude,
-			Longitude: customer.Longitude,
-			CreatedAt: customer.CreatedAt,
-			UpdatedAt: customer.UpdatedAt,
+	var usersOut []*entities.User
+	for _, User := range users {
+		usersOut = append(usersOut, &entities.User{
+			ID:        User.ID,
+			FirstName: User.FirstName,
+			LastName:  User.LastName,
+			Address:   User.Address,
+			Phone:     User.Phone,
+			Email:     User.Email,
+			Latitude:  User.Latitude,
+			Longitude: User.Longitude,
+			CreatedAt: User.CreatedAt,
+			UpdatedAt: User.UpdatedAt,
 		})
 	}
 
-	return customersOut, nil
+	return usersOut, nil
 }
 
-func (r *Repo) CreateCustomer(e *entities.Customer) (entities.ID, error) {
+func (r *Repo) CreateUser(e *entities.User) (entities.ID, error) {
 	ctx := context.Background()
-	_, err := r.db.CreateCustomer(ctx, CreateCustomerParams{
+	_, err := r.db.CreateUser(ctx, CreateUserParams{
 		ID:        e.ID,
 		FirstName: e.FirstName,
 		LastName:  e.LastName,
@@ -242,9 +242,9 @@ func (r *Repo) CreateCustomer(e *entities.Customer) (entities.ID, error) {
 	return e.ID, nil
 }
 
-func (r *Repo) UpdateCustomer(e *entities.Customer) error {
+func (r *Repo) UpdateUser(e *entities.User) error {
 	ctx := context.Background()
-	err := r.db.UpdateCustomer(ctx, UpdateCustomerParams{
+	err := r.db.UpdateUser(ctx, UpdateUserParams{
 		FirstName: e.FirstName,
 		LastName:  e.LastName,
 		Address:   e.Address,
@@ -263,9 +263,9 @@ func (r *Repo) UpdateCustomer(e *entities.Customer) error {
 	return nil
 }
 
-func (r *Repo) DeleteCustomer(id entities.ID) error {
+func (r *Repo) DeleteUser(id entities.ID) error {
 	ctx := context.Background()
-	err := r.db.DeleteCustomer(ctx, id)
+	err := r.db.DeleteUser(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -287,7 +287,7 @@ func (r *Repo) GetInventoryByID(id entities.ID) (*entities.Inventory, error) {
 
 	return &entities.Inventory{
 		ID:            i.ID,
-		Customer:      i.UserID,
+		User:          i.UserID,
 		Product:       i.ProductID,
 		Quantity:      int(i.Quantity),
 		UnitOfMeasure: i.UnitOfMeasureID,
@@ -310,7 +310,7 @@ func (r *Repo) ListInventory() ([]*entities.Inventory, error) {
 	for _, inventory := range inventories {
 		inventoriesOut = append(inventoriesOut, &entities.Inventory{
 			ID:            inventory.ID,
-			Customer:      inventory.UserID,
+			User:          inventory.UserID,
 			Product:       inventory.ProductID,
 			Quantity:      int(inventory.Quantity),
 			UnitOfMeasure: inventory.UnitOfMeasureID,
@@ -326,7 +326,7 @@ func (r *Repo) CreateInventory(e *entities.Inventory) (entities.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateInventory(ctx, CreateInventoryParams{
 		ID:              e.ID,
-		UserID:          e.Customer, // TODO uns estao Customer outros User, decidir
+		UserID:          e.User, // TODO uns estao User outros User, decidir
 		ProductID:       e.Product,
 		Quantity:        int32(e.Quantity),
 		UnitOfMeasureID: e.UnitOfMeasure,
@@ -343,7 +343,7 @@ func (r *Repo) CreateInventory(e *entities.Inventory) (entities.ID, error) {
 func (r *Repo) UpdateInventory(e *entities.Inventory) error {
 	ctx := context.Background()
 	err := r.db.UpdateInventory(ctx, UpdateInventoryParams{
-		UserID:          e.Customer,
+		UserID:          e.User,
 		ProductID:       e.Product,
 		Quantity:        int32(e.Quantity),
 		UnitOfMeasureID: e.UnitOfMeasure,

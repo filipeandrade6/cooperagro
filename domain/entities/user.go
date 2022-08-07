@@ -2,7 +2,7 @@ package entities
 
 import "time"
 
-type Customer struct {
+type User struct {
 	ID        ID
 	FirstName string
 	LastName  string
@@ -11,11 +11,12 @@ type Customer struct {
 	Email     string
 	Latitude  float32
 	Longitude float32
+	Role      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func NewCustomer(
+func NewUser(
 	firstName,
 	lastName,
 	address,
@@ -23,8 +24,9 @@ func NewCustomer(
 	email string,
 	latitude,
 	longitude float32,
-) (*Customer, error) {
-	c := &Customer{
+	role string,
+) (*User, error) {
+	c := &User{
 		ID:        NewID(),
 		FirstName: firstName,
 		LastName:  lastName,
@@ -33,6 +35,7 @@ func NewCustomer(
 		Email:     email,
 		Latitude:  latitude,
 		Longitude: longitude,
+		Role:      role,
 		CreatedAt: time.Now(),
 	}
 
@@ -44,7 +47,7 @@ func NewCustomer(
 	return c, nil
 }
 
-func (c *Customer) Validate() error {
+func (c *User) Validate() error {
 	switch {
 	case c.FirstName == "":
 		fallthrough
@@ -59,6 +62,8 @@ func (c *Customer) Validate() error {
 	case c.Latitude == 0.0:
 		fallthrough
 	case c.Longitude == 0.0:
+		fallthrough
+	case c.Role != "admin" && c.Role != "producer" && c.Role != "buyer":
 		return ErrInvalidEntity
 	}
 

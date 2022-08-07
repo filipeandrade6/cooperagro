@@ -4,7 +4,7 @@ import "time"
 
 type Inventory struct {
 	ID            ID
-	Customer      ID
+	User          ID
 	Product       ID
 	Quantity      int
 	UnitOfMeasure ID
@@ -13,14 +13,14 @@ type Inventory struct {
 }
 
 func NewInventory(
-	customerID,
+	userID,
 	productID ID,
 	quantity int,
 	unitOfMeasureID ID,
 ) *Inventory {
 	return &Inventory{
 		ID:            NewID(),
-		Customer:      customerID,
+		User:          userID,
 		Product:       productID,
 		Quantity:      quantity,
 		UnitOfMeasure: unitOfMeasureID,

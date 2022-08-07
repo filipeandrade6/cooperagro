@@ -42,7 +42,7 @@ func getInventoryByID(service inventory.UseCase) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, &presenter.Inventory{
 			ID:            data.ID,
-			Customer:      data.Customer,
+			User:          data.User,
 			Product:       data.Product,
 			Quantity:      data.Quantity,
 			UnitOfMeasure: data.UnitOfMeasure,
@@ -72,7 +72,7 @@ func listInventory(service inventory.UseCase) gin.HandlerFunc {
 		for _, d := range data {
 			toJ = append(toJ, &presenter.Inventory{
 				ID:            d.ID,
-				Customer:      d.Customer,
+				User:          d.User,
 				Product:       d.Product,
 				Quantity:      d.Quantity,
 				UnitOfMeasure: d.UnitOfMeasure,
@@ -93,7 +93,7 @@ func createInventory(service inventory.UseCase) gin.HandlerFunc {
 		}
 
 		id, err := service.CreateInventory(
-			input.Customer,
+			input.User,
 			input.Product,
 			input.Quantity,
 			input.UnitOfMeasure,
@@ -131,7 +131,7 @@ func updateInventory(service inventory.UseCase) gin.HandlerFunc {
 
 		if err := service.UpdateInventory(&entities.Inventory{
 			ID:            idUUID,
-			Customer:      input.Customer,
+			User:          input.User,
 			Product:       input.Product,
 			Quantity:      input.Quantity,
 			UnitOfMeasure: input.UnitOfMeasure,
