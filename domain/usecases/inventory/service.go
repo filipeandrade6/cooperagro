@@ -45,7 +45,7 @@ func (s *Service) Create(
 	productID entities.ID,
 	quantity int,
 	unitOfMeasureID entities.ID,
-) entities.ID {
+) (entities.ID, error) {
 	i := entities.NewInventory(
 		customerID,
 		productID,

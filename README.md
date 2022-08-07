@@ -1,7 +1,7 @@
 TODO:
 
  - [ ] separar entidade users -> produtores, compradores
- - [ ]
+ - [ ] search customers -> first name para todas colunas
 
 reference:
  - [ddd-go-template by @VinGracia](https://github.com/VinGarcia/ddd-go-template/blob/master/v2-domain-adapters-and-helpers)

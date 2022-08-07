@@ -42,7 +42,7 @@ type Inventory struct {
 }
 
 type Product struct {
-	ID            interface{}
+	ID            uuid.UUID
 	Name          string
 	BaseProductID uuid.UUID
 	CreatedAt     time.Time

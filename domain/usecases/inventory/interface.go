@@ -12,7 +12,7 @@ type Reader interface {
 }
 
 type Writer interface {
-	CreateInventory(e *entities.Inventory) entities.ID
+	CreateInventory(e *entities.Inventory) (entities.ID, error)
 	UpdateInventory(e *entities.Inventory) error
 	DeleteInventory(id entities.ID) error
 }
@@ -32,7 +32,7 @@ type UseCase interface {
 		productID entities.ID,
 		quantity int,
 		unitOfMeasureID entities.ID,
-	) entities.ID
+	) (entities.ID, error)
 	Update(e *entities.Inventory) error
 	Delete(id entities.ID) error
 }

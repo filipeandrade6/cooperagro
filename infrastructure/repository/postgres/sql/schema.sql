@@ -19,7 +19,7 @@ CREATE TABLE inventories (
 );
 
 CREATE TABLE products (
-    id UIID PRIMARY KEY,
+    id UUID PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
     base_product_id UUID NOT NULL,
 	created_at TIMESTAMP NOT NULL,

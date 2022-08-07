@@ -141,7 +141,7 @@ RETURNING id, name, base_product_id, created_at, updated_at
 `
 
 type CreateProductParams struct {
-	ID            interface{}
+	ID            uuid.UUID
 	Name          string
 	BaseProductID uuid.UUID
 	CreatedAt     time.Time
@@ -312,7 +312,7 @@ const deleteProduct = `-- name: DeleteProduct :exec
 DELETE FROM products WHERE id = $1
 `
 
-func (q *Queries) DeleteProduct(ctx context.Context, id interface{}) error {
+func (q *Queries) DeleteProduct(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteProduct, id)
 	return err
 }
@@ -416,7 +416,7 @@ SELECT id, name, base_product_id, created_at, updated_at FROM products WHERE id 
 
 // ------------------------------------------------------------------------------------
 // Product
-func (q *Queries) GetProductByID(ctx context.Context, id interface{}) (Product, error) {
+func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (Product, error) {
 	row := q.db.QueryRow(ctx, getProductByID, id)
 	var i Product
 	err := row.Scan(
@@ -999,7 +999,7 @@ type UpdateProductParams struct {
 	BaseProductID uuid.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	ID            interface{}
+	ID            uuid.UUID
 }
 
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) error {
