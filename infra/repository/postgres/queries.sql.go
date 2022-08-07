@@ -7,7 +7,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,55 +37,6 @@ func (q *Queries) CreateBaseProduct(ctx context.Context, arg CreateBaseProductPa
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const createCustomer = `-- name: CreateCustomer :one
-INSERT INTO customers
-(id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-RETURNING id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at
-`
-
-type CreateCustomerParams struct {
-	ID        uuid.UUID
-	FirstName string
-	LastName  string
-	Address   string
-	Phone     string
-	Email     string
-	Latitude  float32
-	Longitude float32
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
-func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error) {
-	row := q.db.QueryRow(ctx, createCustomer,
-		arg.ID,
-		arg.FirstName,
-		arg.LastName,
-		arg.Address,
-		arg.Phone,
-		arg.Email,
-		arg.Latitude,
-		arg.Longitude,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-	)
-	var i Customer
-	err := row.Scan(
-		&i.ID,
-		&i.FirstName,
-		&i.LastName,
-		&i.Address,
-		&i.Phone,
-		&i.Email,
-		&i.Latitude,
-		&i.Longitude,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -167,37 +117,6 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	return i, err
 }
 
-const createRole = `-- name: CreateRole :one
-INSERT INTO roles
-(id, name, created_at, updated_at)
-VALUES ($1, $2, $3, $4)
-RETURNING id, name, created_at, updated_at
-`
-
-type CreateRoleParams struct {
-	ID        uuid.UUID
-	Name      sql.NullString
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
-func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error) {
-	row := q.db.QueryRow(ctx, createRole,
-		arg.ID,
-		arg.Name,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-	)
-	var i Role
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const createUnitOfMeasure = `-- name: CreateUnitOfMeasure :one
 INSERT INTO units_of_measure
 (id, name, created_at, updated_at)
@@ -231,9 +150,9 @@ func (q *Queries) CreateUnitOfMeasure(ctx context.Context, arg CreateUnitOfMeasu
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users
-(id, first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at)
+(id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-RETURNING id, first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at
+RETURNING id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -245,7 +164,7 @@ type CreateUserParams struct {
 	Email     string
 	Latitude  float32
 	Longitude float32
-	RoleID    uuid.UUID
+	Roles     []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -260,7 +179,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Email,
 		arg.Latitude,
 		arg.Longitude,
-		arg.RoleID,
+		arg.Roles,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
@@ -274,7 +193,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Email,
 		&i.Latitude,
 		&i.Longitude,
-		&i.RoleID,
+		&i.Roles,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -287,15 +206,6 @@ DELETE FROM base_products WHERE id = $1
 
 func (q *Queries) DeleteBaseProduct(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteBaseProduct, id)
-	return err
-}
-
-const deleteCustomer = `-- name: DeleteCustomer :exec
-DELETE FROM customers WHERE id = $1
-`
-
-func (q *Queries) DeleteCustomer(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteCustomer, id)
 	return err
 }
 
@@ -314,15 +224,6 @@ DELETE FROM products WHERE id = $1
 
 func (q *Queries) DeleteProduct(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteProduct, id)
-	return err
-}
-
-const deleteRole = `-- name: DeleteRole :exec
-DELETE FROM roles WHERE id = $1
-`
-
-func (q *Queries) DeleteRole(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteRole, id)
 	return err
 }
 
@@ -356,31 +257,6 @@ func (q *Queries) GetBaseProductByID(ctx context.Context, id uuid.UUID) (BasePro
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const getCustomerByID = `-- name: GetCustomerByID :one
-
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at FROM customers WHERE id = $1 LIMIT 1
-`
-
-// ------------------------------------------------------------------------------------
-// Customer
-func (q *Queries) GetCustomerByID(ctx context.Context, id uuid.UUID) (Customer, error) {
-	row := q.db.QueryRow(ctx, getCustomerByID, id)
-	var i Customer
-	err := row.Scan(
-		&i.ID,
-		&i.FirstName,
-		&i.LastName,
-		&i.Address,
-		&i.Phone,
-		&i.Email,
-		&i.Latitude,
-		&i.Longitude,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -429,25 +305,6 @@ func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (Product, er
 	return i, err
 }
 
-const getRoleByID = `-- name: GetRoleByID :one
-
-SELECT id, name, created_at, updated_at FROM roles WHERE id = $1 LIMIT 1
-`
-
-// ------------------------------------------------------------------------------------
-// Roles
-func (q *Queries) GetRoleByID(ctx context.Context, id uuid.UUID) (Role, error) {
-	row := q.db.QueryRow(ctx, getRoleByID, id)
-	var i Role
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const getUnitOfMeasureByID = `-- name: GetUnitOfMeasureByID :one
 
 SELECT id, name, created_at, updated_at FROM units_of_measure WHERE id = $1 LIMIT 1
@@ -469,7 +326,7 @@ func (q *Queries) GetUnitOfMeasureByID(ctx context.Context, id uuid.UUID) (Units
 
 const getUserByID = `-- name: GetUserByID :one
 
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at FROM users WHERE id = $1 LIMIT 1
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at FROM users WHERE id = $1 LIMIT 1
 `
 
 // ------------------------------------------------------------------------------------
@@ -486,7 +343,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Email,
 		&i.Latitude,
 		&i.Longitude,
-		&i.RoleID,
+		&i.Roles,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -509,41 +366,6 @@ func (q *Queries) ListBaseProduct(ctx context.Context) ([]BaseProduct, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listCustomer = `-- name: ListCustomer :many
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at FROM customers ORDER BY first_name
-`
-
-func (q *Queries) ListCustomer(ctx context.Context) ([]Customer, error) {
-	rows, err := q.db.Query(ctx, listCustomer)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Customer
-	for rows.Next() {
-		var i Customer
-		if err := rows.Scan(
-			&i.ID,
-			&i.FirstName,
-			&i.LastName,
-			&i.Address,
-			&i.Phone,
-			&i.Email,
-			&i.Latitude,
-			&i.Longitude,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -619,35 +441,6 @@ func (q *Queries) ListProduct(ctx context.Context) ([]Product, error) {
 	return items, nil
 }
 
-const listRole = `-- name: ListRole :many
-SELECT id, name, created_at, updated_at FROM roles ORDER BY name
-`
-
-func (q *Queries) ListRole(ctx context.Context) ([]Role, error) {
-	rows, err := q.db.Query(ctx, listRole)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Role
-	for rows.Next() {
-		var i Role
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listUnitOfMeasure = `-- name: ListUnitOfMeasure :many
 SELECT id, name, created_at, updated_at FROM units_of_measure ORDER BY name
 `
@@ -678,7 +471,7 @@ func (q *Queries) ListUnitOfMeasure(ctx context.Context) ([]UnitsOfMeasure, erro
 }
 
 const listUser = `-- name: ListUser :many
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at FROM users ORDER BY first_name
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at FROM users ORDER BY first_name
 `
 
 func (q *Queries) ListUser(ctx context.Context) ([]User, error) {
@@ -699,7 +492,7 @@ func (q *Queries) ListUser(ctx context.Context) ([]User, error) {
 			&i.Email,
 			&i.Latitude,
 			&i.Longitude,
-			&i.RoleID,
+			&i.Roles,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -729,41 +522,6 @@ func (q *Queries) SearchBaseProduct(ctx context.Context, name string) ([]BasePro
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const searchCustomer = `-- name: SearchCustomer :many
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at FROM customers WHERE first_name = $1
-`
-
-func (q *Queries) SearchCustomer(ctx context.Context, firstName string) ([]Customer, error) {
-	rows, err := q.db.Query(ctx, searchCustomer, firstName)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Customer
-	for rows.Next() {
-		var i Customer
-		if err := rows.Scan(
-			&i.ID,
-			&i.FirstName,
-			&i.LastName,
-			&i.Address,
-			&i.Phone,
-			&i.Email,
-			&i.Latitude,
-			&i.Longitude,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -807,35 +565,6 @@ func (q *Queries) SearchProduct(ctx context.Context, name string) ([]Product, er
 	return items, nil
 }
 
-const searchRole = `-- name: SearchRole :many
-SELECT id, name, created_at, updated_at FROM roles WHERE name = $1
-`
-
-func (q *Queries) SearchRole(ctx context.Context, name sql.NullString) ([]Role, error) {
-	rows, err := q.db.Query(ctx, searchRole, name)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Role
-	for rows.Next() {
-		var i Role
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const searchUnitOfMeasure = `-- name: SearchUnitOfMeasure :many
 SELECT id, name, created_at, updated_at FROM units_of_measure WHERE name = $1
 `
@@ -866,7 +595,7 @@ func (q *Queries) SearchUnitOfMeasure(ctx context.Context, name string) ([]Units
 }
 
 const searchUser = `-- name: SearchUser :many
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at FROM users WHERE first_name = $1
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at FROM users WHERE first_name = $1
 `
 
 func (q *Queries) SearchUser(ctx context.Context, firstName string) ([]User, error) {
@@ -887,7 +616,7 @@ func (q *Queries) SearchUser(ctx context.Context, firstName string) ([]User, err
 			&i.Email,
 			&i.Latitude,
 			&i.Longitude,
-			&i.RoleID,
+			&i.Roles,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -917,41 +646,6 @@ type UpdateBaseProductParams struct {
 func (q *Queries) UpdateBaseProduct(ctx context.Context, arg UpdateBaseProductParams) error {
 	_, err := q.db.Exec(ctx, updateBaseProduct,
 		arg.Name,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.ID,
-	)
-	return err
-}
-
-const updateCustomer = `-- name: UpdateCustomer :exec
-UPDATE customers SET
-(first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-WHERE id = $10
-`
-
-type UpdateCustomerParams struct {
-	FirstName string
-	LastName  string
-	Address   string
-	Phone     string
-	Email     string
-	Latitude  float32
-	Longitude float32
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	ID        uuid.UUID
-}
-
-func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) error {
-	_, err := q.db.Exec(ctx, updateCustomer,
-		arg.FirstName,
-		arg.LastName,
-		arg.Address,
-		arg.Phone,
-		arg.Email,
-		arg.Latitude,
-		arg.Longitude,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.ID,
@@ -1013,29 +707,6 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) er
 	return err
 }
 
-const updateRole = `-- name: UpdateRole :exec
-UPDATE roles SET
-(name, created_at, updated_at) = ($1, $2, $3)
-WHERE id = $4
-`
-
-type UpdateRoleParams struct {
-	Name      sql.NullString
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	ID        uuid.UUID
-}
-
-func (q *Queries) UpdateRole(ctx context.Context, arg UpdateRoleParams) error {
-	_, err := q.db.Exec(ctx, updateRole,
-		arg.Name,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.ID,
-	)
-	return err
-}
-
 const updateUnitOfMeasure = `-- name: UpdateUnitOfMeasure :exec
 UPDATE units_of_measure SET
 (name, created_at, updated_at) = ($1, $2, $3)
@@ -1061,7 +732,7 @@ func (q *Queries) UpdateUnitOfMeasure(ctx context.Context, arg UpdateUnitOfMeasu
 
 const updateUser = `-- name: UpdateUser :exec
 UPDATE users SET
-(first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+(first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 WHERE id = $11
 `
 
@@ -1073,7 +744,7 @@ type UpdateUserParams struct {
 	Email     string
 	Latitude  float32
 	Longitude float32
-	RoleID    uuid.UUID
+	Roles     []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	ID        uuid.UUID
@@ -1088,7 +759,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.Email,
 		arg.Latitude,
 		arg.Longitude,
-		arg.RoleID,
+		arg.Roles,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.ID,

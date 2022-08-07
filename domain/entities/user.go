@@ -11,7 +11,7 @@ type User struct {
 	Email     string
 	Latitude  float32
 	Longitude float32
-	Role      string
+	Role      []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -24,7 +24,7 @@ func NewUser(
 	email string,
 	latitude,
 	longitude float32,
-	role string,
+	role []string,
 ) (*User, error) {
 	c := &User{
 		ID:        NewID(),

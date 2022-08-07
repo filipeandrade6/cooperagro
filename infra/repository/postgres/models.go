@@ -5,7 +5,6 @@
 package postgres
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,19 +13,6 @@ import (
 type BaseProduct struct {
 	ID        uuid.UUID
 	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
-type Customer struct {
-	ID        uuid.UUID
-	FirstName string
-	LastName  string
-	Address   string
-	Phone     string
-	Email     string
-	Latitude  float32
-	Longitude float32
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -49,13 +35,6 @@ type Product struct {
 	UpdatedAt     time.Time
 }
 
-type Role struct {
-	ID        uuid.UUID
-	Name      sql.NullString
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
 type UnitsOfMeasure struct {
 	ID        uuid.UUID
 	Name      string
@@ -72,7 +51,7 @@ type User struct {
 	Email     string
 	Latitude  float32
 	Longitude float32
-	RoleID    uuid.UUID
+	Roles     []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

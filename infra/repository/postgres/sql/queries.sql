@@ -99,32 +99,6 @@ WHERE id = $4;
 DELETE FROM units_of_measure WHERE id = $1;
 
 -- ------------------------------------------------------------------------------------
--- Roles
-
--- name: GetRoleByID :one
-SELECT * FROM roles WHERE id = $1 LIMIT 1;
-
--- name: SearchRole :many
-SELECT * FROM roles WHERE name = $1;
-
--- name: ListRole :many
-SELECT * FROM roles ORDER BY name;
-
--- name: CreateRole :one
-INSERT INTO roles
-(id, name, created_at, updated_at)
-VALUES ($1, $2, $3, $4)
-RETURNING *;
-
--- name: UpdateRole :exec
-UPDATE roles SET
-(name, created_at, updated_at) = ($1, $2, $3)
-WHERE id = $4;
-
--- name: DeleteRole :exec
-DELETE FROM roles WHERE id = $1;
-
--- ------------------------------------------------------------------------------------
 -- Users
 
 -- name: GetUserByID :one
@@ -138,40 +112,14 @@ SELECT * FROM users ORDER BY first_name;
 
 -- name: CreateUser :one
 INSERT INTO users
-(id, first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at)
+(id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 RETURNING *;
 
 -- name: UpdateUser :exec
 UPDATE users SET
-(first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+(first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 WHERE id = $11;
 
 -- name: DeleteUser :exec
 DELETE FROM users WHERE id = $1;
-
--- ------------------------------------------------------------------------------------
--- Customer
-
--- name: GetCustomerByID :one
-SELECT * FROM customers WHERE id = $1 LIMIT 1;
-
--- name: SearchCustomer :many
-SELECT * FROM customers WHERE first_name = $1;
-
--- name: ListCustomer :many
-SELECT * FROM customers ORDER BY first_name;
-
--- name: CreateCustomer :one
-INSERT INTO customers
-(id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-RETURNING *;
-
--- name: UpdateCustomer :exec
-UPDATE customers SET
-(first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-WHERE id = $10;
-
--- name: DeleteCustomer :exec
-DELETE FROM customers WHERE id = $1;

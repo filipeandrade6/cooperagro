@@ -41,6 +41,8 @@ func (r *Repo) GetBaseProductByID(id entities.ID) (*entities.BaseProduct, error)
 		return nil, err
 	}
 
+	bp.Name.Valid
+
 	return &entities.BaseProduct{
 		ID:        bp.ID,
 		Name:      bp.Name,
