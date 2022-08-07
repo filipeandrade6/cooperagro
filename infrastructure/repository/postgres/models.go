@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
 )
 
 type BaseProduct struct {
@@ -26,9 +25,8 @@ type Customer struct {
 	Address   string
 	Phone     string
 	Email     string
-	Latitude  pgtype.Numeric
-	Longitude pgtype.Numeric
-	RoleID    uuid.UUID
+	Latitude  float32
+	Longitude float32
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -72,8 +70,8 @@ type User struct {
 	Address   string
 	Phone     string
 	Email     string
-	Latitude  pgtype.Numeric
-	Longitude pgtype.Numeric
+	Latitude  float32
+	Longitude float32
 	RoleID    uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time

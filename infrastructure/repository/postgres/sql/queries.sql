@@ -149,3 +149,29 @@ WHERE id = $11;
 
 -- name: DeleteUser :exec
 DELETE FROM users WHERE id = $1;
+
+-- ------------------------------------------------------------------------------------
+-- Customer
+
+-- name: GetCustomerByID :one
+SELECT * FROM customers WHERE id = $1 LIMIT 1;
+
+-- name: SearchCustomer :many
+SELECT * FROM customers WHERE first_name = $1;
+
+-- name: ListCustomer :many
+SELECT * FROM customers ORDER BY first_name;
+
+-- name: CreateCustomer :one
+INSERT INTO customers
+(id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING *;
+
+-- name: UpdateCustomer :exec
+UPDATE customers SET
+(first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+WHERE id = $10;
+
+-- name: DeleteCustomer :exec
+DELETE FROM customers WHERE id = $1;

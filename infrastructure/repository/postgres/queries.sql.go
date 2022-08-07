@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
 )
 
 const createBaseProduct = `-- name: CreateBaseProduct :one
@@ -39,6 +38,55 @@ func (q *Queries) CreateBaseProduct(ctx context.Context, arg CreateBaseProductPa
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const createCustomer = `-- name: CreateCustomer :one
+INSERT INTO customers
+(id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at
+`
+
+type CreateCustomerParams struct {
+	ID        uuid.UUID
+	FirstName string
+	LastName  string
+	Address   string
+	Phone     string
+	Email     string
+	Latitude  float32
+	Longitude float32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error) {
+	row := q.db.QueryRow(ctx, createCustomer,
+		arg.ID,
+		arg.FirstName,
+		arg.LastName,
+		arg.Address,
+		arg.Phone,
+		arg.Email,
+		arg.Latitude,
+		arg.Longitude,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	var i Customer
+	err := row.Scan(
+		&i.ID,
+		&i.FirstName,
+		&i.LastName,
+		&i.Address,
+		&i.Phone,
+		&i.Email,
+		&i.Latitude,
+		&i.Longitude,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -195,8 +243,8 @@ type CreateUserParams struct {
 	Address   string
 	Phone     string
 	Email     string
-	Latitude  pgtype.Numeric
-	Longitude pgtype.Numeric
+	Latitude  float32
+	Longitude float32
 	RoleID    uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -239,6 +287,15 @@ DELETE FROM base_products WHERE id = $1
 
 func (q *Queries) DeleteBaseProduct(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteBaseProduct, id)
+	return err
+}
+
+const deleteCustomer = `-- name: DeleteCustomer :exec
+DELETE FROM customers WHERE id = $1
+`
+
+func (q *Queries) DeleteCustomer(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteCustomer, id)
 	return err
 }
 
@@ -299,6 +356,31 @@ func (q *Queries) GetBaseProductByID(ctx context.Context, id uuid.UUID) (BasePro
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getCustomerByID = `-- name: GetCustomerByID :one
+
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at FROM customers WHERE id = $1 LIMIT 1
+`
+
+// ------------------------------------------------------------------------------------
+// Customer
+func (q *Queries) GetCustomerByID(ctx context.Context, id uuid.UUID) (Customer, error) {
+	row := q.db.QueryRow(ctx, getCustomerByID, id)
+	var i Customer
+	err := row.Scan(
+		&i.ID,
+		&i.FirstName,
+		&i.LastName,
+		&i.Address,
+		&i.Phone,
+		&i.Email,
+		&i.Latitude,
+		&i.Longitude,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -427,6 +509,41 @@ func (q *Queries) ListBaseProduct(ctx context.Context) ([]BaseProduct, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCustomer = `-- name: ListCustomer :many
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at FROM customers ORDER BY first_name
+`
+
+func (q *Queries) ListCustomer(ctx context.Context) ([]Customer, error) {
+	rows, err := q.db.Query(ctx, listCustomer)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Customer
+	for rows.Next() {
+		var i Customer
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.LastName,
+			&i.Address,
+			&i.Phone,
+			&i.Email,
+			&i.Latitude,
+			&i.Longitude,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -625,6 +742,41 @@ func (q *Queries) SearchBaseProduct(ctx context.Context, name string) ([]BasePro
 	return items, nil
 }
 
+const searchCustomer = `-- name: SearchCustomer :many
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at FROM customers WHERE first_name = $1
+`
+
+func (q *Queries) SearchCustomer(ctx context.Context, firstName string) ([]Customer, error) {
+	rows, err := q.db.Query(ctx, searchCustomer, firstName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Customer
+	for rows.Next() {
+		var i Customer
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.LastName,
+			&i.Address,
+			&i.Phone,
+			&i.Email,
+			&i.Latitude,
+			&i.Longitude,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const searchProduct = `-- name: SearchProduct :many
 SELECT id, name, base_product_id, created_at, updated_at FROM products WHERE name = $1
 `
@@ -772,6 +924,41 @@ func (q *Queries) UpdateBaseProduct(ctx context.Context, arg UpdateBaseProductPa
 	return err
 }
 
+const updateCustomer = `-- name: UpdateCustomer :exec
+UPDATE customers SET
+(first_name, last_name, address, phone, email, latitude, longitude, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+WHERE id = $10
+`
+
+type UpdateCustomerParams struct {
+	FirstName string
+	LastName  string
+	Address   string
+	Phone     string
+	Email     string
+	Latitude  float32
+	Longitude float32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	ID        uuid.UUID
+}
+
+func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) error {
+	_, err := q.db.Exec(ctx, updateCustomer,
+		arg.FirstName,
+		arg.LastName,
+		arg.Address,
+		arg.Phone,
+		arg.Email,
+		arg.Latitude,
+		arg.Longitude,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.ID,
+	)
+	return err
+}
+
 const updateInventory = `-- name: UpdateInventory :exec
 UPDATE inventories SET
 (user_id, product_id, quantity, unit_of_measure_id, created_at, updated_at) = ($1, $2, $3, $4, $5, $6)
@@ -884,8 +1071,8 @@ type UpdateUserParams struct {
 	Address   string
 	Phone     string
 	Email     string
-	Latitude  pgtype.Numeric
-	Longitude pgtype.Numeric
+	Latitude  float32
+	Longitude float32
 	RoleID    uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time

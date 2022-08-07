@@ -41,9 +41,8 @@ CREATE TABLE customers (
 	address VARCHAR(100) NOT NULL,
 	phone VARCHAR(14) NOT NULL,
 	email VARCHAR(50) NOT NULL,
-	latitude DECIMAL(8,6) NOT NULL,
-	longitude DECIMAL(9,6) NOT NULL,
-	role_id UUID NOT NULL,
+	latitude REAL NOT NULL,
+	longitude REAL NOT NULL,
 	created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL
 );
@@ -55,8 +54,8 @@ CREATE TABLE users (
 	address VARCHAR(100) NOT NULL,
 	phone VARCHAR(14) NOT NULL,
 	email VARCHAR(50) NOT NULL,
-	latitude DECIMAL(8,6) NOT NULL,
-	longitude DECIMAL(9,6) NOT NULL,
+	latitude REAL NOT NULL,
+	longitude REAL NOT NULL,
 	role_id UUID NOT NULL,
 	created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL,
