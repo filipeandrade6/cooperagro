@@ -24,19 +24,19 @@ func getCustomerByID(service customer.UseCase) gin.HandlerFunc {
 
 		id, err := entities.StringToID(c.Param("id"))
 		if err != nil {
-			c.String(http.StatusBadRequest, "invalid id")
+			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
 			return
 		}
 
 		data, err := service.GetCustomerByID(id)
 
 		if err != nil && !errors.Is(err, entities.ErrNotFound) {
-			c.String(http.StatusInternalServerError, errorMessage)
+			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
 
 		if data == nil {
-			c.String(http.StatusNotFound, "not found")
+			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
 			return
 		}
 
@@ -71,12 +71,12 @@ func listCustomer(service customer.UseCase) gin.HandlerFunc {
 		}
 
 		if err != nil && !errors.Is(err, entities.ErrNotFound) {
-			c.String(http.StatusInternalServerError, errorMessage)
+			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
 
 		if data == nil {
-			c.String(http.StatusNotFound, "not found")
+			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
 			return
 		}
 
@@ -131,7 +131,7 @@ func updateCustomer(service customer.UseCase) gin.HandlerFunc {
 		id := c.Param("id")
 
 		if id == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"erroe": "empty id"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
 			return
 		}
 

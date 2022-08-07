@@ -1,8 +1,11 @@
 TODO:
 
+ - [ ] adicionar logger
+ - [ ] search by name
  - [ ] separar entidade users -> produtores, compradores
  - [ ] search customers -> first name para todas colunas
  - [ ] unique constraints no DB, validação
+ - [ ] padronizar as repostas de erro ao usuário da api
 
 reference:
  - [ddd-go-template by @VinGracia](https://github.com/VinGarcia/ddd-go-template/blob/master/v2-domain-adapters-and-helpers)
