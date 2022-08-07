@@ -16,7 +16,7 @@ type Writer interface {
 	DeleteBaseProduct(id entities.ID) error
 }
 
-type Repository struct {
+type Repository interface {
 	Reader
 	Writer
 }

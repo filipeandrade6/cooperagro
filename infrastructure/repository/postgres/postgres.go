@@ -17,7 +17,7 @@ type Repo struct {
 	db *Queries
 }
 
-func NewPostgresRepo(urlConn string) (*Queries, error) {
+func NewPostgresRepo(urlConn string) (*Repo, error) {
 	conn, err := pgxpool.Connect(context.Background(), urlConn)
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to database: %v", err)
@@ -26,7 +26,7 @@ func NewPostgresRepo(urlConn string) (*Queries, error) {
 
 	r := New(conn)
 
-	return r, nil
+	return &Repo{r}, nil
 }
 
 // -- Base product

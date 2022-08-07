@@ -14,7 +14,7 @@ type Writer interface {
 	DeleteCustomer(id entities.ID) error
 }
 
-type Repository struct {
+type Repository interface {
 	Reader
 	Writer
 }
