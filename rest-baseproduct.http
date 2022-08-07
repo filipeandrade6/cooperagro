@@ -1,0 +1,35 @@
+GET http://localhost:8080/customer/ HTTP/1.1
+
+###
+
+GET http://localhost:8080/customer/6ff091f2-0b62-40bb-bbd4-6c5fa1d8bbda HTTP/1.1
+
+###
+
+POST http://localhost:8080/customer HTTP/1.1
+content-type: application/json
+
+{
+    "first_name": "filipe",
+	"last_name": "andrade",
+	"address": "rua tal",
+	"phone": "61999999999",
+	"email": "filipe.engenharia42@gmail.com",
+	"latitude": -12.123123,
+	"longitude": -47.123123
+}
+
+###
+
+PUT http://localhost:8080/customer/6ff091f2-0b62-40bb-bbd4-6c5fa1d8bbda HTTP/1.1
+content-type: application/json
+
+{
+    "first_name": "filipe",
+	"last_name": "andrade",
+	"address": "rua tal",
+	"phone": "61888887777",
+	"email": "filipe.engenharia42@gmail.com",
+	"latitude": -20.123456,
+	"longitude": -40.123456
+}
