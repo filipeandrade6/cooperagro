@@ -99,7 +99,7 @@ func createInventory(service inventory.UseCase) gin.HandlerFunc {
 			input.UnitOfMeasure,
 		)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating inventory"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 

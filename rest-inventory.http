@@ -11,9 +11,9 @@ content-type: application/json
 
 {
     "customer": "c9094c97-69b6-4f61-ab4c-288840db2060",
-	"product": ,
-	"quantity": ,
-	"unit_of_measure": ,
+	"product": "627e8364-992c-426c-827e-90f9fe830852",
+	"quantity": 20,
+	"unit_of_measure": "aacb8688-ae01-4110-8909-665dd7589a1a"
 }
 
 ###

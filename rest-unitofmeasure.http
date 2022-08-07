@@ -1,0 +1,27 @@
+GET http://localhost:8080/unitofmeasure/ HTTP/1.1
+
+###
+
+GET http://localhost:8080/unitofmeasure/aacb8688-ae01-4110-8909-665dd7589a1a HTTP/1.1
+
+###
+
+POST http://localhost:8080/unitofmeasure HTTP/1.1
+content-type: application/json
+
+{
+	"name": "kilos"
+}
+
+###
+
+PUT http://localhost:8080/unitofmeasure/aacb8688-ae01-4110-8909-665dd7589a1a HTTP/1.1
+content-type: application/json
+
+{
+    "name": "peça"
+}
+
+###
+
+DELETE http://localhost:8080/unitofmeasure/4c8958f9-088f-483b-8951-4c1a7f820366 HTTP/1.1
