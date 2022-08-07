@@ -1,0 +1,23 @@
+GET http://localhost:8080/baseproduct/ HTTP/1.1
+
+###
+
+GET http://localhost:8080/baseproduct/670480c7-ffab-42cf-929f-9a6ebcad3216 HTTP/1.1
+
+###
+
+POST http://localhost:8080/baseproduct HTTP/1.1
+content-type: application/json
+
+{
+    "name": "acerola"
+}
+
+###
+
+PUT http://localhost:8080/baseproduct/670480c7-ffab-42cf-929f-9a6ebcad3216 HTTP/1.1
+content-type: application/json
+
+{
+    "name": "laranja"
+}

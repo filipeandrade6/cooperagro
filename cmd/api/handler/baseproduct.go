@@ -11,37 +11,43 @@ import (
 )
 
 func MakeBaseProductHandlers(r *gin.Engine, service baseproduct.UseCase) {
-	r.GET("/v1/baseproduct", listBaseProduct(service))
+	r.GET("/baseproduct/:id", getBaseProductByID(service))
+	r.GET("/baseproduct", listBaseProduct(service))
+	r.POST("/baseproduct", createBaseProduct(service))
+	r.PUT("/baseproduct/:id", updateBaseProduct(service))
+	r.DELETE("/baseproduct/:id", deleteBaseProduct(service))
 }
 
-// func searchBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		errorMessage := "error reading baseproduct"
+func getBaseProductByID(service baseproduct.UseCase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		errorMessage := "error reading baseproduct"
 
-// 		name := c.Param("name")
-// 		data, err := service.SearchBaseProduct(name)
-// 		if err != nil && !errors.Is(err, entities.ErrNotFound) {
-// 			c.JSON(http.StatusInternalServerError, errorMessage)
-// 			return
-// 		}
+		id, err := entities.StringToID(c.Param("id"))
+		if err != nil {
+			c.String(http.StatusBadRequest, "invalid id")
+			return
+		}
 
-// 		if data == nil {
-// 			c.JSON(http.StatusNotFound, "not found")
-// 			return
-// 		}
+		data, err := service.GetBaseProductByID(id)
 
-// 		var toJ []*presenter.BaseProduct
-// 		for _, d := range data {
-// 			toJ = append(toJ, &presenter.BaseProduct{
-// 				ID:   d.ID,
-// 				Name: d.Name,
-// 			})
-// 		}
-// 		c.JSON(http.StatusOK, toJ)
+		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+			c.String(http.StatusInternalServerError, errorMessage)
+			return
+		}
 
-// 		// Se der erro de marshalling no JSON?
-// 	}
-// }
+		if data == nil {
+			c.String(http.StatusNotFound, "not found")
+			return
+		}
+
+		c.JSON(http.StatusOK, &presenter.BaseProduct{
+			ID:   data.ID,
+			Name: data.Name,
+		})
+
+		// Se der erro de marshalling no JSON?
+	}
+}
 
 func listBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -59,12 +65,12 @@ func listBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 		}
 
 		if err != nil && !errors.Is(err, entities.ErrNotFound) {
-			c.JSON(http.StatusInternalServerError, errorMessage)
+			c.String(http.StatusInternalServerError, errorMessage)
 			return
 		}
 
 		if data == nil {
-			c.JSON(http.StatusNotFound, nil)
+			c.String(http.StatusNotFound, "not found")
 			return
 		}
 
@@ -78,5 +84,80 @@ func listBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 		c.JSON(http.StatusOK, toJ)
 
 		// Se der erro de marshalling no JSON?
+	}
+}
+
+func createBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var input presenter.CreateBaseProduct
+		if err := c.ShouldBindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // TODO aplicar para outros
+			return
+		}
+
+		id, err := service.CreateBaseProduct(input.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating base product"})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{"id": id})
+		// Se der erro de marshalling no JSON?
+	}
+}
+
+func updateBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"erroe": "empty id"})
+			return
+		}
+
+		idUUID, err := entities.StringToID(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+			return
+		}
+
+		var input presenter.UpdateBaseProduct
+		if err := c.ShouldBindJSON(&input); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := service.UpdateBaseProduct(&entities.BaseProduct{
+			ID:   idUUID,
+			Name: input.Name,
+		}); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"status": "base product udpated"})
+	}
+}
+
+func deleteBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
+			return
+		}
+
+		idUUID, err := entities.StringToID(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+			return
+		}
+
+		if err := service.DeleteBaseProduct(idUUID); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "deleting base product"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"status": "base product deleted"})
 	}
 }

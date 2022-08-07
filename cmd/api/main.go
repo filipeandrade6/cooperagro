@@ -6,6 +6,7 @@ import (
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/handler"
 	"github.com/filipeandrade6/cooperagro/domain/usecases/baseproduct"
+	"github.com/filipeandrade6/cooperagro/domain/usecases/customer"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres"
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +19,7 @@ func main() {
 	}
 
 	baseProductService := baseproduct.NewService(db)
-	// customerService := customer.NewService(db)
+	customerService := customer.NewService(db)
 	// inventoryService := inventory.NewService(db)
 	// productService := product.NewService(db)
 	// unitOfMeasureService := unitofmeasure.NewService(db)
@@ -32,6 +33,7 @@ func main() {
 	})
 
 	handler.MakeBaseProductHandlers(r, baseProductService)
+	handler.MakeCustomerHandlers(r, customerService)
 
 	r.Run()
 

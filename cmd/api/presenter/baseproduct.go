@@ -6,3 +6,11 @@ type BaseProduct struct {
 	ID   entities.ID `json:"id"`
 	Name string      `json:"name"`
 }
+
+type CreateBaseProduct struct {
+	Name string `form:"name" json:"name" binding:"required"`
+}
+
+type UpdateBaseProduct struct {
+	Name string `form:"name" json:"name" binding:"required"`
+}
