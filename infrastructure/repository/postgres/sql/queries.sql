@@ -18,7 +18,7 @@ RETURNING *;
 -- name: UpdateBaseProduct :exec
 UPDATE base_products SET
 (name, created_at, updated_at) = ($1, $2, $3)
-WHERE id = $5;
+WHERE id = $4;
 
 -- name: DeleteBaseProduct :exec
 DELETE FROM base_products WHERE id = $1;
@@ -29,11 +29,8 @@ DELETE FROM base_products WHERE id = $1;
 -- name: GetInventoryByID :one
 SELECT * FROM inventories WHERE id = $1 LIMIT 1;
 
--- name: SearchInventory :many
-SELECT * FROM inventories WHERE name = $1;
-
 -- name: ListInventory :many
-SELECT * FROM inventories ORDER BY name;
+SELECT * FROM inventories ORDER BY created_at;
 
 -- name: CreateInventory :one
 INSERT INTO inventories
@@ -43,7 +40,7 @@ RETURNING *;
 
 -- name: UpdateInventory :exec
 UPDATE inventories SET
-(user_id, product_id, quantity, unit_of_measure_id, created_at, updated_at) = ($1, $2, $3, $4, $5, %6)
+(user_id, product_id, quantity, unit_of_measure_id, created_at, updated_at) = ($1, $2, $3, $4, $5, $6)
 WHERE id = $7;
 
 -- name: DeleteInventory :exec
@@ -122,7 +119,7 @@ RETURNING *;
 -- name: UpdateRole :exec
 UPDATE roles SET
 (name, created_at, updated_at) = ($1, $2, $3)
-WHERE id = $5;
+WHERE id = $4;
 
 -- name: DeleteRole :exec
 DELETE FROM roles WHERE id = $1;
@@ -134,10 +131,10 @@ DELETE FROM roles WHERE id = $1;
 SELECT * FROM users WHERE id = $1 LIMIT 1;
 
 -- name: SearchUser :many
-SELECT * FROM users WHERE name = $1;
+SELECT * FROM users WHERE first_name = $1;
 
 -- name: ListUser :many
-SELECT * FROM users ORDER BY name;
+SELECT * FROM users ORDER BY first_name;
 
 -- name: CreateUser :one
 INSERT INTO users
@@ -147,7 +144,7 @@ RETURNING *;
 
 -- name: UpdateUser :exec
 UPDATE users SET
-(name, first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+(first_name, last_name, address, phone, email, latitude, longitude, role_id, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 WHERE id = $11;
 
 -- name: DeleteUser :exec

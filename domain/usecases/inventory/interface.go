@@ -8,7 +8,6 @@ import "github.com/filipeandrade6/cooperagro/domain/entities"
 
 type Reader interface {
 	GetInventoryByID(id entities.ID) (*entities.Inventory, error)
-	SearchInventory(query string) ([]*entities.Inventory, error)
 	ListInventory() ([]*entities.Inventory, error)
 }
 
@@ -27,7 +26,6 @@ type Repository struct {
 
 type UseCase interface {
 	GetByID(id entities.ID) (*entities.Inventory, error)
-	Search(query string) ([]*entities.Inventory, error)
 	List() ([]*entities.Inventory, error)
 	Create(
 		customerID,

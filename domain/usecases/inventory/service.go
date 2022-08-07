@@ -1,7 +1,6 @@
 package inventory
 
 import (
-	"strings"
 	"time"
 
 	"github.com/filipeandrade6/cooperagro/domain/entities"
@@ -27,18 +26,6 @@ func (s *Service) GetByID(id entities.ID) (*entities.Inventory, error) {
 	}
 
 	return i, nil
-}
-
-func (s *Service) Search(query string) ([]*entities.Inventory, error) {
-	inventories, err := s.repo.SearchInventory(strings.ToLower(query))
-	if err != nil {
-		return nil, err
-	}
-	if len(inventories) == 0 {
-		return nil, entities.ErrNotFound
-	}
-
-	return inventories, nil
 }
 
 func (s *Service) List() ([]*entities.Inventory, error) {

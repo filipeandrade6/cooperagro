@@ -3,15 +3,15 @@ package customer
 import "github.com/filipeandrade6/cooperagro/domain/entities"
 
 type Reader interface {
-	GetByID(id entities.ID) (*entities.Customer, error)
-	Search(query string) ([]*entities.Customer, error)
-	List() ([]*entities.Customer, error)
+	GetCustomerByID(id entities.ID) (*entities.Customer, error)
+	SearchCustomer(query string) ([]*entities.Customer, error)
+	ListCustomer() ([]*entities.Customer, error)
 }
 
 type Writer interface {
-	Create(e *entities.Customer) (entities.ID, error)
-	Update(e *entities.Customer) error
-	Delete(id entities.ID) error
+	CreateCustomer(e *entities.Customer) (entities.ID, error)
+	UpdateCustomer(e *entities.Customer) error
+	DeleteCustomer(id entities.ID) error
 }
 
 type Repository struct {

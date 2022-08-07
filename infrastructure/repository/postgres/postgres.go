@@ -16,10 +16,11 @@ type Repo struct {
 func NewPostgresRepo(urlConn string) (repository.Repository, error) {
 	conn, err := pgxpool.Connect(context.Background(), urlConn)
 	if err != nil {
-		return &Repo{}, fmt.Errorf("unable to connect to database: %v", err)
+		return nil, fmt.Errorf("unable to connect to database: %v", err)
 	}
+	// TODO dar o close com a aplicação
 
-	// dar o close com a aplicação
+	r := New(conn)
 
-	return &Repo{conn}, nil
+	return r, nil
 }

@@ -1,5 +1,5 @@
 CREATE TABLE base_products (
-    id uuid PRIMARY KEY,
+    id UUID PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
 	created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL
@@ -12,10 +12,10 @@ CREATE TABLE inventories (
 	quantity INTEGER NOT NULL,
     unit_of_measure_id UUID NOT NULL,
     created_at TIMESTAMP NOT NULL,
-	updated_at TIMESTAMP NOT NULL
-	CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES users(id)
-    CONSTRAINT product_id FOREIGN KEY (product_id) REFERENCES products(id)
-    CONSTRAINT unit_of_measure_id FOREIGN KEY (unit_of_measure_id) REFERENCES unit_of_measures(id)
+	updated_at TIMESTAMP NOT NULL,
+	CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT product_id FOREIGN KEY (product_id) REFERENCES products(id),
+    CONSTRAINT unit_of_measure_id FOREIGN KEY (unit_of_measure_id) REFERENCES units_of_measure(id)
 );
 
 CREATE TABLE products (
@@ -23,8 +23,8 @@ CREATE TABLE products (
 	name VARCHAR(30) NOT NULL,
     base_product_id UUID NOT NULL,
 	created_at TIMESTAMP NOT NULL,
-	updated_at TIMESTAMP NOT NULL
-	CONSTRAINT base_product_id FOREIGN KEY (base_product_id) REFERENCES base_product(id),
+	updated_at TIMESTAMP NOT NULL,
+	CONSTRAINT base_product_id FOREIGN KEY (base_product_id) REFERENCES base_products(id)
 );
 
 CREATE TABLE units_of_measure (
@@ -46,7 +46,7 @@ CREATE TABLE customers (
 	role_id UUID NOT NULL,
 	created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL
-)
+);
 
 CREATE TABLE users (
     id UUID PRIMARY KEY,
@@ -59,13 +59,13 @@ CREATE TABLE users (
 	longitude DECIMAL(9,6) NOT NULL,
 	role_id UUID NOT NULL,
 	created_at TIMESTAMP NOT NULL,
-	updated_at TIMESTAMP NOT NULL
+	updated_at TIMESTAMP NOT NULL,
 	CONSTRAINT role_id FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
 CREATE TABLE roles (
 	id UUID PRIMARY KEY,
-	name VARCHAR(15)
+	name VARCHAR(15),
     created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL
 );
