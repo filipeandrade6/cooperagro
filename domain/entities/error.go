@@ -2,6 +2,7 @@ package entities
 
 import "errors"
 
-var ErrNotFound = errors.New("not found")
-
-var ErrInvalidEntity = errors.New("invalid entity")
+var (
+	ErrNotFound      = errors.New("not found")
+	ErrInvalidEntity = errors.New("invalid entity")
+)

@@ -17,7 +17,7 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetByID(id entities.ID) (*entities.BaseProduct, error) {
+func (s *Service) GetBaseProductByID(id entities.ID) (*entities.BaseProduct, error) {
 	bp, err := s.repo.GetBaseProductByID(id)
 	if bp == nil {
 		return nil, entities.ErrNotFound
@@ -29,7 +29,7 @@ func (s *Service) GetByID(id entities.ID) (*entities.BaseProduct, error) {
 	return bp, nil
 }
 
-func (s *Service) Search(query string) ([]*entities.BaseProduct, error) {
+func (s *Service) SearchBaseProduct(query string) ([]*entities.BaseProduct, error) {
 	baseProducts, err := s.repo.SearchBaseProduct(strings.ToLower(query))
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *Service) Search(query string) ([]*entities.BaseProduct, error) {
 	return baseProducts, nil
 }
 
-func (s *Service) List() ([]*entities.BaseProduct, error) {
+func (s *Service) ListBaseProduct() ([]*entities.BaseProduct, error) {
 	baseProducts, err := s.repo.ListBaseProduct()
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (s *Service) List() ([]*entities.BaseProduct, error) {
 	return baseProducts, nil
 }
 
-func (s *Service) Create(name string) (entities.ID, error) {
+func (s *Service) CreateBaseProduct(name string) (entities.ID, error) {
 	bp, err := entities.NewBaseProduct(name)
 	if err != nil {
 		return entities.NewID(), err
@@ -62,7 +62,7 @@ func (s *Service) Create(name string) (entities.ID, error) {
 	return s.repo.CreateBaseProduct(bp)
 }
 
-func (s *Service) Update(e *entities.BaseProduct) error {
+func (s *Service) UpdateBaseProduct(e *entities.BaseProduct) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}
@@ -72,8 +72,8 @@ func (s *Service) Update(e *entities.BaseProduct) error {
 	return s.repo.UpdateBaseProduct(e)
 }
 
-func (s *Service) Delete(id entities.ID) error {
-	if _, err := s.GetByID(id); err != nil {
+func (s *Service) DeleteBaseProduct(id entities.ID) error {
+	if _, err := s.GetBaseProductByID(id); err != nil {
 		return err
 	}
 

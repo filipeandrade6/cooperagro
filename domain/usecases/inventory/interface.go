@@ -25,14 +25,14 @@ type Repository interface {
 // Driven Adapter (o que o use case comanda)
 
 type UseCase interface {
-	GetByID(id entities.ID) (*entities.Inventory, error)
-	List() ([]*entities.Inventory, error)
-	Create(
+	GetInventoryByID(id entities.ID) (*entities.Inventory, error)
+	ListInventory() ([]*entities.Inventory, error)
+	CreateInventory(
 		customerID,
 		productID entities.ID,
 		quantity int,
 		unitOfMeasureID entities.ID,
 	) (entities.ID, error)
-	Update(e *entities.Inventory) error
-	Delete(id entities.ID) error
+	UpdateInventory(e *entities.Inventory) error
+	DeleteInventory(id entities.ID) error
 }

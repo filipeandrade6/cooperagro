@@ -20,10 +20,10 @@ type Repository interface {
 }
 
 type UseCase interface {
-	GetByID(id entities.ID) (*entities.Customer, error)
-	Search(query string) ([]*entities.Customer, error)
-	List() ([]*entities.Customer, error)
-	Create(
+	GetCustomerByID(id entities.ID) (*entities.Customer, error)
+	SearchCustomer(query string) ([]*entities.Customer, error)
+	ListCustomer() ([]*entities.Customer, error)
+	CreateCustomer(
 		firstName,
 		lastName,
 		address,
@@ -32,6 +32,6 @@ type UseCase interface {
 		latitude,
 		longitude float32,
 	) (entities.ID, error)
-	Update(e *entities.Customer) error
-	Delete(id entities.ID) error
+	UpdateCustomer(e *entities.Customer) error
+	DeleteCustomer(id entities.ID) error
 }

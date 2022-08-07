@@ -14,4 +14,3 @@ reference:
  {base-path}/{area}/{version}/entity1/{entity1}/{entity2}
  base-path = {dns-name}/{microservice-name}
  area = api or management to indicate general area (just use api)
- 

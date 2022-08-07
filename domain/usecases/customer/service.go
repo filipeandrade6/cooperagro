@@ -17,7 +17,7 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetByID(id entities.ID) (*entities.Customer, error) {
+func (s *Service) GetCustomerByID(id entities.ID) (*entities.Customer, error) {
 	c, err := s.repo.GetCustomerByID(id)
 	if c == nil {
 		return nil, entities.ErrNotFound
@@ -29,7 +29,7 @@ func (s *Service) GetByID(id entities.ID) (*entities.Customer, error) {
 	return c, nil
 }
 
-func (s *Service) Search(query string) ([]*entities.Customer, error) {
+func (s *Service) SearchCustomer(query string) ([]*entities.Customer, error) {
 	customers, err := s.repo.SearchCustomer(strings.ToLower(query))
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *Service) Search(query string) ([]*entities.Customer, error) {
 	return customers, nil
 }
 
-func (s *Service) List() ([]*entities.Customer, error) {
+func (s *Service) ListCustomer() ([]*entities.Customer, error) {
 	customers, err := s.repo.ListCustomer()
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (s *Service) List() ([]*entities.Customer, error) {
 	return customers, nil
 }
 
-func (s *Service) Create(
+func (s *Service) CreateCustomer(
 	firstName,
 	lastName,
 	address,
@@ -78,7 +78,7 @@ func (s *Service) Create(
 	return s.repo.CreateCustomer(c)
 }
 
-func (s *Service) Update(e *entities.Customer) error {
+func (s *Service) UpdateCustomer(e *entities.Customer) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}
@@ -88,8 +88,8 @@ func (s *Service) Update(e *entities.Customer) error {
 	return s.repo.UpdateCustomer(e)
 }
 
-func (s *Service) Delete(id entities.ID) error {
-	if _, err := s.GetByID(id); err != nil {
+func (s *Service) DeleteCustomer(id entities.ID) error {
+	if _, err := s.GetCustomerByID(id); err != nil {
 		return err
 	}
 

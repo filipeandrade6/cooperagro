@@ -17,7 +17,7 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetByID(id entities.ID) (*entities.UnitOfMeasure, error) {
+func (s *Service) GetUnitOfMeasureByID(id entities.ID) (*entities.UnitOfMeasure, error) {
 	u, err := s.repo.GetUnitOfMeasureByID(id)
 	if u == nil {
 		return nil, entities.ErrNotFound
@@ -29,7 +29,7 @@ func (s *Service) GetByID(id entities.ID) (*entities.UnitOfMeasure, error) {
 	return u, nil
 }
 
-func (s *Service) Search(query string) ([]*entities.UnitOfMeasure, error) {
+func (s *Service) SearchUnitOfMeasure(query string) ([]*entities.UnitOfMeasure, error) {
 	unitsOfMeasure, err := s.repo.SearchUnitOfMeasure(strings.ToLower(query))
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *Service) Search(query string) ([]*entities.UnitOfMeasure, error) {
 	return unitsOfMeasure, nil
 }
 
-func (s *Service) List() ([]*entities.UnitOfMeasure, error) {
+func (s *Service) ListUnitOfMeasure() ([]*entities.UnitOfMeasure, error) {
 	unitsOfMeasure, err := s.repo.ListUnitOfMeasure()
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (s *Service) List() ([]*entities.UnitOfMeasure, error) {
 	return unitsOfMeasure, nil
 }
 
-func (s *Service) Create(name string) (entities.ID, error) {
+func (s *Service) CreateUnitOfMeasure(name string) (entities.ID, error) {
 	u, err := entities.NewUnitOfMeasure(name)
 	if err != nil {
 		return entities.NewID(), err
@@ -62,7 +62,7 @@ func (s *Service) Create(name string) (entities.ID, error) {
 	return s.repo.CreateUnitOfMeasure(u)
 }
 
-func (s *Service) Update(e *entities.UnitOfMeasure) error {
+func (s *Service) UpdateUnitOfMeasure(e *entities.UnitOfMeasure) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}
@@ -72,8 +72,8 @@ func (s *Service) Update(e *entities.UnitOfMeasure) error {
 	return s.repo.UpdateUnitOfMeasure(e)
 }
 
-func (s *Service) Delete(id entities.ID) error {
-	if _, err := s.GetByID(id); err != nil {
+func (s *Service) DeleteUnitOfMeasure(id entities.ID) error {
+	if _, err := s.GetUnitOfMeasureByID(id); err != nil {
 		return err
 	}
 

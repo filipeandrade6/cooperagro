@@ -22,10 +22,10 @@ type Repository interface {
 }
 
 type UseCase interface {
-	GetByID(id entities.ID) (*entities.BaseProduct, error)
-	Search(query string) ([]*entities.BaseProduct, error)
-	List() ([]*entities.BaseProduct, error)
-	Create(name string) (entities.ID, error)
-	Update(e *entities.BaseProduct) error
-	Delete(id entities.ID) error
+	GetBaseProductByID(id entities.ID) (*entities.BaseProduct, error)
+	SearchBaseProduct(query string) ([]*entities.BaseProduct, error)
+	ListBaseProduct() ([]*entities.BaseProduct, error)
+	CreateBaseProduct(name string) (entities.ID, error)
+	UpdateBaseProduct(e *entities.BaseProduct) error
+	DeleteBaseProduct(id entities.ID) error
 }

@@ -16,7 +16,7 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetByID(id entities.ID) (*entities.Inventory, error) {
+func (s *Service) GetInventoryByID(id entities.ID) (*entities.Inventory, error) {
 	i, err := s.repo.GetInventoryByID(id)
 	if i == nil {
 		return nil, entities.ErrNotFound
@@ -28,7 +28,7 @@ func (s *Service) GetByID(id entities.ID) (*entities.Inventory, error) {
 	return i, nil
 }
 
-func (s *Service) List() ([]*entities.Inventory, error) {
+func (s *Service) ListInventory() ([]*entities.Inventory, error) {
 	inventories, err := s.repo.ListInventory()
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *Service) List() ([]*entities.Inventory, error) {
 	return inventories, nil
 }
 
-func (s *Service) Create(
+func (s *Service) CreateInventory(
 	customerID,
 	productID entities.ID,
 	quantity int,
@@ -55,14 +55,14 @@ func (s *Service) Create(
 	return s.repo.CreateInventory(i)
 }
 
-func (s *Service) Update(e *entities.Inventory) error {
+func (s *Service) UpdateInventory(e *entities.Inventory) error {
 	e.UpdatedAt = time.Now()
 
 	return s.repo.UpdateInventory(e)
 }
 
-func (s *Service) Delete(id entities.ID) error {
-	if _, err := s.GetByID(id); err != nil {
+func (s *Service) DeleteInventory(id entities.ID) error {
+	if _, err := s.GetInventoryByID(id); err != nil {
 		return err
 	}
 
