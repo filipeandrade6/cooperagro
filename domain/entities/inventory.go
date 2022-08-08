@@ -3,13 +3,13 @@ package entities
 import "time"
 
 type Inventory struct {
-	ID            ID
-	User          ID
-	Product       ID
-	Quantity      int
-	UnitOfMeasure ID
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID              ID
+	UserID          ID
+	ProductID       ID
+	Quantity        int
+	UnitOfMeasureID ID
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 func NewInventory(
@@ -19,11 +19,11 @@ func NewInventory(
 	unitOfMeasureID ID,
 ) *Inventory {
 	return &Inventory{
-		ID:            NewID(),
-		User:          userID,
-		Product:       productID,
-		Quantity:      quantity,
-		UnitOfMeasure: unitOfMeasureID,
-		CreatedAt:     time.Now(),
+		ID:              NewID(),
+		UserID:          userID,
+		ProductID:       productID,
+		Quantity:        quantity,
+		UnitOfMeasureID: unitOfMeasureID,
+		CreatedAt:       time.Now(),
 	}
 }

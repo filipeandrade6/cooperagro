@@ -53,8 +53,8 @@ func (s *Service) ListProduct() ([]*entities.Product, error) {
 	return products, nil
 }
 
-func (s *Service) CreateProduct(name string, baseProduct entities.ID) (entities.ID, error) {
-	p, err := entities.NewProduct(name, baseProduct)
+func (s *Service) CreateProduct(name string, baseProductID entities.ID) (entities.ID, error) {
+	p, err := entities.NewProduct(name, baseProductID)
 	if err != nil {
 		return entities.NewID(), err
 	}

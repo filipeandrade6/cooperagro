@@ -291,13 +291,13 @@ func (r *Repo) GetInventoryByID(id entities.ID) (*entities.Inventory, error) {
 	}
 
 	return &entities.Inventory{
-		ID:            i.ID,
-		User:          i.UserID,
-		Product:       i.ProductID,
-		Quantity:      int(i.Quantity),
-		UnitOfMeasure: i.UnitOfMeasureID,
-		CreatedAt:     i.CreatedAt,
-		UpdatedAt:     i.UpdatedAt,
+		ID:              i.ID,
+		UserID:          i.UserID,
+		ProductID:       i.ProductID,
+		Quantity:        int(i.Quantity),
+		UnitOfMeasureID: i.UnitOfMeasureID,
+		CreatedAt:       i.CreatedAt,
+		UpdatedAt:       i.UpdatedAt,
 	}, nil
 }
 
@@ -314,13 +314,13 @@ func (r *Repo) ListInventory() ([]*entities.Inventory, error) {
 	var inventoriesOut []*entities.Inventory
 	for _, inventory := range inventories {
 		inventoriesOut = append(inventoriesOut, &entities.Inventory{
-			ID:            inventory.ID,
-			User:          inventory.UserID,
-			Product:       inventory.ProductID,
-			Quantity:      int(inventory.Quantity),
-			UnitOfMeasure: inventory.UnitOfMeasureID,
-			CreatedAt:     inventory.CreatedAt,
-			UpdatedAt:     inventory.UpdatedAt,
+			ID:              inventory.ID,
+			UserID:          inventory.UserID,
+			ProductID:       inventory.ProductID,
+			Quantity:        int(inventory.Quantity),
+			UnitOfMeasureID: inventory.UnitOfMeasureID,
+			CreatedAt:       inventory.CreatedAt,
+			UpdatedAt:       inventory.UpdatedAt,
 		})
 	}
 
@@ -331,10 +331,10 @@ func (r *Repo) CreateInventory(e *entities.Inventory) (entities.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateInventory(ctx, CreateInventoryParams{
 		ID:              e.ID,
-		UserID:          e.User, // TODO uns estao User outros User, decidir
-		ProductID:       e.Product,
+		UserID:          e.UserID, // TODO uns estao User outros User, decidir
+		ProductID:       e.ProductID,
 		Quantity:        int32(e.Quantity),
-		UnitOfMeasureID: e.UnitOfMeasure,
+		UnitOfMeasureID: e.UnitOfMeasureID,
 		CreatedAt:       e.CreatedAt,
 		UpdatedAt:       e.UpdatedAt,
 	})
@@ -348,10 +348,10 @@ func (r *Repo) CreateInventory(e *entities.Inventory) (entities.ID, error) {
 func (r *Repo) UpdateInventory(e *entities.Inventory) error {
 	ctx := context.Background()
 	err := r.db.UpdateInventory(ctx, UpdateInventoryParams{
-		UserID:          e.User,
-		ProductID:       e.Product,
+		UserID:          e.UserID,
+		ProductID:       e.ProductID,
 		Quantity:        int32(e.Quantity),
-		UnitOfMeasureID: e.UnitOfMeasure,
+		UnitOfMeasureID: e.UnitOfMeasureID,
 		CreatedAt:       e.CreatedAt,
 		UpdatedAt:       e.UpdatedAt,
 		ID:              e.ID,
@@ -386,11 +386,11 @@ func (r *Repo) GetProductByID(id entities.ID) (*entities.Product, error) {
 	}
 
 	return &entities.Product{
-		ID:          p.ID,
-		Name:        p.Name,
-		BaseProduct: p.BaseProductID,
-		CreatedAt:   p.CreatedAt,
-		UpdatedAt:   p.UpdatedAt,
+		ID:            p.ID,
+		Name:          p.Name,
+		BaseProductID: p.BaseProductID,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}, nil
 }
 
@@ -407,11 +407,11 @@ func (r *Repo) SearchProduct(query string) ([]*entities.Product, error) {
 	var productsOut []*entities.Product
 	for _, product := range products {
 		productsOut = append(productsOut, &entities.Product{
-			ID:          product.ID,
-			Name:        product.Name,
-			BaseProduct: product.BaseProductID,
-			CreatedAt:   product.CreatedAt,
-			UpdatedAt:   product.UpdatedAt,
+			ID:            product.ID,
+			Name:          product.Name,
+			BaseProductID: product.BaseProductID,
+			CreatedAt:     product.CreatedAt,
+			UpdatedAt:     product.UpdatedAt,
 		})
 	}
 
@@ -431,11 +431,11 @@ func (r *Repo) ListProduct() ([]*entities.Product, error) {
 	var productsOut []*entities.Product
 	for _, product := range products {
 		productsOut = append(productsOut, &entities.Product{
-			ID:          product.ID,
-			Name:        product.Name,
-			BaseProduct: product.BaseProductID,
-			CreatedAt:   product.CreatedAt,
-			UpdatedAt:   product.UpdatedAt,
+			ID:            product.ID,
+			Name:          product.Name,
+			BaseProductID: product.BaseProductID,
+			CreatedAt:     product.CreatedAt,
+			UpdatedAt:     product.UpdatedAt,
 		})
 	}
 
@@ -447,7 +447,7 @@ func (r *Repo) CreateProduct(e *entities.Product) (entities.ID, error) {
 	_, err := r.db.CreateProduct(ctx, CreateProductParams{
 		ID:            e.ID,
 		Name:          e.Name,
-		BaseProductID: e.BaseProduct,
+		BaseProductID: e.BaseProductID,
 		CreatedAt:     e.CreatedAt,
 		UpdatedAt:     e.UpdatedAt,
 	})
@@ -462,7 +462,7 @@ func (r *Repo) UpdateProduct(e *entities.Product) error {
 	ctx := context.Background()
 	err := r.db.UpdateProduct(ctx, UpdateProductParams{
 		Name:          e.Name,
-		BaseProductID: e.BaseProduct,
+		BaseProductID: e.BaseProductID,
 		CreatedAt:     e.CreatedAt,
 		UpdatedAt:     e.UpdatedAt,
 		ID:            e.ID,

@@ -3,23 +3,23 @@ package presenter
 import "github.com/filipeandrade6/cooperagro/domain/entities"
 
 type Inventory struct {
-	ID            entities.ID `json:"id"`
-	User          entities.ID `json:"user"`
-	Product       entities.ID `json:"product"`
-	Quantity      int         `json:"quantity"`
-	UnitOfMeasure entities.ID `json:"unit_of_measure"`
+	ID              entities.ID `json:"id"`
+	UserID          entities.ID `json:"user_id"`
+	ProductID       entities.ID `json:"product_id"`
+	Quantity        int         `json:"quantity"`
+	UnitOfMeasureID entities.ID `json:"unit_of_measure_id"`
 }
 
 type CreateInventory struct {
-	User          entities.ID `json:"user" binding:"required"`
-	Product       entities.ID `json:"product" binding:"required"`
-	Quantity      int         `json:"quantity" binding:"required"`
-	UnitOfMeasure entities.ID `json:"unit_of_measure" binding:"required"`
+	UserID          entities.ID `json:"user_id" binding:"required"`
+	ProductID       entities.ID `json:"product_id" binding:"required"`
+	Quantity        int         `json:"quantity" binding:"required"`
+	UnitOfMeasureID entities.ID `json:"unit_of_measure_id" binding:"required"`
 }
 
 type UpdateInventory struct {
-	User          entities.ID `json:"user" binding:"required"`
-	Product       entities.ID `json:"product" binding:"required"`
-	Quantity      int         `json:"quantity" binding:"required"`
-	UnitOfMeasure entities.ID `json:"unit_of_measure" binding:"required"`
+	UserID          entities.ID `json:"user_id" binding:"required"`
+	ProductID       entities.ID `json:"product_id" binding:"required"`
+	Quantity        int         `json:"quantity" binding:"required"`
+	UnitOfMeasureID entities.ID `json:"unit_of_measure_id" binding:"required"`
 }

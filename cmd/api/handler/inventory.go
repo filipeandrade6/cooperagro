@@ -41,11 +41,11 @@ func getInventoryByID(service inventory.UseCase) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, &presenter.Inventory{
-			ID:            data.ID,
-			User:          data.User,
-			Product:       data.Product,
-			Quantity:      data.Quantity,
-			UnitOfMeasure: data.UnitOfMeasure,
+			ID:              data.ID,
+			UserID:          data.UserID,
+			ProductID:       data.ProductID,
+			Quantity:        data.Quantity,
+			UnitOfMeasureID: data.UnitOfMeasureID,
 		})
 
 		// Se der erro de marshalling no JSON?
@@ -71,11 +71,11 @@ func listInventory(service inventory.UseCase) gin.HandlerFunc {
 		var toJ []*presenter.Inventory
 		for _, d := range data {
 			toJ = append(toJ, &presenter.Inventory{
-				ID:            d.ID,
-				User:          d.User,
-				Product:       d.Product,
-				Quantity:      d.Quantity,
-				UnitOfMeasure: d.UnitOfMeasure,
+				ID:              d.ID,
+				UserID:          d.UserID,
+				ProductID:       d.ProductID,
+				Quantity:        d.Quantity,
+				UnitOfMeasureID: d.UnitOfMeasureID,
 			})
 		}
 		c.JSON(http.StatusOK, toJ)
@@ -93,10 +93,10 @@ func createInventory(service inventory.UseCase) gin.HandlerFunc {
 		}
 
 		id, err := service.CreateInventory(
-			input.User,
-			input.Product,
+			input.UserID,
+			input.ProductID,
 			input.Quantity,
-			input.UnitOfMeasure,
+			input.UnitOfMeasureID,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -130,11 +130,11 @@ func updateInventory(service inventory.UseCase) gin.HandlerFunc {
 		}
 
 		if err := service.UpdateInventory(&entities.Inventory{
-			ID:            idUUID,
-			User:          input.User,
-			Product:       input.Product,
-			Quantity:      input.Quantity,
-			UnitOfMeasure: input.UnitOfMeasure,
+			ID:              idUUID,
+			UserID:          input.UserID,
+			ProductID:       input.ProductID,
+			Quantity:        input.Quantity,
+			UnitOfMeasureID: input.UnitOfMeasureID,
 		}); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

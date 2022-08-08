@@ -41,9 +41,9 @@ func getProductByID(service product.UseCase) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, &presenter.Product{
-			ID:          data.ID,
-			Name:        data.Name,
-			BaseProduct: data.BaseProduct,
+			ID:            data.ID,
+			Name:          data.Name,
+			BaseProductID: data.BaseProductID,
 		})
 
 		// Se der erro de marshalling no JSON?
@@ -69,9 +69,9 @@ func listProduct(service product.UseCase) gin.HandlerFunc {
 		var toJ []*presenter.Product
 		for _, d := range data {
 			toJ = append(toJ, &presenter.Product{
-				ID:          d.ID,
-				Name:        d.Name,
-				BaseProduct: d.BaseProduct,
+				ID:            d.ID,
+				Name:          d.Name,
+				BaseProductID: d.BaseProductID,
 			})
 		}
 		c.JSON(http.StatusOK, toJ)
@@ -90,7 +90,7 @@ func createProduct(service product.UseCase) gin.HandlerFunc {
 
 		id, err := service.CreateProduct(
 			input.Name,
-			input.BaseProduct,
+			input.BaseProductID,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating product"})
@@ -124,9 +124,9 @@ func updateProduct(service product.UseCase) gin.HandlerFunc {
 		}
 
 		if err := service.UpdateProduct(&entities.Product{
-			ID:          idUUID,
-			Name:        input.Name,
-			BaseProduct: input.BaseProduct,
+			ID:            idUUID,
+			Name:          input.Name,
+			BaseProductID: input.BaseProductID,
 		}); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
