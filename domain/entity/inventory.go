@@ -2,6 +2,7 @@ package entity
 
 import "time"
 
+// Inventory data
 type Inventory struct {
 	ID              ID
 	UserID          ID
@@ -12,6 +13,7 @@ type Inventory struct {
 	UpdatedAt       time.Time
 }
 
+// NewInventory creates a new Inventory
 func NewInventory(
 	userID,
 	productID ID,

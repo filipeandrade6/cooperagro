@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// User data
 type User struct {
 	ID        ID
 	FirstName string
@@ -18,6 +19,7 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+// NewUser creates a new User
 func NewUser(
 	firstName,
 	lastName,
@@ -49,6 +51,7 @@ func NewUser(
 	return c, nil
 }
 
+// Validate validate User
 func (u *User) Validate() error {
 	switch {
 	case u.FirstName == "":
@@ -72,6 +75,7 @@ func (u *User) Validate() error {
 	return nil
 }
 
+// checkRole verifies if the User roles is valid
 func (u *User) checkRoles() bool {
 	for _, r := range u.Roles {
 		if r == "admin" || r == "producer" || r == "buyer" {

@@ -2,6 +2,7 @@ package entity
 
 import "time"
 
+// UnitOfMeasure data
 type UnitOfMeasure struct {
 	ID        ID
 	Name      string
@@ -9,6 +10,7 @@ type UnitOfMeasure struct {
 	UpdatedAt time.Time
 }
 
+// NewUnitOfMeasure creates a new UnitOfMeasure
 func NewUnitOfMeasure(name string) (*UnitOfMeasure, error) {
 	u := &UnitOfMeasure{
 		ID:        NewID(),
@@ -23,6 +25,7 @@ func NewUnitOfMeasure(name string) (*UnitOfMeasure, error) {
 	return u, nil
 }
 
+// Validate validate UnitOfMeasure
 func (u *UnitOfMeasure) Validate() error {
 	if u.Name == "" {
 		return ErrInvalidEntity
