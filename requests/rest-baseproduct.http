@@ -10,7 +10,7 @@ POST http://localhost:8080/baseproduct HTTP/1.1
 content-type: application/json
 
 {
-    "name": "acerola"
+    "name": "abacaxi"
 }
 
 ###
@@ -21,3 +21,8 @@ content-type: application/json
 {
     "name": "laranja"
 }
+
+###
+
+DELETE http://localhost:8080/baseproduct/678f7fa4-f976-4d3d-be99-d0f7b5b133d3 HTTP/1.1
+content-type: application/json

@@ -1,6 +1,8 @@
 package entities
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	ID        ID
@@ -11,7 +13,7 @@ type User struct {
 	Email     string
 	Latitude  float32
 	Longitude float32
-	Role      []string
+	Roles     []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -24,7 +26,7 @@ func NewUser(
 	email string,
 	latitude,
 	longitude float32,
-	role []string,
+	roles []string,
 ) (*User, error) {
 	c := &User{
 		ID:        NewID(),
@@ -35,7 +37,7 @@ func NewUser(
 		Email:     email,
 		Latitude:  latitude,
 		Longitude: longitude,
-		Role:      role,
+		Roles:     roles,
 		CreatedAt: time.Now(),
 	}
 
@@ -47,25 +49,35 @@ func NewUser(
 	return c, nil
 }
 
-func (c *User) Validate() error {
+func (u *User) Validate() error {
 	switch {
-	case c.FirstName == "":
+	case u.FirstName == "":
 		fallthrough
-	case c.LastName == "":
+	case u.LastName == "":
 		fallthrough
-	case c.Address == "":
+	case u.Address == "":
 		fallthrough
-	case c.Phone == "":
+	case u.Phone == "":
 		fallthrough
-	case c.Email == "": // TODO validar e-mail
+	case u.Email == "": // TODO validar e-mail
 		fallthrough
-	case c.Latitude == 0.0:
+	case u.Latitude == 0.0:
 		fallthrough
-	case c.Longitude == 0.0:
+	case u.Longitude == 0.0:
 		fallthrough
-	case c.Role != "admin" && c.Role != "producer" && c.Role != "buyer":
+	case !u.checkRoles():
 		return ErrInvalidEntity
 	}
 
 	return nil
+}
+
+func (u *User) checkRoles() bool {
+	for _, r := range u.Roles {
+		if r == "admin" || r == "producer" || r == "buyer" {
+			continue
+		}
+		return false
+	}
+	return true
 }

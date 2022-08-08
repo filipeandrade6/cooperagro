@@ -55,6 +55,5 @@ CREATE TABLE users (
 	created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL,
 
-	PRIMARY KEY (id),
-	CONSTRAINT role_id FOREIGN KEY (role_id) REFERENCES roles(id)
+	PRIMARY KEY (id)
 );

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
@@ -49,7 +50,7 @@ func getUserByID(service user.UseCase) gin.HandlerFunc {
 			Email:     data.Email,
 			Latitude:  data.Latitude,
 			Longitude: data.Longitude,
-			Role:      data.Role,
+			Roles:     data.Roles,
 		})
 
 		// Se der erro de marshalling no JSON?
@@ -92,7 +93,7 @@ func listUser(service user.UseCase) gin.HandlerFunc {
 				Email:     d.Email,
 				Latitude:  d.Latitude,
 				Longitude: d.Longitude,
-				Role:      d.Role,
+				Roles:     d.Roles,
 			})
 		}
 		c.JSON(http.StatusOK, toJ)
@@ -117,9 +118,10 @@ func createUser(service user.UseCase) gin.HandlerFunc {
 			input.Email,
 			input.Latitude,
 			input.Longitude,
-			input.Role,
+			input.Roles,
 		)
 		if err != nil {
+			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating user"})
 			return
 		}
@@ -159,7 +161,7 @@ func updateUser(service user.UseCase) gin.HandlerFunc {
 			Email:     input.Email,
 			Latitude:  input.Latitude,
 			Longitude: input.Longitude,
-			Role:      input.Role,
+			Roles:     input.Roles,
 		}); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

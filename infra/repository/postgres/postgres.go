@@ -41,8 +41,6 @@ func (r *Repo) GetBaseProductByID(id entities.ID) (*entities.BaseProduct, error)
 		return nil, err
 	}
 
-	bp.Name.Valid
-
 	return &entities.BaseProduct{
 		ID:        bp.ID,
 		Name:      bp.Name,
@@ -160,6 +158,7 @@ func (r *Repo) GetUserByID(id entities.ID) (*entities.User, error) {
 		Email:     c.Email,
 		Latitude:  c.Latitude,
 		Longitude: c.Longitude,
+		Roles:     c.Roles,
 		CreatedAt: c.CreatedAt,
 		UpdatedAt: c.UpdatedAt,
 	}, nil
@@ -186,6 +185,7 @@ func (r *Repo) SearchUser(query string) ([]*entities.User, error) {
 			Email:     user.Email,
 			Latitude:  user.Latitude,
 			Longitude: user.Longitude,
+			Roles:     user.Roles,
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
 		})
@@ -215,6 +215,7 @@ func (r *Repo) ListUser() ([]*entities.User, error) {
 			Email:     User.Email,
 			Latitude:  User.Latitude,
 			Longitude: User.Longitude,
+			Roles:     User.Roles,
 			CreatedAt: User.CreatedAt,
 			UpdatedAt: User.UpdatedAt,
 		})
@@ -234,6 +235,7 @@ func (r *Repo) CreateUser(e *entities.User) (entities.ID, error) {
 		Email:     e.Email,
 		Latitude:  e.Latitude,
 		Longitude: e.Longitude,
+		Roles:     e.Roles,
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
 	})
@@ -254,6 +256,7 @@ func (r *Repo) UpdateUser(e *entities.User) error {
 		Email:     e.Email,
 		Latitude:  e.Latitude,
 		Longitude: e.Longitude,
+		Roles:     e.Roles,
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
 		ID:        e.ID,
