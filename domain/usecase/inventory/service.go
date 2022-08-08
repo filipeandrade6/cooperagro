@@ -3,7 +3,7 @@ package inventory
 import (
 	"time"
 
-	"github.com/filipeandrade6/cooperagro/domain/entities"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
 )
 
 type Service struct {
@@ -16,10 +16,10 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetInventoryByID(id entities.ID) (*entities.Inventory, error) {
+func (s *Service) GetInventoryByID(id entity.ID) (*entity.Inventory, error) {
 	i, err := s.repo.GetInventoryByID(id)
 	if i == nil {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -28,13 +28,13 @@ func (s *Service) GetInventoryByID(id entities.ID) (*entities.Inventory, error) 
 	return i, nil
 }
 
-func (s *Service) ListInventory() ([]*entities.Inventory, error) {
+func (s *Service) ListInventory() ([]*entity.Inventory, error) {
 	inventories, err := s.repo.ListInventory()
 	if err != nil {
 		return nil, err
 	}
 	if len(inventories) == 0 {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 
 	return inventories, nil
@@ -42,11 +42,11 @@ func (s *Service) ListInventory() ([]*entities.Inventory, error) {
 
 func (s *Service) CreateInventory(
 	customerID,
-	productID entities.ID,
+	productID entity.ID,
 	quantity int,
-	unitOfMeasureID entities.ID,
-) (entities.ID, error) {
-	i := entities.NewInventory(
+	unitOfMeasureID entity.ID,
+) (entity.ID, error) {
+	i := entity.NewInventory(
 		customerID,
 		productID,
 		quantity,
@@ -55,13 +55,13 @@ func (s *Service) CreateInventory(
 	return s.repo.CreateInventory(i)
 }
 
-func (s *Service) UpdateInventory(e *entities.Inventory) error {
+func (s *Service) UpdateInventory(e *entity.Inventory) error {
 	e.UpdatedAt = time.Now()
 
 	return s.repo.UpdateInventory(e)
 }
 
-func (s *Service) DeleteInventory(id entities.ID) error {
+func (s *Service) DeleteInventory(id entity.ID) error {
 	if _, err := s.GetInventoryByID(id); err != nil {
 		return err
 	}

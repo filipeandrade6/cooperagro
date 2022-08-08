@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro/domain/entities"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
 )
 
 type Service struct {
@@ -17,10 +17,10 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetProductByID(id entities.ID) (*entities.Product, error) {
+func (s *Service) GetProductByID(id entity.ID) (*entity.Product, error) {
 	p, err := s.repo.GetProductByID(id)
 	if p == nil {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -29,40 +29,40 @@ func (s *Service) GetProductByID(id entities.ID) (*entities.Product, error) {
 	return p, nil
 }
 
-func (s *Service) SearchProduct(query string) ([]*entities.Product, error) {
+func (s *Service) SearchProduct(query string) ([]*entity.Product, error) {
 	products, err := s.repo.SearchProduct(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
 	if len(products) == 0 {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 
 	return products, nil
 }
 
-func (s *Service) ListProduct() ([]*entities.Product, error) {
+func (s *Service) ListProduct() ([]*entity.Product, error) {
 	products, err := s.repo.ListProduct()
 	if err != nil {
 		return nil, err
 	}
 	if len(products) == 0 {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 
 	return products, nil
 }
 
-func (s *Service) CreateProduct(name string, baseProductID entities.ID) (entities.ID, error) {
-	p, err := entities.NewProduct(name, baseProductID)
+func (s *Service) CreateProduct(name string, baseProductID entity.ID) (entity.ID, error) {
+	p, err := entity.NewProduct(name, baseProductID)
 	if err != nil {
-		return entities.NewID(), err
+		return entity.NewID(), err
 	}
 
 	return s.repo.CreateProduct(p)
 }
 
-func (s *Service) UpdateProduct(e *entities.Product) error {
+func (s *Service) UpdateProduct(e *entity.Product) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func (s *Service) UpdateProduct(e *entities.Product) error {
 	return s.repo.UpdateProduct(e)
 }
 
-func (s *Service) DeleteProduct(id entities.ID) error {
+func (s *Service) DeleteProduct(id entity.ID) error {
 	if _, err := s.GetProductByID(id); err != nil {
 		return err
 	}

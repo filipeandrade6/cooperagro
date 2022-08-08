@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro/domain/entities"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
 )
 
 type Service struct {
@@ -17,10 +17,10 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetUserByID(id entities.ID) (*entities.User, error) {
+func (s *Service) GetUserByID(id entity.ID) (*entity.User, error) {
 	c, err := s.repo.GetUserByID(id)
 	if c == nil {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -29,25 +29,25 @@ func (s *Service) GetUserByID(id entities.ID) (*entities.User, error) {
 	return c, nil
 }
 
-func (s *Service) SearchUser(query string) ([]*entities.User, error) {
+func (s *Service) SearchUser(query string) ([]*entity.User, error) {
 	Users, err := s.repo.SearchUser(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
 	if len(Users) == 0 {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 
 	return Users, nil
 }
 
-func (s *Service) ListUser() ([]*entities.User, error) {
+func (s *Service) ListUser() ([]*entity.User, error) {
 	Users, err := s.repo.ListUser()
 	if err != nil {
 		return nil, err
 	}
 	if len(Users) == 0 {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 
 	return Users, nil
@@ -62,8 +62,8 @@ func (s *Service) CreateUser(
 	latitude,
 	logitude float32,
 	roles []string,
-) (entities.ID, error) {
-	c, err := entities.NewUser(
+) (entity.ID, error) {
+	c, err := entity.NewUser(
 		firstName,
 		lastName,
 		address,
@@ -74,13 +74,13 @@ func (s *Service) CreateUser(
 		roles,
 	)
 	if err != nil {
-		return entities.NewID(), err
+		return entity.NewID(), err
 	}
 
 	return s.repo.CreateUser(c)
 }
 
-func (s *Service) UpdateUser(e *entities.User) error {
+func (s *Service) UpdateUser(e *entity.User) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (s *Service) UpdateUser(e *entities.User) error {
 	return s.repo.UpdateUser(e)
 }
 
-func (s *Service) DeleteUser(id entities.ID) error {
+func (s *Service) DeleteUser(id entity.ID) error {
 	if _, err := s.GetUserByID(id); err != nil {
 		return err
 	}

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/filipeandrade6/cooperagro/domain/entities"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
 )
 
 type Service struct {
@@ -17,10 +17,10 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) GetUnitOfMeasureByID(id entities.ID) (*entities.UnitOfMeasure, error) {
+func (s *Service) GetUnitOfMeasureByID(id entity.ID) (*entity.UnitOfMeasure, error) {
 	u, err := s.repo.GetUnitOfMeasureByID(id)
 	if u == nil {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -29,40 +29,40 @@ func (s *Service) GetUnitOfMeasureByID(id entities.ID) (*entities.UnitOfMeasure,
 	return u, nil
 }
 
-func (s *Service) SearchUnitOfMeasure(query string) ([]*entities.UnitOfMeasure, error) {
+func (s *Service) SearchUnitOfMeasure(query string) ([]*entity.UnitOfMeasure, error) {
 	unitsOfMeasure, err := s.repo.SearchUnitOfMeasure(strings.ToLower(query))
 	if err != nil {
 		return nil, err
 	}
 	if len(unitsOfMeasure) == 0 {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 
 	return unitsOfMeasure, nil
 }
 
-func (s *Service) ListUnitOfMeasure() ([]*entities.UnitOfMeasure, error) {
+func (s *Service) ListUnitOfMeasure() ([]*entity.UnitOfMeasure, error) {
 	unitsOfMeasure, err := s.repo.ListUnitOfMeasure()
 	if err != nil {
 		return nil, err
 	}
 	if len(unitsOfMeasure) == 0 {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 
 	return unitsOfMeasure, nil
 }
 
-func (s *Service) CreateUnitOfMeasure(name string) (entities.ID, error) {
-	u, err := entities.NewUnitOfMeasure(name)
+func (s *Service) CreateUnitOfMeasure(name string) (entity.ID, error) {
+	u, err := entity.NewUnitOfMeasure(name)
 	if err != nil {
-		return entities.NewID(), err
+		return entity.NewID(), err
 	}
 
 	return s.repo.CreateUnitOfMeasure(u)
 }
 
-func (s *Service) UpdateUnitOfMeasure(e *entities.UnitOfMeasure) error {
+func (s *Service) UpdateUnitOfMeasure(e *entity.UnitOfMeasure) error {
 	if err := e.Validate(); err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func (s *Service) UpdateUnitOfMeasure(e *entities.UnitOfMeasure) error {
 	return s.repo.UpdateUnitOfMeasure(e)
 }
 
-func (s *Service) DeleteUnitOfMeasure(id entities.ID) error {
+func (s *Service) DeleteUnitOfMeasure(id entity.ID) error {
 	if _, err := s.GetUnitOfMeasureByID(id); err != nil {
 		return err
 	}

@@ -1,17 +1,17 @@
 package presenter
 
-import "github.com/filipeandrade6/cooperagro/domain/entities"
+import "github.com/filipeandrade6/cooperagro/domain/entity"
 
 type User struct {
-	ID        entities.ID `json:"id"`
-	FirstName string      `json:"first_name"`
-	LastName  string      `json:"last_name"`
-	Address   string      `json:"address"`
-	Phone     string      `json:"phone"`
-	Email     string      `json:"email"`
-	Latitude  float32     `json:"latitude"`
-	Longitude float32     `json:"longitude"`
-	Roles     []string    `json:"roles"`
+	ID        entity.ID `json:"id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Address   string    `json:"address"`
+	Phone     string    `json:"phone"`
+	Email     string    `json:"email"`
+	Latitude  float32   `json:"latitude"`
+	Longitude float32   `json:"longitude"`
+	Roles     []string  `json:"roles"`
 }
 
 type CreateUser struct {

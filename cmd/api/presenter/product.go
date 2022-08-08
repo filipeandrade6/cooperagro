@@ -1,19 +1,19 @@
 package presenter
 
-import "github.com/filipeandrade6/cooperagro/domain/entities"
+import "github.com/filipeandrade6/cooperagro/domain/entity"
 
 type Product struct {
-	ID            entities.ID `json:"id"`
-	Name          string      `json:"name"`
-	BaseProductID entities.ID `json:"base_product_id"`
+	ID            entity.ID `json:"id"`
+	Name          string    `json:"name"`
+	BaseProductID entity.ID `json:"base_product_id"`
 }
 
 type CreateProduct struct {
-	Name          string      `json:"name" binding:"required"`
-	BaseProductID entities.ID `json:"base_product_id" binding:"required"`
+	Name          string    `json:"name" binding:"required"`
+	BaseProductID entity.ID `json:"base_product_id" binding:"required"`
 }
 
 type UpdateProduct struct {
-	Name          string      `json:"name" binding:"required"`
-	BaseProductID entities.ID `json:"base_product_id" binding:"required"`
+	Name          string    `json:"name" binding:"required"`
+	BaseProductID entity.ID `json:"base_product_id" binding:"required"`
 }

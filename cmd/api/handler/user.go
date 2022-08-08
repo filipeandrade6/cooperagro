@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-	"github.com/filipeandrade6/cooperagro/domain/entities"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/user"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +23,7 @@ func getUserByID(service user.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorMessage := "error reading user"
 
-		id, err := entities.StringToID(c.Param("id"))
+		id, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
 			return
@@ -31,7 +31,7 @@ func getUserByID(service user.UseCase) gin.HandlerFunc {
 
 		data, err := service.GetUserByID(id)
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -61,7 +61,7 @@ func listUser(service user.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorMessage := "error reading user"
 
-		var data []*entities.User
+		var data []*entity.User
 		var err error
 
 		firstName := c.Query("first_name")
@@ -72,7 +72,7 @@ func listUser(service user.UseCase) gin.HandlerFunc {
 			data, err = service.SearchUser(firstName)
 		}
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -140,7 +140,7 @@ func updateUser(service user.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return
@@ -152,7 +152,7 @@ func updateUser(service user.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		if err := service.UpdateUser(&entities.User{
+		if err := service.UpdateUser(&entity.User{
 			ID:        idUUID,
 			FirstName: input.FirstName,
 			LastName:  input.LastName,
@@ -179,7 +179,7 @@ func deleteUser(service user.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return

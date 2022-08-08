@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-	"github.com/filipeandrade6/cooperagro/domain/entities"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/unitofmeasure"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +22,7 @@ func getUnitOfMeasureByID(service unitofmeasure.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorMessage := "error reading unit of measure"
 
-		id, err := entities.StringToID(c.Param("id"))
+		id, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
 			return
@@ -30,7 +30,7 @@ func getUnitOfMeasureByID(service unitofmeasure.UseCase) gin.HandlerFunc {
 
 		data, err := service.GetUnitOfMeasureByID(id)
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -55,7 +55,7 @@ func listUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 
 		data, err := service.ListUnitOfMeasure()
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -106,7 +106,7 @@ func updateUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return
@@ -118,7 +118,7 @@ func updateUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		if err := service.UpdateUnitOfMeasure(&entities.UnitOfMeasure{
+		if err := service.UpdateUnitOfMeasure(&entity.UnitOfMeasure{
 			ID:   idUUID,
 			Name: input.Name,
 		}); err != nil {
@@ -138,7 +138,7 @@ func deleteUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return

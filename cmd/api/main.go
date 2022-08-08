@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/handler"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/baseproduct"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/inventory"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/product"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/unitofmeasure"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/user"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres"
 	"github.com/gin-gonic/gin"
 )

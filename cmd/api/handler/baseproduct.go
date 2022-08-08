@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-	"github.com/filipeandrade6/cooperagro/domain/entities"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/baseproduct"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +22,7 @@ func getBaseProductByID(service baseproduct.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorMessage := "error reading baseproduct"
 
-		id, err := entities.StringToID(c.Param("id"))
+		id, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
 			return
@@ -30,7 +30,7 @@ func getBaseProductByID(service baseproduct.UseCase) gin.HandlerFunc {
 
 		data, err := service.GetBaseProductByID(id)
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -53,7 +53,7 @@ func listBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorMessage := "error reading baseproduct"
 
-		var data []*entities.BaseProduct
+		var data []*entity.BaseProduct
 		var err error
 
 		name := c.Query("name")
@@ -64,7 +64,7 @@ func listBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 			data, err = service.SearchBaseProduct(name)
 		}
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -115,7 +115,7 @@ func updateBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return
@@ -127,7 +127,7 @@ func updateBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		if err := service.UpdateBaseProduct(&entities.BaseProduct{
+		if err := service.UpdateBaseProduct(&entity.BaseProduct{
 			ID:   idUUID,
 			Name: input.Name,
 		}); err != nil {
@@ -147,7 +147,7 @@ func deleteBaseProduct(service baseproduct.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return

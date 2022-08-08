@@ -1,10 +1,10 @@
 package presenter
 
-import "github.com/filipeandrade6/cooperagro/domain/entities"
+import "github.com/filipeandrade6/cooperagro/domain/entity"
 
 type BaseProduct struct {
-	ID   entities.ID `json:"id"`
-	Name string      `json:"name"`
+	ID   entity.ID `json:"id"`
+	Name string    `json:"name"`
 }
 
 type CreateBaseProduct struct {

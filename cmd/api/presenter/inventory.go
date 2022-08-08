@@ -1,25 +1,25 @@
 package presenter
 
-import "github.com/filipeandrade6/cooperagro/domain/entities"
+import "github.com/filipeandrade6/cooperagro/domain/entity"
 
 type Inventory struct {
-	ID              entities.ID `json:"id"`
-	UserID          entities.ID `json:"user_id"`
-	ProductID       entities.ID `json:"product_id"`
-	Quantity        int         `json:"quantity"`
-	UnitOfMeasureID entities.ID `json:"unit_of_measure_id"`
+	ID              entity.ID `json:"id"`
+	UserID          entity.ID `json:"user_id"`
+	ProductID       entity.ID `json:"product_id"`
+	Quantity        int       `json:"quantity"`
+	UnitOfMeasureID entity.ID `json:"unit_of_measure_id"`
 }
 
 type CreateInventory struct {
-	UserID          entities.ID `json:"user_id" binding:"required"`
-	ProductID       entities.ID `json:"product_id" binding:"required"`
-	Quantity        int         `json:"quantity" binding:"required"`
-	UnitOfMeasureID entities.ID `json:"unit_of_measure_id" binding:"required"`
+	UserID          entity.ID `json:"user_id" binding:"required"`
+	ProductID       entity.ID `json:"product_id" binding:"required"`
+	Quantity        int       `json:"quantity" binding:"required"`
+	UnitOfMeasureID entity.ID `json:"unit_of_measure_id" binding:"required"`
 }
 
 type UpdateInventory struct {
-	UserID          entities.ID `json:"user_id" binding:"required"`
-	ProductID       entities.ID `json:"product_id" binding:"required"`
-	Quantity        int         `json:"quantity" binding:"required"`
-	UnitOfMeasureID entities.ID `json:"unit_of_measure_id" binding:"required"`
+	UserID          entity.ID `json:"user_id" binding:"required"`
+	ProductID       entity.ID `json:"product_id" binding:"required"`
+	Quantity        int       `json:"quantity" binding:"required"`
+	UnitOfMeasureID entity.ID `json:"unit_of_measure_id" binding:"required"`
 }

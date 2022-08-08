@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-	"github.com/filipeandrade6/cooperagro/domain/entities"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/inventory"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +22,7 @@ func getInventoryByID(service inventory.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorMessage := "error reading inventory"
 
-		id, err := entities.StringToID(c.Param("id"))
+		id, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
 			return
@@ -30,7 +30,7 @@ func getInventoryByID(service inventory.UseCase) gin.HandlerFunc {
 
 		data, err := service.GetInventoryByID(id)
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -58,7 +58,7 @@ func listInventory(service inventory.UseCase) gin.HandlerFunc {
 
 		data, err := service.ListInventory()
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -117,7 +117,7 @@ func updateInventory(service inventory.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return
@@ -129,7 +129,7 @@ func updateInventory(service inventory.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		if err := service.UpdateInventory(&entities.Inventory{
+		if err := service.UpdateInventory(&entity.Inventory{
 			ID:              idUUID,
 			UserID:          input.UserID,
 			ProductID:       input.ProductID,
@@ -152,7 +152,7 @@ func deleteInventory(service inventory.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return

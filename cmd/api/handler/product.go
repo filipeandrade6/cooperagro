@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-	"github.com/filipeandrade6/cooperagro/domain/entities"
-	"github.com/filipeandrade6/cooperagro/domain/usecases/product"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +22,7 @@ func getProductByID(service product.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorMessage := "error reading product"
 
-		id, err := entities.StringToID(c.Param("id"))
+		id, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
 			return
@@ -30,7 +30,7 @@ func getProductByID(service product.UseCase) gin.HandlerFunc {
 
 		data, err := service.GetProductByID(id)
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -56,7 +56,7 @@ func listProduct(service product.UseCase) gin.HandlerFunc {
 
 		data, err := service.ListProduct()
 
-		if err != nil && !errors.Is(err, entities.ErrNotFound) {
+		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
 			return
 		}
@@ -111,7 +111,7 @@ func updateProduct(service product.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return
@@ -123,7 +123,7 @@ func updateProduct(service product.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		if err := service.UpdateProduct(&entities.Product{
+		if err := service.UpdateProduct(&entity.Product{
 			ID:            idUUID,
 			Name:          input.Name,
 			BaseProductID: input.BaseProductID,
@@ -144,7 +144,7 @@ func deleteProduct(service product.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		idUUID, err := entities.StringToID(id)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return

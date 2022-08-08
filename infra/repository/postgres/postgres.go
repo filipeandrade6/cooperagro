@@ -5,8 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/filipeandrade6/cooperagro/domain/entities"
-
+	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -31,17 +30,17 @@ func NewPostgresRepo(urlConn string) (*Repo, error) {
 
 // -- Base product
 
-func (r *Repo) GetBaseProductByID(id entities.ID) (*entities.BaseProduct, error) {
+func (r *Repo) GetBaseProductByID(id entity.ID) (*entity.BaseProduct, error) {
 	ctx := context.Background()
 	bp, err := r.db.GetBaseProductByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return &entities.BaseProduct{
+	return &entity.BaseProduct{
 		ID:        bp.ID,
 		Name:      bp.Name,
 		CreatedAt: bp.CreatedAt,
@@ -49,20 +48,20 @@ func (r *Repo) GetBaseProductByID(id entities.ID) (*entities.BaseProduct, error)
 	}, nil
 }
 
-func (r *Repo) SearchBaseProduct(query string) ([]*entities.BaseProduct, error) {
+func (r *Repo) SearchBaseProduct(query string) ([]*entity.BaseProduct, error) {
 	ctx := context.Background()
 	bps, err := r.db.SearchBaseProduct(ctx, query)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var bpsOut []*entities.BaseProduct
+	var bpsOut []*entity.BaseProduct
 
 	for _, bp := range bps {
-		bpsOut = append(bpsOut, &entities.BaseProduct{
+		bpsOut = append(bpsOut, &entity.BaseProduct{
 			ID:        bp.ID,
 			Name:      bp.Name,
 			CreatedAt: bp.CreatedAt,
@@ -73,20 +72,20 @@ func (r *Repo) SearchBaseProduct(query string) ([]*entities.BaseProduct, error) 
 	return bpsOut, nil
 }
 
-func (r *Repo) ListBaseProduct() ([]*entities.BaseProduct, error) {
+func (r *Repo) ListBaseProduct() ([]*entity.BaseProduct, error) {
 	ctx := context.Background()
 	bps, err := r.db.ListBaseProduct(ctx)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var bpsOut []*entities.BaseProduct
+	var bpsOut []*entity.BaseProduct
 
 	for _, bp := range bps {
-		bpsOut = append(bpsOut, &entities.BaseProduct{
+		bpsOut = append(bpsOut, &entity.BaseProduct{
 			ID:        bp.ID,
 			Name:      bp.Name,
 			CreatedAt: bp.CreatedAt,
@@ -97,7 +96,7 @@ func (r *Repo) ListBaseProduct() ([]*entities.BaseProduct, error) {
 	return bpsOut, nil
 }
 
-func (r *Repo) CreateBaseProduct(e *entities.BaseProduct) (entities.ID, error) {
+func (r *Repo) CreateBaseProduct(e *entity.BaseProduct) (entity.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateBaseProduct(ctx, CreateBaseProductParams{
 		ID:        e.ID,
@@ -112,7 +111,7 @@ func (r *Repo) CreateBaseProduct(e *entities.BaseProduct) (entities.ID, error) {
 	return e.ID, nil
 }
 
-func (r *Repo) UpdateBaseProduct(e *entities.BaseProduct) error {
+func (r *Repo) UpdateBaseProduct(e *entity.BaseProduct) error {
 	ctx := context.Background()
 	err := r.db.UpdateBaseProduct(ctx, UpdateBaseProductParams{
 		Name:      e.Name,
@@ -127,7 +126,7 @@ func (r *Repo) UpdateBaseProduct(e *entities.BaseProduct) error {
 	return nil
 }
 
-func (r *Repo) DeleteBaseProduct(id entities.ID) error {
+func (r *Repo) DeleteBaseProduct(id entity.ID) error {
 	ctx := context.Background()
 	err := r.db.DeleteBaseProduct(ctx, id)
 	if err != nil {
@@ -139,17 +138,17 @@ func (r *Repo) DeleteBaseProduct(id entities.ID) error {
 
 // -- User
 
-func (r *Repo) GetUserByID(id entities.ID) (*entities.User, error) {
+func (r *Repo) GetUserByID(id entity.ID) (*entity.User, error) {
 	ctx := context.Background()
 	c, err := r.db.GetUserByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return &entities.User{
+	return &entity.User{
 		ID:        c.ID,
 		FirstName: c.FirstName,
 		LastName:  c.LastName,
@@ -164,19 +163,19 @@ func (r *Repo) GetUserByID(id entities.ID) (*entities.User, error) {
 	}, nil
 }
 
-func (r *Repo) SearchUser(query string) ([]*entities.User, error) {
+func (r *Repo) SearchUser(query string) ([]*entity.User, error) {
 	ctx := context.Background()
 	users, err := r.db.SearchUser(ctx, query) // TODO SearchUser faz busca na coluna first_name -> alterar depois
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var usersOut []*entities.User
+	var usersOut []*entity.User
 	for _, user := range users {
-		usersOut = append(usersOut, &entities.User{
+		usersOut = append(usersOut, &entity.User{
 			ID:        user.ID,
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
@@ -194,19 +193,19 @@ func (r *Repo) SearchUser(query string) ([]*entities.User, error) {
 	return usersOut, nil
 }
 
-func (r *Repo) ListUser() ([]*entities.User, error) {
+func (r *Repo) ListUser() ([]*entity.User, error) {
 	ctx := context.Background()
 	users, err := r.db.ListUser(ctx)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var usersOut []*entities.User
+	var usersOut []*entity.User
 	for _, User := range users {
-		usersOut = append(usersOut, &entities.User{
+		usersOut = append(usersOut, &entity.User{
 			ID:        User.ID,
 			FirstName: User.FirstName,
 			LastName:  User.LastName,
@@ -224,7 +223,7 @@ func (r *Repo) ListUser() ([]*entities.User, error) {
 	return usersOut, nil
 }
 
-func (r *Repo) CreateUser(e *entities.User) (entities.ID, error) {
+func (r *Repo) CreateUser(e *entity.User) (entity.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateUser(ctx, CreateUserParams{
 		ID:        e.ID,
@@ -246,7 +245,7 @@ func (r *Repo) CreateUser(e *entities.User) (entities.ID, error) {
 	return e.ID, nil
 }
 
-func (r *Repo) UpdateUser(e *entities.User) error {
+func (r *Repo) UpdateUser(e *entity.User) error {
 	ctx := context.Background()
 	err := r.db.UpdateUser(ctx, UpdateUserParams{
 		FirstName: e.FirstName,
@@ -268,7 +267,7 @@ func (r *Repo) UpdateUser(e *entities.User) error {
 	return nil
 }
 
-func (r *Repo) DeleteUser(id entities.ID) error {
+func (r *Repo) DeleteUser(id entity.ID) error {
 	ctx := context.Background()
 	err := r.db.DeleteUser(ctx, id)
 	if err != nil {
@@ -280,17 +279,17 @@ func (r *Repo) DeleteUser(id entities.ID) error {
 
 // -- Inventory
 
-func (r *Repo) GetInventoryByID(id entities.ID) (*entities.Inventory, error) {
+func (r *Repo) GetInventoryByID(id entity.ID) (*entity.Inventory, error) {
 	ctx := context.Background()
 	i, err := r.db.GetInventoryByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return &entities.Inventory{
+	return &entity.Inventory{
 		ID:              i.ID,
 		UserID:          i.UserID,
 		ProductID:       i.ProductID,
@@ -301,19 +300,19 @@ func (r *Repo) GetInventoryByID(id entities.ID) (*entities.Inventory, error) {
 	}, nil
 }
 
-func (r *Repo) ListInventory() ([]*entities.Inventory, error) {
+func (r *Repo) ListInventory() ([]*entity.Inventory, error) {
 	ctx := context.Background()
 	inventories, err := r.db.ListInventory(ctx)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var inventoriesOut []*entities.Inventory
+	var inventoriesOut []*entity.Inventory
 	for _, inventory := range inventories {
-		inventoriesOut = append(inventoriesOut, &entities.Inventory{
+		inventoriesOut = append(inventoriesOut, &entity.Inventory{
 			ID:              inventory.ID,
 			UserID:          inventory.UserID,
 			ProductID:       inventory.ProductID,
@@ -327,7 +326,7 @@ func (r *Repo) ListInventory() ([]*entities.Inventory, error) {
 	return inventoriesOut, nil
 }
 
-func (r *Repo) CreateInventory(e *entities.Inventory) (entities.ID, error) {
+func (r *Repo) CreateInventory(e *entity.Inventory) (entity.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateInventory(ctx, CreateInventoryParams{
 		ID:              e.ID,
@@ -345,7 +344,7 @@ func (r *Repo) CreateInventory(e *entities.Inventory) (entities.ID, error) {
 	return e.ID, nil
 }
 
-func (r *Repo) UpdateInventory(e *entities.Inventory) error {
+func (r *Repo) UpdateInventory(e *entity.Inventory) error {
 	ctx := context.Background()
 	err := r.db.UpdateInventory(ctx, UpdateInventoryParams{
 		UserID:          e.UserID,
@@ -363,7 +362,7 @@ func (r *Repo) UpdateInventory(e *entities.Inventory) error {
 	return nil
 }
 
-func (r *Repo) DeleteInventory(id entities.ID) error {
+func (r *Repo) DeleteInventory(id entity.ID) error {
 	ctx := context.Background()
 	err := r.db.DeleteInventory(ctx, id)
 	if err != nil {
@@ -375,17 +374,17 @@ func (r *Repo) DeleteInventory(id entities.ID) error {
 
 // -- Product
 
-func (r *Repo) GetProductByID(id entities.ID) (*entities.Product, error) {
+func (r *Repo) GetProductByID(id entity.ID) (*entity.Product, error) {
 	ctx := context.Background()
 	p, err := r.db.GetProductByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return &entities.Product{
+	return &entity.Product{
 		ID:            p.ID,
 		Name:          p.Name,
 		BaseProductID: p.BaseProductID,
@@ -394,19 +393,19 @@ func (r *Repo) GetProductByID(id entities.ID) (*entities.Product, error) {
 	}, nil
 }
 
-func (r *Repo) SearchProduct(query string) ([]*entities.Product, error) {
+func (r *Repo) SearchProduct(query string) ([]*entity.Product, error) {
 	ctx := context.Background()
 	products, err := r.db.SearchProduct(ctx, query)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var productsOut []*entities.Product
+	var productsOut []*entity.Product
 	for _, product := range products {
-		productsOut = append(productsOut, &entities.Product{
+		productsOut = append(productsOut, &entity.Product{
 			ID:            product.ID,
 			Name:          product.Name,
 			BaseProductID: product.BaseProductID,
@@ -418,19 +417,19 @@ func (r *Repo) SearchProduct(query string) ([]*entities.Product, error) {
 	return productsOut, nil
 }
 
-func (r *Repo) ListProduct() ([]*entities.Product, error) {
+func (r *Repo) ListProduct() ([]*entity.Product, error) {
 	ctx := context.Background()
 	products, err := r.db.ListProduct(ctx)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var productsOut []*entities.Product
+	var productsOut []*entity.Product
 	for _, product := range products {
-		productsOut = append(productsOut, &entities.Product{
+		productsOut = append(productsOut, &entity.Product{
 			ID:            product.ID,
 			Name:          product.Name,
 			BaseProductID: product.BaseProductID,
@@ -442,7 +441,7 @@ func (r *Repo) ListProduct() ([]*entities.Product, error) {
 	return productsOut, nil
 }
 
-func (r *Repo) CreateProduct(e *entities.Product) (entities.ID, error) {
+func (r *Repo) CreateProduct(e *entity.Product) (entity.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateProduct(ctx, CreateProductParams{
 		ID:            e.ID,
@@ -458,7 +457,7 @@ func (r *Repo) CreateProduct(e *entities.Product) (entities.ID, error) {
 	return e.ID, nil
 }
 
-func (r *Repo) UpdateProduct(e *entities.Product) error {
+func (r *Repo) UpdateProduct(e *entity.Product) error {
 	ctx := context.Background()
 	err := r.db.UpdateProduct(ctx, UpdateProductParams{
 		Name:          e.Name,
@@ -474,7 +473,7 @@ func (r *Repo) UpdateProduct(e *entities.Product) error {
 	return nil
 }
 
-func (r *Repo) DeleteProduct(id entities.ID) error {
+func (r *Repo) DeleteProduct(id entity.ID) error {
 	ctx := context.Background()
 	err := r.db.DeleteProduct(ctx, id)
 	if err != nil {
@@ -486,17 +485,17 @@ func (r *Repo) DeleteProduct(id entities.ID) error {
 
 // -- Unit of measure
 
-func (r *Repo) GetUnitOfMeasureByID(id entities.ID) (*entities.UnitOfMeasure, error) {
+func (r *Repo) GetUnitOfMeasureByID(id entity.ID) (*entity.UnitOfMeasure, error) {
 	ctx := context.Background()
 	u, err := r.db.GetUnitOfMeasureByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return &entities.UnitOfMeasure{
+	return &entity.UnitOfMeasure{
 		ID:        u.ID,
 		Name:      u.Name,
 		CreatedAt: u.CreatedAt,
@@ -504,19 +503,19 @@ func (r *Repo) GetUnitOfMeasureByID(id entities.ID) (*entities.UnitOfMeasure, er
 	}, nil
 }
 
-func (r *Repo) SearchUnitOfMeasure(query string) ([]*entities.UnitOfMeasure, error) {
+func (r *Repo) SearchUnitOfMeasure(query string) ([]*entity.UnitOfMeasure, error) {
 	ctx := context.Background()
 	units, err := r.db.SearchUnitOfMeasure(ctx, query)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var unitsOut []*entities.UnitOfMeasure
+	var unitsOut []*entity.UnitOfMeasure
 	for _, unit := range units {
-		unitsOut = append(unitsOut, &entities.UnitOfMeasure{
+		unitsOut = append(unitsOut, &entity.UnitOfMeasure{
 			ID:        unit.ID,
 			Name:      unit.Name,
 			CreatedAt: unit.CreatedAt,
@@ -527,19 +526,19 @@ func (r *Repo) SearchUnitOfMeasure(query string) ([]*entities.UnitOfMeasure, err
 	return unitsOut, nil
 }
 
-func (r *Repo) ListUnitOfMeasure() ([]*entities.UnitOfMeasure, error) {
+func (r *Repo) ListUnitOfMeasure() ([]*entity.UnitOfMeasure, error) {
 	ctx := context.Background()
 	units, err := r.db.ListUnitOfMeasure(ctx)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, entity.ErrNotFound
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var unitsOut []*entities.UnitOfMeasure
+	var unitsOut []*entity.UnitOfMeasure
 	for _, unit := range units {
-		unitsOut = append(unitsOut, &entities.UnitOfMeasure{
+		unitsOut = append(unitsOut, &entity.UnitOfMeasure{
 			ID:        unit.ID,
 			Name:      unit.Name,
 			CreatedAt: unit.CreatedAt,
@@ -550,7 +549,7 @@ func (r *Repo) ListUnitOfMeasure() ([]*entities.UnitOfMeasure, error) {
 	return unitsOut, nil
 }
 
-func (r *Repo) CreateUnitOfMeasure(e *entities.UnitOfMeasure) (entities.ID, error) {
+func (r *Repo) CreateUnitOfMeasure(e *entity.UnitOfMeasure) (entity.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateUnitOfMeasure(ctx, CreateUnitOfMeasureParams{
 		ID:        e.ID,
@@ -565,7 +564,7 @@ func (r *Repo) CreateUnitOfMeasure(e *entities.UnitOfMeasure) (entities.ID, erro
 	return e.ID, nil
 }
 
-func (r *Repo) UpdateUnitOfMeasure(e *entities.UnitOfMeasure) error {
+func (r *Repo) UpdateUnitOfMeasure(e *entity.UnitOfMeasure) error {
 	ctx := context.Background()
 	err := r.db.UpdateUnitOfMeasure(ctx, UpdateUnitOfMeasureParams{
 		Name:      e.Name,
@@ -580,7 +579,7 @@ func (r *Repo) UpdateUnitOfMeasure(e *entities.UnitOfMeasure) error {
 	return nil
 }
 
-func (r *Repo) DeleteUnitOfMeasure(id entities.ID) error {
+func (r *Repo) DeleteUnitOfMeasure(id entity.ID) error {
 	ctx := context.Background()
 	err := r.db.DeleteUnitOfMeasure(ctx, id)
 	if err != nil {

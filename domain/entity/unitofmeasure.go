@@ -1,30 +1,30 @@
-package entities
+package entity
 
 import "time"
 
-type BaseProduct struct {
+type UnitOfMeasure struct {
 	ID        ID
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func NewBaseProduct(name string) (*BaseProduct, error) {
-	bp := &BaseProduct{
+func NewUnitOfMeasure(name string) (*UnitOfMeasure, error) {
+	u := &UnitOfMeasure{
 		ID:        NewID(),
 		Name:      name,
 		CreatedAt: time.Now(),
 	}
-	err := bp.Validate()
+	err := u.Validate()
 	if err != nil {
 		return nil, ErrInvalidEntity
 	}
 
-	return bp, nil
+	return u, nil
 }
 
-func (bp *BaseProduct) Validate() error {
-	if bp.Name == "" {
+func (u *UnitOfMeasure) Validate() error {
+	if u.Name == "" {
 		return ErrInvalidEntity
 	}
 
