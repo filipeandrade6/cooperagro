@@ -18,21 +18,21 @@ func newFixtureBaseProduct() *entity.BaseProduct {
 func TestCreate(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
-	u := newFixtureBaseProduct()
-	_, err := s.CreateBaseProduct((u.Name))
+	bp := newFixtureBaseProduct()
+	_, err := s.CreateBaseProduct((bp.Name))
 	assert.Nil(t, err)
-	assert.False(t, u.CreatedAt.IsZero())
+	assert.False(t, bp.CreatedAt.IsZero())
 }
 
 func TestSearchListGetBaseProduct(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
-	u1 := newFixtureBaseProduct()
-	u2 := newFixtureBaseProduct()
-	u2.Name = "manga"
+	bp1 := newFixtureBaseProduct()
+	bp2 := newFixtureBaseProduct()
+	bp2.Name = "manga"
 
-	uID, _ := s.CreateBaseProduct(u1.Name)
-	_, _ = s.CreateBaseProduct(u2.Name)
+	uID, _ := s.CreateBaseProduct(bp1.Name)
+	_, _ = s.CreateBaseProduct(bp2.Name)
 
 	t.Run("search", func(t *testing.T) {
 		bp, err := s.SearchBaseProduct("MANGA")
@@ -54,7 +54,7 @@ func TestSearchListGetBaseProduct(t *testing.T) {
 	t.Run("get", func(t *testing.T) {
 		bp, err := s.GetBaseProductByID(uID)
 		assert.Nil(t, err)
-		assert.Equal(t, u1.Name, bp.Name)
+		assert.Equal(t, bp1.Name, bp.Name)
 	})
 }
 

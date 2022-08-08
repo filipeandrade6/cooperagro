@@ -33,7 +33,7 @@ func TestListGetInventory(t *testing.T) {
 	s := NewService(repo)
 	i := newFixtureInventory()
 
-	uID, _ := s.CreateInventory(i.UserID, i.ProductID, i.Quantity, i.UnitOfMeasureID)
+	iID, _ := s.CreateInventory(i.UserID, i.ProductID, i.Quantity, i.UnitOfMeasureID)
 
 	t.Run("list all", func(t *testing.T) {
 		all, err := s.ListInventory()
@@ -42,7 +42,7 @@ func TestListGetInventory(t *testing.T) {
 	})
 
 	t.Run("get", func(t *testing.T) {
-		j, err := s.GetInventoryByID(uID)
+		j, err := s.GetInventoryByID(iID)
 		assert.Nil(t, err)
 		assert.Equal(t, i.Quantity, j.Quantity)
 	})
