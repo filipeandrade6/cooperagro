@@ -1,14 +1,13 @@
-package entity_test
+package entity
 
 import (
 	"testing"
 
-	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewUser(t *testing.T) {
-	bp, err := entity.NewUser(
+	bp, err := NewUser(
 		"Filipe",
 		"Andrade",
 		"Main street",
@@ -58,7 +57,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: -12.123456,
 			roles:     []string{"producer", "buyer"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -69,7 +68,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: -12.123456,
 			roles:     []string{"producer", "buyer"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -80,7 +79,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: -12.123456,
 			roles:     []string{"producer", "buyer"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -91,7 +90,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: -12.123456,
 			roles:     []string{"producer", "buyer"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -102,7 +101,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: -12.123456,
 			roles:     []string{"producer", "buyer"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -113,7 +112,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  0.0,
 			longitude: -12.123456,
 			roles:     []string{"producer", "buyer"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -124,7 +123,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: 0.0,
 			roles:     []string{"producer", "buyer"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -135,7 +134,7 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: -12.123456,
 			roles:     nil,
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 		{
 			firstName: "Filipe",
@@ -146,12 +145,12 @@ func TestUserValidate(t *testing.T) {
 			latitude:  -12.123456,
 			longitude: -12.123456,
 			roles:     []string{"research"},
-			want:      entity.ErrInvalidEntity,
+			want:      ErrInvalidEntity,
 		},
 	}
 
 	for _, tc := range tests {
-		_, err := entity.NewUser(
+		_, err := NewUser(
 			tc.firstName,
 			tc.lastName,
 			tc.address,

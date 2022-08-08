@@ -1,18 +1,17 @@
-package entity_test
+package entity
 
 import (
 	"testing"
 
-	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewInventory(t *testing.T) {
-	i, err := entity.NewInventory(
-		entity.NewID(),
-		entity.NewID(),
+	i, err := NewInventory(
+		NewID(),
+		NewID(),
 		1,
-		entity.NewID(),
+		NewID(),
 	)
 	assert.Nil(t, err)
 	assert.Equal(t, i.Quantity, 1)
@@ -21,39 +20,39 @@ func TestNewInventory(t *testing.T) {
 
 func TestInventoryValidate(t *testing.T) {
 	type test struct {
-		userID          entity.ID
-		productID       entity.ID
+		userID          ID
+		productID       ID
 		quantity        int
-		unitOfMeasureID entity.ID
+		unitOfMeasureID ID
 		want            error
 	}
 
 	tests := []test{
 		{
-			userID:          entity.NewID(),
-			productID:       entity.NewID(),
+			userID:          NewID(),
+			productID:       NewID(),
 			quantity:        1,
-			unitOfMeasureID: entity.NewID(),
+			unitOfMeasureID: NewID(),
 			want:            nil,
 		},
 		{
-			userID:          entity.NewID(),
-			productID:       entity.NewID(),
+			userID:          NewID(),
+			productID:       NewID(),
 			quantity:        0,
-			unitOfMeasureID: entity.NewID(),
+			unitOfMeasureID: NewID(),
 			want:            nil,
 		},
 		{
-			userID:          entity.NewID(),
-			productID:       entity.NewID(),
+			userID:          NewID(),
+			productID:       NewID(),
 			quantity:        -1,
-			unitOfMeasureID: entity.NewID(),
-			want:            entity.ErrInvalidEntity,
+			unitOfMeasureID: NewID(),
+			want:            ErrInvalidEntity,
 		},
 	}
 
 	for _, tc := range tests {
-		_, err := entity.NewInventory(
+		_, err := NewInventory(
 			tc.userID,
 			tc.productID,
 			tc.quantity,

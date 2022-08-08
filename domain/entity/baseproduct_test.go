@@ -1,15 +1,13 @@
-package entity_test
+package entity
 
 import (
 	"testing"
-
-	"github.com/filipeandrade6/cooperagro/domain/entity"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewBaseProduct(t *testing.T) {
-	bp, err := entity.NewBaseProduct("tomate")
+	bp, err := NewBaseProduct("tomate")
 	assert.Nil(t, err)
 	assert.Equal(t, bp.Name, "tomate")
 	assert.NotNil(t, bp.ID)
@@ -28,12 +26,12 @@ func TestBaseProductValidate(t *testing.T) {
 		},
 		{
 			name: "",
-			want: entity.ErrInvalidEntity,
+			want: ErrInvalidEntity,
 		},
 	}
 
 	for _, tc := range tests {
-		_, err := entity.NewBaseProduct(tc.name)
+		_, err := NewBaseProduct(tc.name)
 		assert.Equal(t, err, tc.want)
 	}
 }

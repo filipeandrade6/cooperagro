@@ -1,14 +1,13 @@
-package entity_test
+package entity
 
 import (
 	"testing"
 
-	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewProduct(t *testing.T) {
-	p, err := entity.NewProduct("lima", entity.NewID())
+	p, err := NewProduct("lima", NewID())
 	assert.Nil(t, err)
 	assert.Equal(t, p.Name, "lima")
 	assert.NotNil(t, p.ID)
@@ -17,25 +16,25 @@ func TestNewProduct(t *testing.T) {
 func TestProductValidate(t *testing.T) {
 	type test struct {
 		name          string
-		baseProductID entity.ID
+		baseProductID ID
 		want          error
 	}
 
 	tests := []test{
 		{
 			name:          "lima",
-			baseProductID: entity.NewID(),
+			baseProductID: NewID(),
 			want:          nil,
 		},
 		{
 			name:          "",
-			baseProductID: entity.NewID(),
-			want:          entity.ErrInvalidEntity,
+			baseProductID: NewID(),
+			want:          ErrInvalidEntity,
 		},
 	}
 
 	for _, tc := range tests {
-		_, err := entity.NewProduct(tc.name, tc.baseProductID)
+		_, err := NewProduct(tc.name, tc.baseProductID)
 		assert.Equal(t, err, tc.want)
 	}
 }

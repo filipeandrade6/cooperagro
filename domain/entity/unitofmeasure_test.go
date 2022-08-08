@@ -1,14 +1,13 @@
-package entity_test
+package entity
 
 import (
 	"testing"
 
-	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewUnitOfMeasure(t *testing.T) {
-	u, err := entity.NewUnitOfMeasure("kilogram")
+	u, err := NewUnitOfMeasure("kilogram")
 	assert.Nil(t, err)
 	assert.Equal(t, u.Name, "kilogram")
 	assert.NotNil(t, u.ID)
@@ -27,12 +26,12 @@ func TestUnitOfMeasureValidate(t *testing.T) {
 		},
 		{
 			name: "",
-			want: entity.ErrInvalidEntity,
+			want: ErrInvalidEntity,
 		},
 	}
 
 	for _, tc := range tests {
-		_, err := entity.NewUnitOfMeasure(tc.name)
+		_, err := NewUnitOfMeasure(tc.name)
 		assert.Equal(t, err, tc.want)
 	}
 }
