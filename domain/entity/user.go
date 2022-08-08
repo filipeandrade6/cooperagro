@@ -77,6 +77,10 @@ func (u *User) Validate() error {
 
 // checkRole verifies if the User roles is valid
 func (u *User) checkRoles() bool {
+	if len(u.Roles) == 0 {
+		return false
+	}
+
 	for _, r := range u.Roles {
 		if r == "admin" || r == "producer" || r == "buyer" {
 			continue

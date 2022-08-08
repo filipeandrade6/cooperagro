@@ -8,10 +8,10 @@ import (
 )
 
 func TestNewUnitOfMeasure(t *testing.T) {
-	bp, err := entity.NewUnitOfMeasure("kilogram")
+	u, err := entity.NewUnitOfMeasure("kilogram")
 	assert.Nil(t, err)
-	assert.Equal(t, bp.Name, "kilogram")
-	assert.NotNil(t, bp.ID)
+	assert.Equal(t, u.Name, "kilogram")
+	assert.NotNil(t, u.ID)
 }
 
 func TestUnitOfMeasureValidate(t *testing.T) {
