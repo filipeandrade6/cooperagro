@@ -7,6 +7,7 @@ TODO:
  - [ ] unique constraints no DB, validação
  - [ ] padronizar as repostas de erro ao usuário da api
  - [ ] arrumar created_at e update_at
+ - [ ] adicionar contratos/inventorios na entidade user?
 
 reference:
  - [ddd-go-template by @VinGracia](https://github.com/VinGarcia/ddd-go-template/blob/master/v2-domain-adapters-and-helpers)

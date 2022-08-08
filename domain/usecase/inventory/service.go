@@ -46,12 +46,15 @@ func (s *Service) CreateInventory(
 	quantity int,
 	unitOfMeasureID entity.ID,
 ) (entity.ID, error) {
-	i := entity.NewInventory(
+	i, err := entity.NewInventory(
 		customerID,
 		productID,
 		quantity,
 		unitOfMeasureID,
 	)
+	if err != nil {
+		return entity.NewID(), err
+	}
 	return s.repo.CreateInventory(i)
 }
 

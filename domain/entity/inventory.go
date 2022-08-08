@@ -19,8 +19,9 @@ func NewInventory(
 	productID ID,
 	quantity int,
 	unitOfMeasureID ID,
-) *Inventory {
-	return &Inventory{
+) (*Inventory, error) {
+
+	i := &Inventory{
 		ID:              NewID(),
 		UserID:          userID,
 		ProductID:       productID,
@@ -28,4 +29,19 @@ func NewInventory(
 		UnitOfMeasureID: unitOfMeasureID,
 		CreatedAt:       time.Now(),
 	}
+
+	err := i.Validate()
+	if err != nil {
+		return nil, ErrInvalidEntity
+	}
+
+	return i, nil
+}
+
+// Validate validate Inventory
+func (i *Inventory) Validate() error {
+	if i.Quantity < 0 {
+		return ErrInvalidEntity
+	}
+	return nil
 }
