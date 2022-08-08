@@ -46,18 +46,36 @@ func TestSearchListGetUser(t *testing.T) {
 	s := NewService(repo)
 	u1 := newFixtureUser()
 	u2 := newFixtureUser()
-	u2.Name = "manga"
+	u2.FirstName = "Ana"
 
-	uID, _ := s.CreateUser(u1.Name)
-	_, _ = s.CreateUser(u2.Name)
+	uID, _ := s.CreateUser(
+		u1.FirstName,
+		u1.LastName,
+		u1.Address,
+		u1.Phone,
+		u1.Email,
+		u1.Latitude,
+		u1.Longitude,
+		u1.Roles,
+	)
+	_, _ = s.CreateUser(
+		u2.FirstName,
+		u2.LastName,
+		u2.Address,
+		u2.Phone,
+		u2.Email,
+		u2.Latitude,
+		u2.Longitude,
+		u2.Roles,
+	)
 
 	t.Run("search", func(t *testing.T) {
-		u, err := s.SearchUser("MANGA")
+		u, err := s.SearchUser("ANA")
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(u))
-		assert.Equal(t, "manga", u[0].Name)
+		assert.Equal(t, "Ana", u[0].FirstName)
 
-		u, err = s.SearchUser("acerola")
+		u, err = s.SearchUser("josé")
 		assert.Equal(t, entity.ErrNotFound, err)
 		assert.Nil(t, u)
 	})
@@ -71,7 +89,7 @@ func TestSearchListGetUser(t *testing.T) {
 	t.Run("get", func(t *testing.T) {
 		u, err := s.GetUserByID(uID)
 		assert.Nil(t, err)
-		assert.Equal(t, u1.Name, u.Name)
+		assert.Equal(t, u1.FirstName, u.FirstName)
 	})
 }
 
@@ -82,14 +100,23 @@ func TestUpdateDeleteUser(t *testing.T) {
 	s := NewService(repo)
 	u := newFixtureUser()
 
-	id, err := s.CreateUser(u.Name)
+	id, err := s.CreateUser(
+		u.FirstName,
+		u.LastName,
+		u.Address,
+		u.Phone,
+		u.Email,
+		u.Latitude,
+		u.Longitude,
+		u.Roles,
+	)
 	assert.Nil(t, err)
 	saved, _ := s.GetUserByID(id)
-	saved.Name = "manga"
+	saved.FirstName = "ana"
 	assert.Nil(t, s.UpdateUser(saved))
 	updated, err := s.GetUserByID(id)
 	assert.Nil(t, err)
-	assert.Equal(t, "manga", updated.Name)
+	assert.Equal(t, "ana", updated.FirstName)
 
 	assert.Nil(t, s.DeleteUser(id))
 	assert.Equal(t, entity.ErrNotFound, s.DeleteUser(id))
