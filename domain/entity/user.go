@@ -2,6 +2,8 @@ package entity
 
 import (
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // User data
@@ -15,6 +17,7 @@ type User struct {
 	Latitude  float32
 	Longitude float32
 	Roles     []string
+	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -29,6 +32,7 @@ func NewUser(
 	latitude,
 	longitude float32,
 	roles []string,
+	password string,
 ) (*User, error) {
 	c := &User{
 		ID:        NewID(),
@@ -42,8 +46,13 @@ func NewUser(
 		Roles:     roles,
 		CreatedAt: time.Now(),
 	}
+	pwd, err := generatePassword(password)
+	if err != nil {
+		return nil, err
+	}
 
-	err := c.Validate()
+	c.Password = pwd
+	err = c.Validate()
 	if err != nil {
 		return nil, ErrInvalidEntity
 	}
@@ -88,4 +97,20 @@ func (u *User) checkRoles() bool {
 		return false
 	}
 	return true
+}
+
+func (u *User) ValidatePassword(p string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(p))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func generatePassword(raw string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(raw), 10)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
 }
