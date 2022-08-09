@@ -32,20 +32,28 @@ func (i *inmem) ListInventory() ([]*entity.Inventory, error) {
 	return d, nil
 }
 
-// TODO considerar erro de unique
-
 func (i *inmem) CreateInventory(e *entity.Inventory) (entity.ID, error) {
+	for _, j := range i.m {
+		if e.UserID == j.UserID && e.ProductID == j.ProductID && e.UnitOfMeasureID == j.UnitOfMeasureID {
+			return e.ID, entity.ErrEntityAlreadyExists
+		}
+	}
+
 	i.m[e.ID] = e
 
 	return e.ID, nil
 }
 
-// TODO considerar erro de unique
-
 func (i *inmem) UpdateInventory(e *entity.Inventory) error {
 	_, err := i.GetInventoryByID(e.ID)
 	if err != nil {
 		return err
+	}
+
+	for _, j := range i.m {
+		if e.UserID == j.UserID && e.ProductID == j.ProductID && e.UnitOfMeasureID == j.UnitOfMeasureID {
+			return entity.ErrEntityAlreadyExists
+		}
 	}
 
 	i.m[e.ID] = e

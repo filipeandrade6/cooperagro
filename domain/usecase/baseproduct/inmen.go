@@ -46,6 +46,12 @@ func (i *inmem) ListBaseProduct() ([]*entity.BaseProduct, error) {
 }
 
 func (i *inmem) CreateBaseProduct(e *entity.BaseProduct) (entity.ID, error) {
+	for _, j := range i.m {
+		if e.Name == j.Name {
+			return e.ID, entity.ErrEntityAlreadyExists
+		}
+	}
+
 	i.m[e.ID] = e
 
 	return e.ID, nil
@@ -55,6 +61,12 @@ func (i *inmem) UpdateBaseProduct(e *entity.BaseProduct) error {
 	_, err := i.GetBaseProductByID(e.ID)
 	if err != nil {
 		return err
+	}
+
+	for _, j := range i.m {
+		if e.Name == j.Name {
+			return entity.ErrEntityAlreadyExists
+		}
 	}
 
 	i.m[e.ID] = e

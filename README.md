@@ -1,13 +1,10 @@
 TODO:
 
- - [ ] inmem deve constar erro entity.ErrEntityAlreadyExist
+ - [ ] arrumar o created_at and updated_at
  - [ ] usecase deve tratar erros do banco de dados
- - [ ] considerar UNIQUES do db no inmem mock
- - [ ] adicionar UNIQUES no banco de dados? - baseproduct.Name, etc (unique product (name/baseproct))
  - [ ] updated_at pode ser nulo durante a criação?
  - [ ] adicionar logger
  - [ ] search by name
- - [ ] separar entidade users -> produtores, compradores
  - [ ] search customers -> first name para todas colunas
  - [ ] unique constraints no DB, validação
  - [ ] padronizar as repostas de erro ao usuário da api

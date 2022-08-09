@@ -34,13 +34,12 @@ CREATE TABLE base_products (
 
 CREATE TABLE products (
     id UUID,
-	name VARCHAR(30) NOT NULL UNIQUE,
+	name VARCHAR(30) NOT NULL,
     base_product_id UUID NOT NULL,
 	created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL,
 
 	PRIMARY KEY (id),
-	UNIQUE(name, base_product_id),
 	CONSTRAINT base_product_id FOREIGN KEY (base_product_id) REFERENCES base_products(id)
 );
 

@@ -46,6 +46,12 @@ func (i *inmem) ListUnitOfMeasure() ([]*entity.UnitOfMeasure, error) {
 }
 
 func (i *inmem) CreateUnitOfMeasure(e *entity.UnitOfMeasure) (entity.ID, error) {
+	for _, j := range i.m {
+		if e.Name == j.Name {
+			return e.ID, entity.ErrEntityAlreadyExists
+		}
+	}
+
 	i.m[e.ID] = e
 
 	return e.ID, nil
@@ -55,6 +61,12 @@ func (i *inmem) UpdateUnitOfMeasure(e *entity.UnitOfMeasure) error {
 	_, err := i.GetUnitOfMeasureByID(e.ID)
 	if err != nil {
 		return err
+	}
+
+	for _, j := range i.m {
+		if e.Name == j.Name {
+			return entity.ErrEntityAlreadyExists
+		}
 	}
 
 	i.m[e.ID] = e

@@ -6,6 +6,7 @@ import (
 
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres/data"
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -109,6 +110,11 @@ func (r *Repo) CreateUser(e *entity.User) (entity.ID, error) {
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
 	})
+
+	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+		return e.ID, entity.ErrEntityAlreadyExists
+	}
+
 	if err != nil {
 		return e.ID, err
 	}
@@ -131,6 +137,11 @@ func (r *Repo) UpdateUser(e *entity.User) error {
 		UpdatedAt: e.UpdatedAt,
 		ID:        e.ID,
 	})
+
+	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+		return entity.ErrEntityAlreadyExists
+	}
+
 	if err != nil {
 		return err
 	}

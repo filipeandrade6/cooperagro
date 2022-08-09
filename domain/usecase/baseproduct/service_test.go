@@ -15,11 +15,31 @@ func newFixtureBaseProduct() *entity.BaseProduct {
 	}
 }
 
+func TestService_GetBaseProductByID(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+	bp := newFixtureBaseProduct()
+
+	id, _ := s.CreateBaseProduct(bp.Name)
+}
+
+func TestService_CreateBaseProduct(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+	bp := newFixtureBaseProduct()
+	_, err := s.CreateBaseProduct(bp.Name)
+	assert.Nil(t, err)
+	assert.False(t, bp.CreatedAt.IsZero())
+
+	_, err = s.CreateBaseProduct(bp.Name)
+	assert.Equal(t, entity.ErrEntityAlreadyExists, err)
+}
+
 func TestCreate(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
 	bp := newFixtureBaseProduct()
-	_, err := s.CreateBaseProduct((bp.Name))
+	_, err := s.CreateBaseProduct(bp.Name)
 	assert.Nil(t, err)
 	assert.False(t, bp.CreatedAt.IsZero())
 }
