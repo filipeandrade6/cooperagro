@@ -28,22 +28,22 @@ func TestCreate(t *testing.T) {
 func TestSearchListGetProduct(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
-	bp1 := newFixtureProduct()
-	bp2 := newFixtureProduct()
-	bp2.Name = "bahia"
+	p1 := newFixtureProduct()
+	p2 := newFixtureProduct()
+	p2.Name = "bahia"
 
-	uID, _ := s.CreateProduct(bp1.Name, bp1.BaseProductID)
-	_, _ = s.CreateProduct(bp2.Name, bp2.BaseProductID)
+	uID, _ := s.CreateProduct(p1.Name, p1.BaseProductID)
+	_, _ = s.CreateProduct(p2.Name, p2.BaseProductID)
 
 	t.Run("search", func(t *testing.T) {
-		bp, err := s.SearchProduct("BAHIA")
+		p, err := s.SearchProduct("BAHIA")
 		assert.Nil(t, err)
-		assert.Equal(t, 1, len(bp))
-		assert.Equal(t, "bahia", bp[0].Name)
+		assert.Equal(t, 1, len(p))
+		assert.Equal(t, "bahia", p[0].Name)
 
-		bp, err = s.SearchProduct("pera")
+		p, err = s.SearchProduct("pera")
 		assert.Equal(t, entity.ErrNotFound, err)
-		assert.Nil(t, bp)
+		assert.Nil(t, p)
 	})
 
 	t.Run("list all", func(t *testing.T) {
@@ -53,9 +53,9 @@ func TestSearchListGetProduct(t *testing.T) {
 	})
 
 	t.Run("get", func(t *testing.T) {
-		bp, err := s.GetProductByID(uID)
+		p, err := s.GetProductByID(uID)
 		assert.Nil(t, err)
-		assert.Equal(t, bp.Name, bp.Name)
+		assert.Equal(t, p.Name, p.Name)
 	})
 }
 
@@ -64,9 +64,9 @@ func TestSearchListGetProduct(t *testing.T) {
 func TestUpdateDeleteProduct(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
-	bp := newFixtureProduct()
+	p := newFixtureProduct()
 
-	id, err := s.CreateProduct(bp.Name, bp.BaseProductID)
+	id, err := s.CreateProduct(p.Name, p.BaseProductID)
 	assert.Nil(t, err)
 	saved, _ := s.GetProductByID(id)
 	saved.Name = "bahia"
@@ -77,4 +77,16 @@ func TestUpdateDeleteProduct(t *testing.T) {
 
 	assert.Nil(t, s.DeleteProduct(id))
 	assert.Equal(t, entity.ErrNotFound, s.DeleteProduct(id))
+}
+
+func TestCreateUpdateSameNameAndBaseProductIDProduct(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+	p := newFixtureProduct()
+
+	_, err := s.CreateProduct(p.Name, p.BaseProductID)
+	assert.Nil(t, err)
+	_, err = s.CreateProduct(p.Name, p.BaseProductID)
+	assert.Equal(t, entity.ErrEntityAlreadyExists, err)
+	assert.Equal(t, entity.ErrEntityAlreadyExists, s.UpdateProduct(p))
 }

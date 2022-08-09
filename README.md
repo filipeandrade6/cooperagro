@@ -1,5 +1,6 @@
 TODO:
 
+ - [ ] inmem deve constar erro entity.ErrEntityAlreadyExist
  - [ ] usecase deve tratar erros do banco de dados
  - [ ] considerar UNIQUES do db no inmem mock
  - [ ] adicionar UNIQUES no banco de dados? - baseproduct.Name, etc (unique product (name/baseproct))
