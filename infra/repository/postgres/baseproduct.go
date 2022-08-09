@@ -87,7 +87,7 @@ func (r *Repo) CreateBaseProduct(e *entity.BaseProduct) (entity.ID, error) {
 		UpdatedAt: e.UpdatedAt,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" { // TODO verificar esse tratamento de erro
 		return e.ID, entity.ErrEntityAlreadyExists
 	}
 
@@ -107,7 +107,7 @@ func (r *Repo) UpdateBaseProduct(e *entity.BaseProduct) error {
 		ID:        e.ID,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" { // TODO verificar esse tratamento de erro
 		return entity.ErrEntityAlreadyExists
 	}
 

@@ -16,21 +16,21 @@ type UpdateBaseProduct struct {
 }
 
 type EchoBaseProduct struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type EchoCreateBaseProduct struct {
-	Name string `form:"name" json:"name"`
+	Name string `json:"name,omitempty"`
 }
 
 type EchoUpdateBaseProduct struct {
-	ID   string `json:"id"`
-	Name string `form:"name" json:"name"`
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type EchoDeleteBaseProduct struct {
-	ID string `json:"id"`
+	ID string `json:"id,omitempty"`
 }
 
 // Juntar todos?

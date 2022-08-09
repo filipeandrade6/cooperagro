@@ -1,5 +1,7 @@
 TODO:
 
+ - [ ] corrigir os retorno da api tipo err.Error()
+ - [ ] remover duplicada de nome CretaBaseProduct em baseproduct etc
  - [ ] como atualizar para o mesmo campo?
  - [ ] middleware de binding
  - [ ] adicionar preço por unidade (price unit_price quantity_price)

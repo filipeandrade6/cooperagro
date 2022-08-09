@@ -23,3 +23,29 @@ type UpdateInventory struct {
 	Quantity        int       `json:"quantity" binding:"required"`
 	UnitOfMeasureID entity.ID `json:"unit_of_measure_id" binding:"required"`
 }
+
+type EchoInventory struct {
+	ID              string `json:"id"`
+	UserID          string `json:"user_id"`
+	ProductID       string `json:"product_id"`
+	Quantity        int    `json:"quantity"`
+	UnitOfMeasureID string `json:"unit_of_measure_id"`
+}
+
+type EchoCreateInventory struct {
+	UserID          string `json:"user_id"`
+	ProductID       string `json:"product_id"`
+	Quantity        int    `json:"quantity"`
+	UnitOfMeasureID string `json:"unit_of_measure_id"`
+}
+
+type EchoUpdateInventory struct {
+	UserID          string `json:"user_id"`
+	ProductID       string `json:"product_id"`
+	Quantity        int    `json:"quantity"`
+	UnitOfMeasureID string `json:"unit_of_measure_id"`
+}
+
+type EchoDeleteInventory struct {
+	ID string `json:"id"`
+}
