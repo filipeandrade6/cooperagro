@@ -4,14 +4,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/filipeandrade6/cooperagro/cmd/api/handler"
+	handler "github.com/filipeandrade6/cooperagro/cmd/api/handler/echo"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres"
-	"github.com/gin-gonic/gin"
+
+	//"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -22,24 +20,34 @@ func main() {
 	}
 
 	baseProductService := baseproduct.NewService(db)
-	userService := user.NewService(db)
-	inventoryService := inventory.NewService(db)
-	productService := product.NewService(db)
-	unitOfMeasureService := unitofmeasure.NewService(db)
+	// userService := user.NewService(db)
+	// inventoryService := inventory.NewService(db)
+	// productService := product.NewService(db)
+	// unitOfMeasureService := unitofmeasure.NewService(db)
 
-	r := gin.Default()
+	// r := gin.Default()
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
+	// r.GET("/ping", func(c *gin.Context) {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"message": "pong",
+	// 	})
+	// })
+
+	e := echo.New()
+
+	e.GET("/ping", func(c echo.Context) error {
+		return c.String(http.StatusOK, "pong")
 	})
 
-	handler.MakeBaseProductHandlers(r, baseProductService)
-	handler.MakeUserHandlers(r, userService)
-	handler.MakeInventoryHandlers(r, inventoryService)
-	handler.MakeProductHandlers(r, productService)
-	handler.MakeUnitOfMeasureHandlers(r, unitOfMeasureService)
+	handler.MakeBaseProductHandlers(e, baseProductService)
 
-	r.Run()
+	// gin.MakeBaseProductHandlers(r, baseProductService)
+	// gin.MakeUserHandlers(r, userService)
+	// gin.MakeInventoryHandlers(r, inventoryService)
+	// gin.MakeProductHandlers(r, productService)
+	// gin.MakeUnitOfMeasureHandlers(r, unitOfMeasureService)
+
+	// r.Run()
+
+	e.Logger.Fatal(e.Start(":8080"))
 }

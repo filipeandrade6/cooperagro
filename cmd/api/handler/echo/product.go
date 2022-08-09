@@ -1,4 +1,4 @@
-package handler
+package echo
 
 import (
 	"errors"
@@ -6,21 +6,21 @@ import (
 
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
 	"github.com/gin-gonic/gin"
 )
 
-func MakeUnitOfMeasureHandlers(r *gin.Engine, service unitofmeasure.UseCase) {
-	r.GET("/unitofmeasure/:id", getUnitOfMeasureByID(service))
-	r.GET("/unitofmeasure", listUnitOfMeasure(service))
-	r.POST("/unitofmeasure", createUnitOfMeasure(service))
-	r.PUT("/unitofmeasure/:id", updateUnitOfMeasure(service))
-	r.DELETE("/unitofmeasure/:id", deleteUnitOfMeasure(service))
+func MakeProductHandlers(r *gin.Engine, service product.UseCase) {
+	r.GET("/product/:id", getProductByID(service))
+	r.GET("/product", listProduct(service))
+	r.POST("/product", createProduct(service))
+	r.PUT("/product/:id", updateProduct(service))
+	r.DELETE("/product/:id", deleteProduct(service))
 }
 
-func getUnitOfMeasureByID(service unitofmeasure.UseCase) gin.HandlerFunc {
+func getProductByID(service product.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		errorMessage := "error reading unit of measure"
+		errorMessage := "error reading product"
 
 		id, err := entity.StringToID(c.Param("id"))
 		if err != nil {
@@ -28,7 +28,7 @@ func getUnitOfMeasureByID(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		data, err := service.GetUnitOfMeasureByID(id)
+		data, err := service.GetProductByID(id)
 
 		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
@@ -40,20 +40,21 @@ func getUnitOfMeasureByID(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, &presenter.UnitOfMeasure{
-			ID:   data.ID,
-			Name: data.Name,
+		c.JSON(http.StatusOK, &presenter.Product{
+			ID:            data.ID,
+			Name:          data.Name,
+			BaseProductID: data.BaseProductID,
 		})
 
 		// Se der erro de marshalling no JSON?
 	}
 }
 
-func listUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
+func listProduct(service product.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		errorMessage := "error reading unit of measure"
+		errorMessage := "error reading product"
 
-		data, err := service.ListUnitOfMeasure()
+		data, err := service.ListProduct()
 
 		if err != nil && !errors.Is(err, entity.ErrNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
@@ -65,11 +66,12 @@ func listUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		var toJ []*presenter.UnitOfMeasure
+		var toJ []*presenter.Product
 		for _, d := range data {
-			toJ = append(toJ, &presenter.UnitOfMeasure{
-				ID:   d.ID,
-				Name: d.Name,
+			toJ = append(toJ, &presenter.Product{
+				ID:            d.ID,
+				Name:          d.Name,
+				BaseProductID: d.BaseProductID,
 			})
 		}
 		c.JSON(http.StatusOK, toJ)
@@ -78,17 +80,20 @@ func listUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 	}
 }
 
-func createUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
+func createProduct(service product.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var input presenter.CreateUnitOfMeasure
+		var input presenter.CreateProduct
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // TODO aplicar para outros
 			return
 		}
 
-		id, err := service.CreateUnitOfMeasure(input.Name)
+		id, err := service.CreateProduct(
+			input.Name,
+			input.BaseProductID,
+		)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating unit of measure"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating product"})
 			return
 		}
 
@@ -97,7 +102,7 @@ func createUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 	}
 }
 
-func updateUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
+func updateProduct(service product.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
@@ -112,25 +117,26 @@ func updateUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		var input presenter.UpdateUnitOfMeasure
+		var input presenter.UpdateProduct
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err := service.UpdateUnitOfMeasure(&entity.UnitOfMeasure{
-			ID:   idUUID,
-			Name: input.Name,
+		if err := service.UpdateProduct(&entity.Product{
+			ID:            idUUID,
+			Name:          input.Name,
+			BaseProductID: input.BaseProductID,
 		}); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"status": "unit of measure udpated"})
+		c.JSON(http.StatusOK, gin.H{"status": "product udpated"})
 	}
 }
 
-func deleteUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
+func deleteProduct(service product.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		if id == "" {
@@ -144,11 +150,11 @@ func deleteUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		if err := service.DeleteUnitOfMeasure(idUUID); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "deleting unit of measure"})
+		if err := service.DeleteProduct(idUUID); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "deleting product"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"status": "unit of measure deleted"})
+		c.JSON(http.StatusOK, gin.H{"status": "product deleted"})
 	}
 }
