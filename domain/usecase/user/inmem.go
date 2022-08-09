@@ -46,13 +46,13 @@ func (i *inmem) ListUser() ([]*entity.User, error) {
 }
 
 func (i *inmem) CreateUser(e *entity.User) (entity.ID, error) {
-	i.m[e.ID] = e
-
 	for _, j := range i.m {
 		if e.Email == j.Email {
 			return e.ID, entity.ErrEntityAlreadyExists
 		}
 	}
+
+	i.m[e.ID] = e
 
 	return e.ID, nil
 }
@@ -64,7 +64,7 @@ func (i *inmem) UpdateUser(e *entity.User) error {
 	}
 
 	for _, j := range i.m {
-		if e.Email == j.Email {
+		if e.Email == j.Email && e.ID != j.ID {
 			return entity.ErrEntityAlreadyExists
 		}
 	}

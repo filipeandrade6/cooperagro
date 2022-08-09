@@ -2,7 +2,6 @@ package baseproduct
 
 import (
 	"testing"
-	"time"
 
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/stretchr/testify/assert"
@@ -10,8 +9,7 @@ import (
 
 func newFixtureBaseProduct() *entity.BaseProduct {
 	return &entity.BaseProduct{
-		Name:      "tomate",
-		CreatedAt: time.Now(),
+		Name: "tomate",
 	}
 }
 
@@ -19,81 +17,129 @@ func TestService_GetBaseProductByID(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
 	bp := newFixtureBaseProduct()
+	id, err := s.CreateBaseProduct(bp.Name)
+	assert.Nil(t, err)
 
-	id, _ := s.CreateBaseProduct(bp.Name)
+	t.Run("get existent", func(t *testing.T) {
+		saved, err := s.GetBaseProductByID(id)
+		assert.Nil(t, err)
+		assert.Equal(t, bp.Name, saved.Name)
+	})
+
+	t.Run("get non existent", func(t *testing.T) {
+		_, err := s.GetBaseProductByID(entity.NewID())
+		assert.Equal(t, entity.ErrNotFound, err)
+	})
+}
+
+func TestService_SearchBaseProduct(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+	bp := newFixtureBaseProduct()
+
+	_, _ = s.CreateBaseProduct(bp.Name)
+
+	t.Run("search equal", func(t *testing.T) {
+		saved, err := s.SearchBaseProduct("tomate")
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(saved))
+		assert.Equal(t, bp.Name, saved[0].Name)
+	})
+
+	t.Run("search equal but with capital letters", func(t *testing.T) {
+		saved, err := s.SearchBaseProduct("TomatE")
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(saved))
+		assert.Equal(t, bp.Name, saved[0].Name)
+	})
+
+	t.Run("search for inexistent", func(t *testing.T) {
+		saved, err := s.SearchBaseProduct("morango")
+		assert.Equal(t, entity.ErrNotFound, err)
+		assert.Equal(t, 0, len(saved))
+	})
+}
+
+func TestService_ListBaseProduct(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+
+	t.Run("list empty", func(t *testing.T) {
+		bps, err := s.ListBaseProduct()
+		assert.Equal(t, entity.ErrNotFound, err)
+		assert.Equal(t, 0, len(bps))
+	})
+
+	t.Run("list all", func(t *testing.T) {
+		bp1 := newFixtureBaseProduct()
+		bp2 := newFixtureBaseProduct()
+		bp2.Name = "acerola"
+		_, _ = s.CreateBaseProduct(bp1.Name)
+		_, _ = s.CreateBaseProduct(bp2.Name)
+
+		bps, err := s.ListBaseProduct()
+		assert.Nil(t, err)
+		assert.Equal(t, 2, len(bps))
+	})
 }
 
 func TestService_CreateBaseProduct(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
 	bp := newFixtureBaseProduct()
-	_, err := s.CreateBaseProduct(bp.Name)
-	assert.Nil(t, err)
-	assert.False(t, bp.CreatedAt.IsZero())
 
-	_, err = s.CreateBaseProduct(bp.Name)
-	assert.Equal(t, entity.ErrEntityAlreadyExists, err)
+	t.Run("create base product", func(t *testing.T) {
+		_, err := s.CreateBaseProduct(bp.Name)
+		assert.Nil(t, err)
+	})
+
+	t.Run("create existent base product", func(t *testing.T) {
+		_, err := s.CreateBaseProduct(bp.Name)
+		assert.Equal(t, entity.ErrEntityAlreadyExists, err)
+	})
 }
 
-func TestCreate(t *testing.T) {
+func TestService_UpdateBaseProduct(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
+
 	bp := newFixtureBaseProduct()
-	_, err := s.CreateBaseProduct(bp.Name)
-	assert.Nil(t, err)
-	assert.False(t, bp.CreatedAt.IsZero())
-}
-
-func TestSearchListGetBaseProduct(t *testing.T) {
-	repo := newInmem()
-	s := NewService(repo)
-	bp1 := newFixtureBaseProduct()
 	bp2 := newFixtureBaseProduct()
 	bp2.Name = "manga"
 
-	uID, _ := s.CreateBaseProduct(bp1.Name)
+	id, _ := s.CreateBaseProduct(bp.Name)
 	_, _ = s.CreateBaseProduct(bp2.Name)
 
-	t.Run("search", func(t *testing.T) {
-		bp, err := s.SearchBaseProduct("MANGA")
+	t.Run("update base product", func(t *testing.T) {
+		err := s.UpdateBaseProduct(&entity.BaseProduct{
+			ID:   id,
+			Name: "acerola",
+		})
 		assert.Nil(t, err)
-		assert.Equal(t, 1, len(bp))
-		assert.Equal(t, "manga", bp[0].Name)
-
-		bp, err = s.SearchBaseProduct("acerola")
-		assert.Equal(t, entity.ErrNotFound, err)
-		assert.Nil(t, bp)
 	})
 
-	t.Run("list all", func(t *testing.T) {
-		all, err := s.ListBaseProduct()
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(all))
-	})
-
-	t.Run("get", func(t *testing.T) {
-		bp, err := s.GetBaseProductByID(uID)
-		assert.Nil(t, err)
-		assert.Equal(t, bp1.Name, bp.Name)
+	t.Run("update to existent base product", func(t *testing.T) {
+		err := s.UpdateBaseProduct(&entity.BaseProduct{
+			ID:   id,
+			Name: bp2.Name,
+		})
+		assert.Equal(t, entity.ErrEntityAlreadyExists, err)
 	})
 }
 
-// TODO teste update para nome existente (que deveria ser unico)
-
-func TestUpdateDeleteBaseProduct(t *testing.T) {
+func TestService_DeleteBaseProduct(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
 	bp := newFixtureBaseProduct()
+	id, _ := s.CreateBaseProduct(bp.Name)
 
-	id, err := s.CreateBaseProduct(bp.Name)
-	assert.Nil(t, err)
-	saved, _ := s.GetBaseProductByID(id)
-	saved.Name = "manga"
-	assert.Nil(t, s.UpdateBaseProduct(saved))
-	updated, err := s.GetBaseProductByID(id)
-	assert.Nil(t, err)
-	assert.Equal(t, "manga", updated.Name)
+	t.Run("delete base product", func(t *testing.T) {
+		err := s.DeleteBaseProduct(id)
+		assert.Nil(t, err)
+	})
 
-	assert.Nil(t, s.DeleteBaseProduct(id))
-	assert.Equal(t, entity.ErrNotFound, s.DeleteBaseProduct(id))
+	t.Run("delete inexistent base product", func(t *testing.T) {
+		err := s.DeleteBaseProduct(id)
+		assert.Equal(t, entity.ErrNotFound, err)
+	})
 }

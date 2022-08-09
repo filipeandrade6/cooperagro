@@ -2,7 +2,6 @@ package unitofmeasure
 
 import (
 	"testing"
-	"time"
 
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/stretchr/testify/assert"
@@ -10,70 +9,137 @@ import (
 
 func newFixtureUnitOfMeasure() *entity.UnitOfMeasure {
 	return &entity.UnitOfMeasure{
-		Name:      "kilogram",
-		CreatedAt: time.Now(),
+		Name: "kilogram",
 	}
 }
 
-func TestCreate(t *testing.T) {
+func TestService_GetUnitOfMeasureByID(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
-	bp := newFixtureUnitOfMeasure()
-	_, err := s.CreateUnitOfMeasure((bp.Name))
+	u := newFixtureUnitOfMeasure()
+	id, err := s.CreateUnitOfMeasure(u.Name)
 	assert.Nil(t, err)
-	assert.False(t, bp.CreatedAt.IsZero())
+
+	t.Run("get existent", func(t *testing.T) {
+		saved, err := s.GetUnitOfMeasureByID(id)
+		assert.Nil(t, err)
+		assert.Equal(t, u.Name, saved.Name)
+	})
+
+	t.Run("get non existent", func(t *testing.T) {
+		_, err := s.GetUnitOfMeasureByID(entity.NewID())
+		assert.Equal(t, entity.ErrNotFound, err)
+	})
 }
 
-func TestSearchListGetUnitOfMeasure(t *testing.T) {
+func TestService_SearchUnitOfMeasure(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
-	bp1 := newFixtureUnitOfMeasure()
-	bp2 := newFixtureUnitOfMeasure()
-	bp2.Name = "unit"
+	u := newFixtureUnitOfMeasure()
 
-	uID, _ := s.CreateUnitOfMeasure(bp1.Name)
-	_, _ = s.CreateUnitOfMeasure(bp2.Name)
+	_, _ = s.CreateUnitOfMeasure(u.Name)
 
-	t.Run("search", func(t *testing.T) {
-		bp, err := s.SearchUnitOfMeasure("UNIT")
+	t.Run("search equal", func(t *testing.T) {
+		saved, err := s.SearchUnitOfMeasure("kilogram")
 		assert.Nil(t, err)
-		assert.Equal(t, 1, len(bp))
-		assert.Equal(t, "unit", bp[0].Name)
+		assert.Equal(t, 1, len(saved))
+		assert.Equal(t, u.Name, saved[0].Name)
+	})
 
-		bp, err = s.SearchUnitOfMeasure("liters")
+	t.Run("search equal but with capital letters", func(t *testing.T) {
+		saved, err := s.SearchUnitOfMeasure("KilograM")
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(saved))
+		assert.Equal(t, u.Name, saved[0].Name)
+	})
+
+	t.Run("search for inexistent", func(t *testing.T) {
+		saved, err := s.SearchUnitOfMeasure("piece")
 		assert.Equal(t, entity.ErrNotFound, err)
-		assert.Nil(t, bp)
+		assert.Equal(t, 0, len(saved))
+	})
+}
+
+func TestService_ListUnitOfMeasure(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+
+	t.Run("list empty", func(t *testing.T) {
+		us, err := s.ListUnitOfMeasure()
+		assert.Equal(t, entity.ErrNotFound, err)
+		assert.Equal(t, 0, len(us))
 	})
 
 	t.Run("list all", func(t *testing.T) {
-		all, err := s.ListUnitOfMeasure()
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(all))
-	})
+		u1 := newFixtureUnitOfMeasure()
+		u2 := newFixtureUnitOfMeasure()
+		u2.Name = "piece"
+		_, _ = s.CreateUnitOfMeasure(u1.Name)
+		_, _ = s.CreateUnitOfMeasure(u2.Name)
 
-	t.Run("get", func(t *testing.T) {
-		bp, err := s.GetUnitOfMeasureByID(uID)
+		us, err := s.ListUnitOfMeasure()
 		assert.Nil(t, err)
-		assert.Equal(t, bp1.Name, bp.Name)
+		assert.Equal(t, 2, len(us))
 	})
 }
 
-// TODO teste update para nome existente (que deveria ser unico)
-
-func TestUpdateDeleteUnitOfMeasure(t *testing.T) {
+func TestService_CreateUnitOfMeasure(t *testing.T) {
 	repo := newInmem()
 	s := NewService(repo)
-	bp := newFixtureUnitOfMeasure()
+	u := newFixtureUnitOfMeasure()
 
-	id, err := s.CreateUnitOfMeasure(bp.Name)
-	assert.Nil(t, err)
-	saved, _ := s.GetUnitOfMeasureByID(id)
-	saved.Name = "unit"
-	assert.Nil(t, s.UpdateUnitOfMeasure(saved))
-	updated, err := s.GetUnitOfMeasureByID(id)
-	assert.Nil(t, err)
-	assert.Equal(t, "unit", updated.Name)
+	t.Run("create unit of measure", func(t *testing.T) {
+		_, err := s.CreateUnitOfMeasure(u.Name)
+		assert.Nil(t, err)
+	})
 
-	assert.Nil(t, s.DeleteUnitOfMeasure(id))
-	assert.Equal(t, entity.ErrNotFound, s.DeleteUnitOfMeasure(id))
+	t.Run("create existent unit of measure", func(t *testing.T) {
+		_, err := s.CreateUnitOfMeasure(u.Name)
+		assert.Equal(t, entity.ErrEntityAlreadyExists, err)
+	})
+}
+
+func TestService_UpdateUnitOfMeasure(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+
+	u := newFixtureUnitOfMeasure()
+	u2 := newFixtureUnitOfMeasure()
+	u2.Name = "piece"
+
+	id, _ := s.CreateUnitOfMeasure(u.Name)
+	_, _ = s.CreateUnitOfMeasure(u2.Name)
+
+	t.Run("update unit of measure", func(t *testing.T) {
+		err := s.UpdateUnitOfMeasure(&entity.UnitOfMeasure{
+			ID:   id,
+			Name: "liters",
+		})
+		assert.Nil(t, err)
+	})
+
+	t.Run("update to existent unit of measure", func(t *testing.T) {
+		err := s.UpdateUnitOfMeasure(&entity.UnitOfMeasure{
+			ID:   id,
+			Name: u2.Name,
+		})
+		assert.Equal(t, entity.ErrEntityAlreadyExists, err)
+	})
+}
+
+func TestService_DeleteUnitOfMeasure(t *testing.T) {
+	repo := newInmem()
+	s := NewService(repo)
+	u := newFixtureUnitOfMeasure()
+	id, _ := s.CreateUnitOfMeasure(u.Name)
+
+	t.Run("delete unit of measure", func(t *testing.T) {
+		err := s.DeleteUnitOfMeasure(id)
+		assert.Nil(t, err)
+	})
+
+	t.Run("delete inexistent unit of measure", func(t *testing.T) {
+		err := s.DeleteUnitOfMeasure(id)
+		assert.Equal(t, entity.ErrNotFound, err)
+	})
 }

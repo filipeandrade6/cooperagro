@@ -64,7 +64,7 @@ func (i *inmem) UpdateProduct(e *entity.Product) error {
 	}
 
 	for _, j := range i.m {
-		if e.Name == j.Name && e.BaseProductID == j.BaseProductID {
+		if e.Name == j.Name && e.BaseProductID == j.BaseProductID && e.ID != j.ID {
 			return entity.ErrEntityAlreadyExists
 		}
 	}

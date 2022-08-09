@@ -40,6 +40,7 @@ CREATE TABLE products (
 	updated_at TIMESTAMP NOT NULL,
 
 	PRIMARY KEY (id),
+	UNIQUE(name, base_product_id),
 	CONSTRAINT base_product_id FOREIGN KEY (base_product_id) REFERENCES base_products(id)
 );
 

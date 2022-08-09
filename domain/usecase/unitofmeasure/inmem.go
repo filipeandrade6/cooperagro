@@ -64,7 +64,7 @@ func (i *inmem) UpdateUnitOfMeasure(e *entity.UnitOfMeasure) error {
 	}
 
 	for _, j := range i.m {
-		if e.Name == j.Name {
+		if e.Name == j.Name && e.ID != j.ID {
 			return entity.ErrEntityAlreadyExists
 		}
 	}

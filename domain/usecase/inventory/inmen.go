@@ -51,7 +51,7 @@ func (i *inmem) UpdateInventory(e *entity.Inventory) error {
 	}
 
 	for _, j := range i.m {
-		if e.UserID == j.UserID && e.ProductID == j.ProductID && e.UnitOfMeasureID == j.UnitOfMeasureID {
+		if e.UserID == j.UserID && e.ProductID == j.ProductID && e.UnitOfMeasureID == j.UnitOfMeasureID && e.ID != j.ID {
 			return entity.ErrEntityAlreadyExists
 		}
 	}
