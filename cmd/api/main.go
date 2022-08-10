@@ -26,11 +26,11 @@ func main() {
 	userService := user.NewService(db)
 
 	e := echo.New()
-
-	e.Logger.Error("hello")
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	config := middleware.JWTConfig{
-		Claims:     &auth.JWTCustomClaims{},
+		Claims:     &auth.Claims{},
 		SigningKey: []byte("secret"),
 	}
 	e.Use(middleware.JWTWithConfig(config))

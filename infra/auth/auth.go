@@ -1,13 +1,22 @@
 package auth
 
 import (
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 )
 
-// jwtCustomClaims are custom claims extending default ones.
-// See https://github.com/golang-jwt/jwt for more examples
-type JWTCustomClaims struct {
-	ID    string   `json:"name"`
+type Claims struct {
+	jwt.RegisteredClaims
+	ID    string   `json:"id"`
 	Roles []string `json:"roles"`
-	jwt.StandardClaims
+}
+
+func (c Claims) Authorized(roles ...string) bool {
+	for _, has := range c.Roles {
+		for _, want := range roles {
+			if has == want {
+				return true
+			}
+		}
+	}
+	return false
 }

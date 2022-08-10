@@ -6,6 +6,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const (
+	RoleAdmin    = "admin"
+	RoleProducer = "producer"
+	RoleBuyer    = "buyer"
+)
+
 // User data
 type User struct {
 	ID        ID
@@ -94,7 +100,7 @@ func (u *User) checkRoles() bool {
 	}
 
 	for _, r := range u.Roles {
-		if r == "admin" || r == "producer" || r == "buyer" {
+		if r == RoleAdmin || r == RoleProducer || r == RoleBuyer {
 			continue
 		}
 		return false

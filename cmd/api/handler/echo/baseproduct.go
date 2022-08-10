@@ -26,7 +26,7 @@ func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "could not get values from the request"},
+				echo.Map{"status": "could not get values from the request"},
 			)
 		}
 
@@ -34,28 +34,25 @@ func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if errors.Is(entity.ErrEntityAlreadyExists, err) {
 			return c.JSON(
 				http.StatusConflict,
-				presenter.Response{Status: "base product already exists"},
+				echo.Map{"status": "base product already exists"},
 			)
 		}
 		if errors.Is(entity.ErrInvalidEntity, err) {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "invalid parameters"},
+				echo.Map{"status": "invalid parameters"},
 			)
 		}
 		if err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
-				presenter.Response{Status: err.Error()},
+				echo.Map{"status": err.Error()},
 			)
 		}
 
 		return c.JSON(
 			http.StatusCreated,
-			presenter.Response{
-				ID:     id.String(),
-				Status: "base product created",
-			},
+			echo.Map{"id": id.String()},
 		)
 	}
 }
@@ -66,7 +63,7 @@ func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if id == "" {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "empty id"},
+				echo.Map{"status": "empty id"},
 			)
 		}
 
@@ -74,7 +71,7 @@ func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "invalid id"},
+				echo.Map{"status": "invalid id"},
 			)
 		}
 
@@ -82,13 +79,13 @@ func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if errors.Is(err, entity.ErrNotFound) {
 			return c.JSON(
 				http.StatusNotFound,
-				presenter.Response{Status: "base product not found"},
+				echo.Map{"status": "base product not found"},
 			)
 		}
 		if err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
-				presenter.Response{Status: err.Error()}, // TODO - não expor o erro ao usuŕio?
+				echo.Map{"status": err.Error()}, // TODO - não expor o erro ao usuŕio?
 			)
 		}
 
@@ -114,13 +111,13 @@ func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if errors.Is(err, entity.ErrNotFound) {
 			return c.JSON(
 				http.StatusNotFound,
-				presenter.Response{Status: "base products not found"},
+				echo.Map{"status": "base products not found"},
 			)
 		}
 		if err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
-				presenter.Response{Status: err.Error()},
+				echo.Map{"status": err.Error()},
 			)
 		}
 
@@ -143,7 +140,7 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if id == "" {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "empty id"},
+				echo.Map{"status": "empty id"},
 			)
 		}
 
@@ -151,7 +148,7 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "invalid id"},
+				echo.Map{"status": "invalid id"},
 			)
 		}
 
@@ -159,7 +156,7 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
-				presenter.Response{Status: "could not get values from the request"},
+				echo.Map{"status": "could not get values from the request"},
 			)
 		}
 
@@ -169,11 +166,11 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		}); err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
-				presenter.Response{Status: err.Error()},
+				echo.Map{"status": err.Error()},
 			)
 		}
 
-		return c.JSON(http.StatusOK, presenter.Response{Status: "base product udpated"})
+		return c.JSON(http.StatusOK, echo.Map{"status": "base product udpated"})
 	}
 }
 
@@ -184,7 +181,7 @@ func deleteBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if id == "" {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "empty id"},
+				echo.Map{"status": "empty id"},
 			)
 		}
 
@@ -192,17 +189,17 @@ func deleteBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "invalid id"},
+				echo.Map{"status": "invalid id"},
 			)
 		}
 
 		if err := service.DeleteBaseProduct(idUUID); err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
-				presenter.Response{Status: err.Error()},
+				echo.Map{"status": err.Error()},
 			)
 		}
 
-		return c.JSON(http.StatusOK, presenter.Response{Status: "base product deleted"})
+		return c.JSON(http.StatusOK, echo.Map{"status": "base product deleted"})
 	}
 }

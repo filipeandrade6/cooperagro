@@ -9,7 +9,7 @@ import (
 	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
 	"github.com/filipeandrade6/cooperagro/infra/auth"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -38,11 +38,11 @@ func login(service user.UseCase) echo.HandlerFunc {
 		}
 
 		// Set custom claims
-		claims := &auth.JWTCustomClaims{
+		claims := &auth.Claims{
 			ID:    username,
 			Roles: user.Roles,
-			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: &jwt.NumericDate{time.Now().Add(time.Hour * 72)},
 			},
 		}
 

@@ -1,6 +1,7 @@
 TODO:
 
  - [ ] utilizar echo.Map ao invez de reponse
+ - [ ] deletar repo.go?
  - [ ] utilizar echo.ErrUnauthorized .ErrBadRequest etc?
  - [ ] adicionar salt no password
  - [ ] middleware de binding
