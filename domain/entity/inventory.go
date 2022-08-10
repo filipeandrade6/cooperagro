@@ -20,6 +20,7 @@ func NewInventory(
 	quantity int,
 	unitOfMeasureID ID,
 ) (*Inventory, error) {
+	now := time.Now()
 
 	i := &Inventory{
 		ID:              NewID(),
@@ -27,7 +28,8 @@ func NewInventory(
 		ProductID:       productID,
 		Quantity:        quantity,
 		UnitOfMeasureID: unitOfMeasureID,
-		CreatedAt:       time.Now(),
+		CreatedAt:       now,
+		UpdatedAt:       now,
 	}
 
 	err := i.Validate()

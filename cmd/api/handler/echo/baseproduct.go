@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func MakeBaseProductHandlers(e *echo.Echo, service baseproduct.UseCase) {
+func MakeBaseProductHandlers(e *echo.Group, service baseproduct.UseCase) {
 	e.POST("/baseproducts", createBaseProduct(service))
 	e.GET("/baseproducts", readBaseProduct(service))
 	e.GET("/baseproducts/:id", getBaseProduct(service))
@@ -21,7 +21,7 @@ func MakeBaseProductHandlers(e *echo.Echo, service baseproduct.UseCase) {
 
 func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input presenter.EchoCreateBaseProduct
+		var input presenter.BaseProduct
 
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(
@@ -155,7 +155,7 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			)
 		}
 
-		var input presenter.EchoUpdateBaseProduct
+		var input presenter.BaseProduct
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,

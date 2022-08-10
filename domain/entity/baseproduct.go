@@ -12,10 +12,13 @@ type BaseProduct struct {
 
 // NewBaseProduct creates a new BaseProduct
 func NewBaseProduct(name string) (*BaseProduct, error) {
+	now := time.Now()
+
 	bp := &BaseProduct{
 		ID:        NewID(),
 		Name:      name,
-		CreatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 	err := bp.Validate()
 	if err != nil {

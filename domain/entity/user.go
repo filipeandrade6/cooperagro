@@ -34,6 +34,8 @@ func NewUser(
 	roles []string,
 	password string,
 ) (*User, error) {
+	now := time.Now()
+
 	c := &User{
 		ID:        NewID(),
 		FirstName: firstName,
@@ -44,7 +46,8 @@ func NewUser(
 		Latitude:  latitude,
 		Longitude: longitude,
 		Roles:     roles,
-		CreatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 	pwd, err := generatePassword(password)
 	if err != nil {

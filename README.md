@@ -1,14 +1,11 @@
 TODO:
 
+ - [ ] utilizar echo.Map ao invez de reponse
+ - [ ] utilizar echo.ErrUnauthorized .ErrBadRequest etc?
  - [ ] adicionar salt no password
- - [ ] remover duplicada de nome CretaBaseProduct em baseproduct etc
- - [ ] como atualizar para o mesmo campo?
  - [ ] middleware de binding
  - [ ] adicionar preço por unidade (price unit_price quantity_price)
  - [ ] adicionar campo para imagens nas entidades? (product), (inventory)
- - [ ] arrumar o created_at and updated_at
- - [ ] usecase deve tratar erros do banco de dados
- - [ ] updated_at pode ser nulo durante a criação?
  - [ ] adicionar logger
  - [ ] search by name
  - [ ] search customers -> first name para todas colunas

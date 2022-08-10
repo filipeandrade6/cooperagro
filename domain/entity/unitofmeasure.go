@@ -12,10 +12,13 @@ type UnitOfMeasure struct {
 
 // NewUnitOfMeasure creates a new UnitOfMeasure
 func NewUnitOfMeasure(name string) (*UnitOfMeasure, error) {
+	now := time.Now()
+
 	u := &UnitOfMeasure{
 		ID:        NewID(),
 		Name:      name,
-		CreatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 	err := u.Validate()
 	if err != nil {
