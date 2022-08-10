@@ -1,6 +1,6 @@
 TODO:
 
- - [ ] corrigir os retorno da api tipo err.Error()
+ - [ ] adicionar salt no password
  - [ ] remover duplicada de nome CretaBaseProduct em baseproduct etc
  - [ ] como atualizar para o mesmo campo?
  - [ ] middleware de binding

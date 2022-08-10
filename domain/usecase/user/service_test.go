@@ -19,6 +19,7 @@ func newFixtureUser() *entity.User {
 		Latitude:  -12.123456,
 		Longitude: -12.123456,
 		Roles:     []string{"admin"},
+		Password:  "admin",
 		CreatedAt: time.Now(),
 	}
 }
@@ -36,6 +37,7 @@ func TestService_GetUserByID(t *testing.T) {
 		u.Latitude,
 		u.Longitude,
 		u.Roles,
+		u.Password,
 	)
 	assert.Nil(t, err)
 
@@ -72,6 +74,7 @@ func TestService_SearchUser(t *testing.T) {
 		u.Latitude,
 		u.Longitude,
 		u.Roles,
+		u.Password,
 	)
 
 	t.Run("search equal", func(t *testing.T) {
@@ -132,6 +135,7 @@ func TestService_ListUser(t *testing.T) {
 			u1.Latitude,
 			u1.Longitude,
 			u1.Roles,
+			u1.Password,
 		)
 		_, _ = s.CreateUser(
 			u2.FirstName,
@@ -142,6 +146,7 @@ func TestService_ListUser(t *testing.T) {
 			u2.Latitude,
 			u2.Longitude,
 			u2.Roles,
+			u2.Password,
 		)
 
 		us, err := s.ListUser()
@@ -165,6 +170,7 @@ func TestService_CreateUser(t *testing.T) {
 			u.Latitude,
 			u.Longitude,
 			u.Roles,
+			u.Password,
 		)
 		assert.Nil(t, err)
 	})
@@ -179,6 +185,7 @@ func TestService_CreateUser(t *testing.T) {
 			u.Latitude,
 			u.Longitude,
 			u.Roles,
+			u.Password,
 		)
 		assert.Equal(t, entity.ErrEntityAlreadyExists, err)
 	})
@@ -201,6 +208,7 @@ func TestService_UpdateUser(t *testing.T) {
 		u1.Latitude,
 		u1.Longitude,
 		u1.Roles,
+		u1.Password,
 	)
 	_, _ = s.CreateUser(
 		u2.FirstName,
@@ -211,6 +219,7 @@ func TestService_UpdateUser(t *testing.T) {
 		u2.Latitude,
 		u2.Longitude,
 		u2.Roles,
+		u2.Password,
 	)
 
 	t.Run("update user", func(t *testing.T) {
@@ -224,6 +233,7 @@ func TestService_UpdateUser(t *testing.T) {
 			Latitude:  u1.Latitude,
 			Longitude: u1.Longitude,
 			Roles:     u1.Roles,
+			Password:  u1.Password,
 		})
 		assert.Nil(t, err)
 	})
@@ -239,6 +249,7 @@ func TestService_UpdateUser(t *testing.T) {
 			Latitude:  u1.Latitude,
 			Longitude: u1.Longitude,
 			Roles:     u1.Roles,
+			Password:  u1.Password,
 		})
 		assert.Equal(t, entity.ErrEntityAlreadyExists, err)
 	})
@@ -257,6 +268,7 @@ func TestService_DeleteUser(t *testing.T) {
 		u.Latitude,
 		u.Longitude,
 		u.Roles,
+		u.Password,
 	)
 
 	t.Run("delete user", func(t *testing.T) {

@@ -30,6 +30,7 @@ func (r *Repo) GetUserByID(id entity.ID) (*entity.User, error) {
 		Latitude:  c.Latitude,
 		Longitude: c.Longitude,
 		Roles:     c.Roles,
+		Password:  c.Password,
 		CreatedAt: c.CreatedAt,
 		UpdatedAt: c.UpdatedAt,
 	}, nil
@@ -57,6 +58,7 @@ func (r *Repo) SearchUser(query string) ([]*entity.User, error) {
 			Latitude:  user.Latitude,
 			Longitude: user.Longitude,
 			Roles:     user.Roles,
+			Password:  user.Password,
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
 		})
@@ -87,6 +89,7 @@ func (r *Repo) ListUser() ([]*entity.User, error) {
 			Latitude:  User.Latitude,
 			Longitude: User.Longitude,
 			Roles:     User.Roles,
+			Password:  User.Password,
 			CreatedAt: User.CreatedAt,
 			UpdatedAt: User.UpdatedAt,
 		})
@@ -107,6 +110,7 @@ func (r *Repo) CreateUser(e *entity.User) (entity.ID, error) {
 		Latitude:  e.Latitude,
 		Longitude: e.Longitude,
 		Roles:     e.Roles,
+		Password:  e.Password,
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
 	})
@@ -133,6 +137,7 @@ func (r *Repo) UpdateUser(e *entity.User) error {
 		Latitude:  e.Latitude,
 		Longitude: e.Longitude,
 		Roles:     e.Roles,
+		Password:  e.Password,
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
 		ID:        e.ID,

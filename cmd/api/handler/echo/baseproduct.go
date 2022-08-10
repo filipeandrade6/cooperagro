@@ -12,10 +12,11 @@ import (
 )
 
 func MakeBaseProductHandlers(e *echo.Echo, service baseproduct.UseCase) {
-	e.POST("/baseproduct/", createBaseProduct(service))
-	e.GET("/baseproduct/", readBaseProduct(service))
-	e.PUT("/baseproduct/", updateBaseProduct(service))
-	e.DELETE("/baseproduct/", deleteBaseProduct(service))
+	e.POST("/baseproducts", createBaseProduct(service))
+	e.GET("/baseproducts", readBaseProduct(service))
+	e.GET("/baseproducts/:id", getBaseProduct(service))
+	e.PUT("/baseproducts/:id", updateBaseProduct(service))
+	e.DELETE("/baseproducts/:id", deleteBaseProduct(service))
 }
 
 func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
@@ -59,56 +60,25 @@ func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	}
 }
 
-func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
+func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input presenter.EchoBaseProduct
-		var datas []*entity.BaseProduct
-		var err error
-
-		if err = c.Bind(&input); err != nil {
+		id := c.Param("id")
+		if id == "" {
 			return c.JSON(
 				http.StatusBadRequest,
-				presenter.Response{Status: "could not get values from the request"},
+				presenter.Response{Status: "empty id"},
 			)
 		}
 
-		switch {
-		case input.ID != "":
-			idUUID, err := entity.StringToID(input.ID)
-			if err != nil {
-				return c.JSON(
-					http.StatusBadRequest,
-					presenter.Response{Status: "invalid id"},
-				)
-			}
-
-			data, err := service.GetBaseProductByID(idUUID)
-			if errors.Is(err, entity.ErrNotFound) {
-				return c.JSON(
-					http.StatusNotFound,
-					presenter.Response{Status: "base product not found"},
-				)
-			}
-			if err != nil {
-				return c.JSON(
-					http.StatusInternalServerError,
-					presenter.Response{Status: err.Error()}, // TODO - não expor o erro ao usuŕio?
-				)
-			}
-
-			return c.JSON(http.StatusOK, &presenter.BaseProduct{
-				ID:   data.ID,
-				Name: data.Name,
-			})
-
-		case input.Name == "":
-			datas, err = service.ListBaseProduct()
-
-		default:
-			datas, err = service.SearchBaseProduct(input.Name)
-
+		idUUID, err := entity.StringToID(id)
+		if err != nil {
+			return c.JSON(
+				http.StatusBadRequest,
+				presenter.Response{Status: "invalid id"},
+			)
 		}
 
+		data, err := service.GetBaseProductByID(idUUID)
 		if errors.Is(err, entity.ErrNotFound) {
 			return c.JSON(
 				http.StatusNotFound,
@@ -118,37 +88,78 @@ func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
+				presenter.Response{Status: err.Error()}, // TODO - não expor o erro ao usuŕio?
+			)
+		}
+
+		return c.JSON(http.StatusOK, &presenter.BaseProduct{
+			ID:   data.ID,
+			Name: data.Name,
+		})
+	}
+}
+
+func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var data []*entity.BaseProduct
+		var err error
+
+		name := c.QueryParam("name")
+		if name != "" {
+			data, err = service.SearchBaseProduct(name)
+		} else {
+			data, err = service.ListBaseProduct()
+		}
+
+		if errors.Is(err, entity.ErrNotFound) {
+			return c.JSON(
+				http.StatusNotFound,
+				presenter.Response{Status: "base products not found"},
+			)
+		}
+		if err != nil {
+			return c.JSON(
+				http.StatusInternalServerError,
 				presenter.Response{Status: err.Error()},
 			)
 		}
 
-		var toJ []*presenter.BaseProduct
-		for _, d := range datas {
-			toJ = append(toJ, &presenter.BaseProduct{
+		var out []*presenter.BaseProduct
+		for _, d := range data {
+			out = append(out, &presenter.BaseProduct{
 				ID:   d.ID,
 				Name: d.Name,
 			})
 		}
 
-		return c.JSON(http.StatusOK, toJ)
+		return c.JSON(http.StatusOK, out)
 	}
 }
 
 func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		id := c.Param("id")
+
+		if id == "" {
+			return c.JSON(
+				http.StatusBadRequest,
+				presenter.Response{Status: "empty id"},
+			)
+		}
+
+		idUUID, err := entity.StringToID(id)
+		if err != nil {
+			return c.JSON(
+				http.StatusBadRequest,
+				presenter.Response{Status: "invalid id"},
+			)
+		}
+
 		var input presenter.EchoUpdateBaseProduct
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
 				presenter.Response{Status: "could not get values from the request"},
-			)
-		}
-
-		idUUID, err := entity.StringToID(input.ID)
-		if err != nil {
-			return c.JSON(
-				http.StatusBadRequest,
-				presenter.Response{Status: "invalid id"},
 			)
 		}
 
@@ -168,15 +179,16 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 
 func deleteBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input presenter.EchoDeleteBaseProduct
-		if err := c.Bind(&input); err != nil {
+		id := c.Param("id")
+
+		if id == "" {
 			return c.JSON(
-				http.StatusInternalServerError,
-				presenter.Response{Status: "could not get values from the request"},
+				http.StatusBadRequest,
+				presenter.Response{Status: "empty id"},
 			)
 		}
 
-		idUUID, err := entity.StringToID(input.ID)
+		idUUID, err := entity.StringToID(id)
 		if err != nil {
 			return c.JSON(
 				http.StatusBadRequest,

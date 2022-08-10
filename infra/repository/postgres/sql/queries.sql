@@ -112,14 +112,14 @@ SELECT * FROM users ORDER BY first_name;
 
 -- name: CreateUser :one
 INSERT INTO users
-(id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+(id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 RETURNING *;
 
 -- name: UpdateUser :exec
 UPDATE users SET
-(first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-WHERE id = $11;
+(first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+WHERE id = $12;
 
 -- name: DeleteUser :exec
 DELETE FROM users WHERE id = $1;

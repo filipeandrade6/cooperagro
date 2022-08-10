@@ -150,9 +150,9 @@ func (q *Queries) CreateUnitOfMeasure(ctx context.Context, arg CreateUnitOfMeasu
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users
-(id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-RETURNING id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at
+(id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+RETURNING id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -165,6 +165,7 @@ type CreateUserParams struct {
 	Latitude  float32
 	Longitude float32
 	Roles     []string
+	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -180,6 +181,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Latitude,
 		arg.Longitude,
 		arg.Roles,
+		arg.Password,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
@@ -194,6 +196,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Latitude,
 		&i.Longitude,
 		&i.Roles,
+		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -326,7 +329,7 @@ func (q *Queries) GetUnitOfMeasureByID(ctx context.Context, id uuid.UUID) (Units
 
 const getUserByID = `-- name: GetUserByID :one
 
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at FROM users WHERE id = $1 LIMIT 1
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at FROM users WHERE id = $1 LIMIT 1
 `
 
 // ------------------------------------------------------------------------------------
@@ -344,6 +347,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Latitude,
 		&i.Longitude,
 		&i.Roles,
+		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -471,7 +475,7 @@ func (q *Queries) ListUnitOfMeasure(ctx context.Context) ([]UnitsOfMeasure, erro
 }
 
 const listUser = `-- name: ListUser :many
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at FROM users ORDER BY first_name
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at FROM users ORDER BY first_name
 `
 
 func (q *Queries) ListUser(ctx context.Context) ([]User, error) {
@@ -493,6 +497,7 @@ func (q *Queries) ListUser(ctx context.Context) ([]User, error) {
 			&i.Latitude,
 			&i.Longitude,
 			&i.Roles,
+			&i.Password,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -595,7 +600,7 @@ func (q *Queries) SearchUnitOfMeasure(ctx context.Context, name string) ([]Units
 }
 
 const searchUser = `-- name: SearchUser :many
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at FROM users WHERE first_name = $1
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at FROM users WHERE first_name = $1
 `
 
 func (q *Queries) SearchUser(ctx context.Context, firstName string) ([]User, error) {
@@ -617,6 +622,7 @@ func (q *Queries) SearchUser(ctx context.Context, firstName string) ([]User, err
 			&i.Latitude,
 			&i.Longitude,
 			&i.Roles,
+			&i.Password,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -732,8 +738,8 @@ func (q *Queries) UpdateUnitOfMeasure(ctx context.Context, arg UpdateUnitOfMeasu
 
 const updateUser = `-- name: UpdateUser :exec
 UPDATE users SET
-(first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-WHERE id = $11
+(first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+WHERE id = $12
 `
 
 type UpdateUserParams struct {
@@ -745,6 +751,7 @@ type UpdateUserParams struct {
 	Latitude  float32
 	Longitude float32
 	Roles     []string
+	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	ID        uuid.UUID
@@ -760,6 +767,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.Latitude,
 		arg.Longitude,
 		arg.Roles,
+		arg.Password,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.ID,

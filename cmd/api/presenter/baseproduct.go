@@ -25,7 +25,6 @@ type EchoCreateBaseProduct struct {
 }
 
 type EchoUpdateBaseProduct struct {
-	ID   string `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 

@@ -62,6 +62,7 @@ func (s *Service) CreateUser(
 	latitude,
 	logitude float32,
 	roles []string,
+	password string,
 ) (entity.ID, error) {
 	c, err := entity.NewUser(
 		firstName,
@@ -72,6 +73,7 @@ func (s *Service) CreateUser(
 		latitude,
 		logitude,
 		roles,
+		password,
 	)
 	if err != nil {
 		return entity.NewID(), err

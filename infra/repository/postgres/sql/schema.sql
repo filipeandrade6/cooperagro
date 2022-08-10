@@ -8,6 +8,7 @@ CREATE TABLE users (
 	latitude REAL NOT NULL,
 	longitude REAL NOT NULL,
 	roles TEXT[] NOT NULL,
+	password VARCHAR(60) NOT NULL,
 	created_at TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP NOT NULL,
 

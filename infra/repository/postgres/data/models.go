@@ -52,6 +52,7 @@ type User struct {
 	Latitude  float32
 	Longitude float32
 	Roles     []string
+	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

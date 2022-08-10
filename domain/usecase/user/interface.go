@@ -32,6 +32,7 @@ type UseCase interface {
 		latitude,
 		longitude float32,
 		roles []string,
+		password string,
 	) (entity.ID, error)
 	UpdateUser(e *entity.User) error
 	DeleteUser(id entity.ID) error

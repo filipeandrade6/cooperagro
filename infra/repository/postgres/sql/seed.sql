@@ -1,7 +1,7 @@
 -- User
 INSERT INTO
-users(id, first_name, last_name, address, phone, email, latitude, longitude, roles, created_at, updated_at)
-VALUES ('6bb774bd-fc80-40a9-a063-c7838209ec54', 'Filipe', 'Andrade', 'Main street', '5561555554444', 'filipe@email.com', -12.123456, -12.123456, '{admin, producer}', NOW(), NOW());
+users(id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at)
+VALUES ('6bb774bd-fc80-40a9-a063-c7838209ec54', 'Filipe', 'Andrade', 'Main street', '5561555554444', 'filipe@email.com', -12.123456, -12.123456, '{admin, producer}', '$2a$12$rR/HxfiayY9cDdpljIfUMuu4DoEp76Kg072QkmxLxAcw3VckrDW.a', NOW(), NOW());
 
 -- Unit of measure
 INSERT INTO
