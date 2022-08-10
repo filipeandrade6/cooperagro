@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func MakeAuthHandlers(e *echo.Group, service user.UseCase) {
+func MakeAuthHandlers(e *echo.Echo, service user.UseCase) {
 	e.POST("/login", login(service))
 }
 
@@ -39,8 +39,8 @@ func login(service user.UseCase) echo.HandlerFunc {
 
 		// Set custom claims
 		claims := &auth.Claims{
-			ID:    username,
-			Roles: user.Roles,
+			UserID: username,
+			Roles:  user.Roles,
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: &jwt.NumericDate{time.Now().Add(time.Hour * 72)},
 			},

@@ -4,25 +4,27 @@ import (
 	"errors"
 	"net/http"
 
+	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
+	"github.com/filipeandrade6/cooperagro/infra/auth"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
 func MakeBaseProductHandlers(e *echo.Group, service baseproduct.UseCase) {
-	e.POST("/baseproducts", createBaseProduct(service))
+	e.POST("/baseproducts", createBaseProduct(service), mid.AdminRequired)
 	e.GET("/baseproducts", readBaseProduct(service))
 	e.GET("/baseproducts/:id", getBaseProduct(service))
-	e.PUT("/baseproducts/:id", updateBaseProduct(service))
-	e.DELETE("/baseproducts/:id", deleteBaseProduct(service))
+	e.PUT("/baseproducts/:id", updateBaseProduct(service), mid.AdminRequired)
+	e.DELETE("/baseproducts/:id", deleteBaseProduct(service), mid.AdminRequired)
 }
 
 func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input presenter.BaseProduct
-
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(
 				http.StatusBadRequest,
@@ -135,6 +137,13 @@ func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 
 func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(*auth.Claims)
+
+		if !claims.Authorized("admin") {
+			return echo.ErrForbidden
+		}
+
 		id := c.Param("id")
 
 		if id == "" {
@@ -176,6 +185,13 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 
 func deleteBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(*auth.Claims)
+
+		if !claims.Authorized("admin") {
+			return echo.ErrForbidden
+		}
+
 		id := c.Param("id")
 
 		if id == "" {

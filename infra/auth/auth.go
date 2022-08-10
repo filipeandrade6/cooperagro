@@ -6,8 +6,8 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	ID    string   `json:"id"`
-	Roles []string `json:"roles"`
+	UserID string   `json:"user_id"`
+	Roles  []string `json:"roles"`
 }
 
 func (c Claims) Authorized(roles ...string) bool {

@@ -29,11 +29,9 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	config := middleware.JWTConfig{
-		Claims:     &auth.Claims{},
-		SigningKey: []byte("secret"),
-	}
-	e.Use(middleware.JWTWithConfig(config))
+	handler.MakeAuthHandlers(e, userService)
+
+	// e.Use(middleware.JWTWithConfig(config))
 
 	e.GET("/ping", func(c echo.Context) error {
 		return c.String(http.StatusOK, "pong")
@@ -41,7 +39,12 @@ func main() {
 
 	v1 := e.Group("/api/v1")
 
-	handler.MakeAuthHandlers(v1, userService)
+	config := middleware.JWTConfig{
+		Claims:     &auth.Claims{},
+		SigningKey: []byte("secret"),
+	}
+	v1.Use(middleware.JWTWithConfig(config))
+
 	handler.MakeBaseProductHandlers(v1, baseProductService)
 
 	// gin.MakeBaseProductHandlers(r, baseProductService)
