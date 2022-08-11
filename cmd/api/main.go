@@ -7,6 +7,7 @@ import (
 	handler "github.com/filipeandrade6/cooperagro/cmd/api/handler/echo"
 	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
 	"github.com/filipeandrade6/cooperagro/infra/auth"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres"
@@ -24,6 +25,7 @@ func main() {
 	}
 
 	baseProductService := baseproduct.NewService(db)
+	unitOfMeasureService := unitofmeasure.NewService(db)
 	userService := user.NewService(db)
 
 	e := echo.New()
@@ -45,7 +47,7 @@ func main() {
 		SigningKey: []byte("secret"),
 	}
 	v1.Use(middleware.JWTWithConfig(config))
-	v1.Use(mid.Logado)
+	v1.Use(mid.UserRoleContextSetter)
 
 	handler.MakeBaseProductHandlers(v1, baseProductService)
 
@@ -53,7 +55,7 @@ func main() {
 	// gin.MakeUserHandlers(r, userService)
 	// gin.MakeInventoryHandlers(r, inventoryService)
 	// gin.MakeProductHandlers(r, productService)
-	// gin.MakeUnitOfMeasureHandlers(r, unitOfMeasureService)
+	handler.MakeUnitOfMeasureHandlers(v1, unitOfMeasureService)
 
 	// r.Run()
 

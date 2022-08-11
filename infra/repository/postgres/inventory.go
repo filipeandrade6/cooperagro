@@ -69,7 +69,7 @@ func (r *Repo) CreateInventory(e *entity.Inventory) (entity.ID, error) {
 		UpdatedAt:       e.UpdatedAt,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
 		return e.ID, entity.ErrEntityAlreadyExists
 	}
 
@@ -92,7 +92,7 @@ func (r *Repo) UpdateInventory(e *entity.Inventory) error {
 		ID:              e.ID,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
 		return entity.ErrEntityAlreadyExists
 	}
 

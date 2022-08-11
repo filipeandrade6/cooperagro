@@ -14,3 +14,7 @@ type CreateUnitOfMeasure struct {
 type UpdateUnitOfMeasure struct {
 	Name string `json:"name" binding:"required"`
 }
+
+type EchoUnitOfMeasure struct {
+	Name string `json:"name"`
+}

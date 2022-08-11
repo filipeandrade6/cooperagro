@@ -4,151 +4,148 @@ import (
 	"errors"
 	"net/http"
 
+	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
-func MakeUnitOfMeasureHandlers(r *gin.Engine, service unitofmeasure.UseCase) {
-	r.GET("/unitofmeasure/:id", getUnitOfMeasureByID(service))
-	r.GET("/unitofmeasure", listUnitOfMeasure(service))
-	r.POST("/unitofmeasure", createUnitOfMeasure(service))
-	r.PUT("/unitofmeasure/:id", updateUnitOfMeasure(service))
-	r.DELETE("/unitofmeasure/:id", deleteUnitOfMeasure(service))
+func MakeUnitOfMeasureHandlers(e *echo.Group, service unitofmeasure.UseCase) {
+	e.POST("/unitsofmeasure", createUnitOfMeasure(service), mid.AdminRequired)
+	e.GET("/unitsofmeasure", readUnitOfMeasure(service))
+	e.GET("/unitsofmeasure/:id", getUnitOfMeasure(service))
+	e.PUT("/unitsofmeasure/:id", updateUnitOfMeasure(service), mid.AdminRequired)
+	e.DELETE("/unitsofmeasure/:id", deleteUnitOfMeasure(service), mid.AdminRequired)
 }
 
-func getUnitOfMeasureByID(service unitofmeasure.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		errorMessage := "error reading unit of measure"
+func createUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input presenter.EchoUnitOfMeasure
+		if err := c.Bind(&input); err != nil {
+			return echo.ErrBadRequest
+		}
 
-		id, err := entity.StringToID(c.Param("id"))
+		id, err := service.CreateUnitOfMeasure(input.Name)
+		if errors.Is(entity.ErrEntityAlreadyExists, err) {
+			return c.NoContent(http.StatusConflict)
+		}
+		if errors.Is(entity.ErrInvalidEntity, err) {
+			return echo.ErrBadRequest
+		}
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
-			return
+			return echo.ErrInternalServerError
 		}
 
-		data, err := service.GetUnitOfMeasureByID(id)
-
-		if err != nil && !errors.Is(err, entity.ErrNotFound) {
-			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
-			return
-		}
-
-		if data == nil {
-			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
-			return
-		}
-
-		c.JSON(http.StatusOK, &presenter.UnitOfMeasure{
-			ID:   data.ID,
-			Name: data.Name,
-		})
-
-		// Se der erro de marshalling no JSON?
+		return c.JSON(
+			http.StatusCreated,
+			echo.Map{"id": id.String()},
+		)
 	}
 }
 
-func listUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		errorMessage := "error reading unit of measure"
-
-		data, err := service.ListUnitOfMeasure()
-
-		if err != nil && !errors.Is(err, entity.ErrNotFound) {
-			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
-			return
+func getUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
+		if err != nil {
+			return echo.ErrBadRequest
 		}
 
-		if data == nil {
-			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
-			return
+		data, err := service.GetUnitOfMeasureByID(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
 		}
 
-		var toJ []*presenter.UnitOfMeasure
+		return c.JSON(http.StatusOK, &presenter.UnitOfMeasure{
+			ID:   data.ID,
+			Name: data.Name,
+		})
+	}
+}
+
+func readUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var data []*entity.UnitOfMeasure
+		var err error
+
+		name := c.QueryParam("name")
+		if name != "" {
+			data, err = service.SearchUnitOfMeasure(name)
+		} else {
+			data, err = service.ListUnitOfMeasure()
+		}
+
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+
+		var out []*presenter.UnitOfMeasure
 		for _, d := range data {
-			toJ = append(toJ, &presenter.UnitOfMeasure{
+			out = append(out, &presenter.UnitOfMeasure{
 				ID:   d.ID,
 				Name: d.Name,
 			})
 		}
-		c.JSON(http.StatusOK, toJ)
 
-		// Se der erro de marshalling no JSON?
+		return c.JSON(http.StatusOK, out)
 	}
 }
 
-func createUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var input presenter.CreateUnitOfMeasure
-		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // TODO aplicar para outros
-			return
-		}
-
-		id, err := service.CreateUnitOfMeasure(input.Name)
+func updateUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating unit of measure"})
-			return
+			return echo.ErrBadRequest
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"id": id})
-		// Se der erro de marshalling no JSON?
-	}
-}
-
-func updateUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-
-		if id == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
-			return
+		var input presenter.UnitOfMeasure
+		if err := c.Bind(&input); err != nil {
+			return echo.ErrInternalServerError
 		}
 
-		idUUID, err := entity.StringToID(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-			return
-		}
-
-		var input presenter.UpdateUnitOfMeasure
-		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		if err := service.UpdateUnitOfMeasure(&entity.UnitOfMeasure{
+		err = service.UpdateUnitOfMeasure(&entity.UnitOfMeasure{
 			ID:   idUUID,
 			Name: input.Name,
-		}); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+		})
+		switch {
+		case errors.Is(entity.ErrInvalidEntity, err):
+			return echo.ErrBadRequest
+
+		case errors.Is(entity.ErrNotFound, err):
+			return echo.ErrNotFound
+
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
+
+		case err != nil:
+			return echo.ErrInternalServerError
 		}
 
-		c.JSON(http.StatusOK, gin.H{"status": "unit of measure udpated"})
+		return c.NoContent(http.StatusOK)
 	}
 }
 
-func deleteUnitOfMeasure(service unitofmeasure.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-		if id == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
-			return
-		}
-
-		idUUID, err := entity.StringToID(id)
+func deleteUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-			return
+			return echo.ErrBadRequest
 		}
 
-		if err := service.DeleteUnitOfMeasure(idUUID); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "deleting unit of measure"})
-			return
+		err = service.DeleteUnitOfMeasure(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
 		}
 
-		c.JSON(http.StatusOK, gin.H{"status": "unit of measure deleted"})
+		return c.NoContent(http.StatusOK)
 	}
 }

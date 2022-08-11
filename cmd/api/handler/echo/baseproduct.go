@@ -8,9 +8,7 @@ import (
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
-	"github.com/filipeandrade6/cooperagro/infra/auth"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -31,10 +29,7 @@ func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 
 		id, err := service.CreateBaseProduct(input.Name)
 		if errors.Is(entity.ErrEntityAlreadyExists, err) {
-			return c.JSON(
-				http.StatusConflict,
-				echo.Map{"status": "base product already exists"},
-			)
+			return c.NoContent(http.StatusConflict)
 		}
 		if errors.Is(entity.ErrInvalidEntity, err) {
 			return echo.ErrBadRequest
@@ -52,12 +47,7 @@ func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 
 func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id := c.Param("id")
-		if id == "" {
-			return echo.ErrBadRequest
-		}
-
-		idUUID, err := entity.StringToID(id)
+		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			return echo.ErrBadRequest
 		}
@@ -110,20 +100,7 @@ func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 
 func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user := c.Get("user").(*jwt.Token)
-		claims := user.Claims.(*auth.Claims)
-
-		if !claims.Authorized("admin") {
-			return echo.ErrForbidden
-		}
-
-		id := c.Param("id")
-
-		if id == "" {
-			return echo.ErrBadRequest
-		}
-
-		idUUID, err := entity.StringToID(id)
+		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			return echo.ErrBadRequest
 		}
@@ -133,10 +110,21 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		if err := service.UpdateBaseProduct(&entity.BaseProduct{
+		err = service.UpdateBaseProduct(&entity.BaseProduct{
 			ID:   idUUID,
 			Name: input.Name,
-		}); err != nil {
+		})
+		switch {
+		case errors.Is(entity.ErrInvalidEntity, err):
+			return echo.ErrBadRequest
+
+		case errors.Is(entity.ErrNotFound, err):
+			return echo.ErrNotFound
+
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
+
+		case err != nil:
 			return echo.ErrInternalServerError
 		}
 
@@ -146,25 +134,16 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 
 func deleteBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user := c.Get("user").(*jwt.Token)
-		claims := user.Claims.(*auth.Claims)
-
-		if !claims.Authorized("admin") {
-			return echo.ErrForbidden
-		}
-
-		id := c.Param("id")
-
-		if id == "" {
-			return echo.ErrBadRequest
-		}
-
-		idUUID, err := entity.StringToID(id)
+		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			return echo.ErrBadRequest
 		}
 
-		if err := service.DeleteBaseProduct(idUUID); err != nil {
+		err = service.DeleteBaseProduct(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
 			return echo.ErrInternalServerError
 		}
 

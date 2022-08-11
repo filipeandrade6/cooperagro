@@ -17,3 +17,8 @@ type UpdateProduct struct {
 	Name          string    `json:"name" binding:"required"`
 	BaseProductID entity.ID `json:"base_product_id" binding:"required"`
 }
+
+type EchoProduct struct {
+	Name          string `json:"name"`
+	BaseProductID string `json:"base_product_id"`
+}

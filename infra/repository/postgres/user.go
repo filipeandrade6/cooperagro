@@ -115,7 +115,7 @@ func (r *Repo) CreateUser(e *entity.User) (entity.ID, error) {
 		UpdatedAt: e.UpdatedAt,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
 		return e.ID, entity.ErrEntityAlreadyExists
 	}
 
@@ -143,7 +143,7 @@ func (r *Repo) UpdateUser(e *entity.User) error {
 		ID:        e.ID,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
 		return entity.ErrEntityAlreadyExists
 	}
 

@@ -1,160 +1,156 @@
 package echo
 
-import (
-	"errors"
-	"net/http"
+// import (
+// 	"errors"
+// 	"net/http"
 
-	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-	"github.com/filipeandrade6/cooperagro/domain/entity"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
-	"github.com/gin-gonic/gin"
-)
+// 	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
+// 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
+// 	"github.com/filipeandrade6/cooperagro/domain/entity"
+// 	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
+// 	"github.com/labstack/echo/v4"
+// )
 
-func MakeProductHandlers(r *gin.Engine, service product.UseCase) {
-	r.GET("/product/:id", getProductByID(service))
-	r.GET("/product", listProduct(service))
-	r.POST("/product", createProduct(service))
-	r.PUT("/product/:id", updateProduct(service))
-	r.DELETE("/product/:id", deleteProduct(service))
-}
+// func MakeProductHandlers(e *echo.Group, service product.UseCase) {
+// 	e.POST("/products", createProduct(service), mid.AdminRequired)
+// 	e.GET("/products", readProduct(service))
+// 	e.GET("/products/:id", getProduct(service))
+// 	e.PUT("/products/:id", updateProduct(service), mid.AdminRequired)
+// 	e.DELETE("/products/:id", deleteProduct(service), mid.AdminRequired)
+// }
 
-func getProductByID(service product.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		errorMessage := "error reading product"
+// func createProduct(service product.UseCase) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		var input presenter.EchoProduct
+// 		if err := c.Bind(&input); err != nil {
+// 			return echo.ErrBadRequest
+// 		}
 
-		id, err := entity.StringToID(c.Param("id"))
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
-			return
-		}
+// 		idUIID, err := entity.StringToID(input.BaseProductID)
+// 		if err != nil {
+// 			return echo.ErrBadRequest
+// 		}
 
-		data, err := service.GetProductByID(id)
+// 		id, err := service.CreateProduct(input.Name, idUIID)
+// 		if errors.Is(entity.ErrEntityAlreadyExists, err) {
+// 			return c.NoContent(http.StatusConflict)
+// 		}
+// 		if errors.Is(entity.ErrInvalidEntity, err) {
+// 			return echo.ErrBadRequest
+// 		}
+// 		if err != nil {
+// 			return echo.ErrInternalServerError
+// 		}
 
-		if err != nil && !errors.Is(err, entity.ErrNotFound) {
-			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
-			return
-		}
+// 		return c.JSON(
+// 			http.StatusCreated,
+// 			echo.Map{"id": id.String()},
+// 		)
+// 	}
+// }
 
-		if data == nil {
-			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
-			return
-		}
+// func getProduct(service product.UseCase) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		idUUID, err := entity.StringToID(c.Param("id"))
+// 		if err != nil {
+// 			return echo.ErrBadRequest
+// 		}
 
-		c.JSON(http.StatusOK, &presenter.Product{
-			ID:            data.ID,
-			Name:          data.Name,
-			BaseProductID: data.BaseProductID,
-		})
+// 		data, err := service.GetProductByID(idUUID)
+// 		if errors.Is(err, entity.ErrNotFound) {
+// 			return echo.ErrNotFound
+// 		}
+// 		if err != nil {
+// 			return echo.ErrInternalServerError
+// 		}
 
-		// Se der erro de marshalling no JSON?
-	}
-}
+// 		return c.JSON(http.StatusOK, &presenter.Product{
+// 			ID:   data.ID,
+// 			Name: data.Name,
+// 		})
+// 	}
+// }
 
-func listProduct(service product.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		errorMessage := "error reading product"
+// func readProduct(service product.UseCase) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		var data []*entity.Product
+// 		var err error
 
-		data, err := service.ListProduct()
+// 		name := c.QueryParam("name")
+// 		if name != "" {
+// 			data, err = service.SearchProduct(name)
+// 		} else {
+// 			data, err = service.ListProduct()
+// 		}
 
-		if err != nil && !errors.Is(err, entity.ErrNotFound) {
-			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
-			return
-		}
+// 		if errors.Is(err, entity.ErrNotFound) {
+// 			return echo.ErrNotFound
+// 		}
+// 		if err != nil {
+// 			return echo.ErrInternalServerError
+// 		}
 
-		if data == nil {
-			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
-			return
-		}
+// 		var out []*presenter.Product
+// 		for _, d := range data {
+// 			out = append(out, &presenter.Product{
+// 				ID:   d.ID,
+// 				Name: d.Name,
+// 			})
+// 		}
 
-		var toJ []*presenter.Product
-		for _, d := range data {
-			toJ = append(toJ, &presenter.Product{
-				ID:            d.ID,
-				Name:          d.Name,
-				BaseProductID: d.BaseProductID,
-			})
-		}
-		c.JSON(http.StatusOK, toJ)
+// 		return c.JSON(http.StatusOK, out)
+// 	}
+// }
 
-		// Se der erro de marshalling no JSON?
-	}
-}
+// func updateProduct(service product.UseCase) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		idUUID, err := entity.StringToID(c.Param("id"))
+// 		if err != nil {
+// 			return echo.ErrBadRequest
+// 		}
 
-func createProduct(service product.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var input presenter.CreateProduct
-		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // TODO aplicar para outros
-			return
-		}
+// 		var input presenter.Product
+// 		if err := c.Bind(&input); err != nil {
+// 			return echo.ErrInternalServerError
+// 		}
 
-		id, err := service.CreateProduct(
-			input.Name,
-			input.BaseProductID,
-		)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating product"})
-			return
-		}
+// 		err = service.UpdateProduct(&entity.Product{
+// 			ID:   idUUID,
+// 			Name: input.Name,
+// 		})
+// 		switch {
+// 		case errors.Is(entity.ErrInvalidEntity, err):
+// 			return echo.ErrBadRequest
 
-		c.JSON(http.StatusCreated, gin.H{"id": id})
-		// Se der erro de marshalling no JSON?
-	}
-}
+// 		case errors.Is(entity.ErrNotFound, err):
+// 			return echo.ErrNotFound
 
-func updateProduct(service product.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
+// 		case errors.Is(entity.ErrEntityAlreadyExists, err):
+// 			return c.NoContent(http.StatusConflict)
 
-		if id == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
-			return
-		}
+// 		case err != nil:
+// 			return echo.ErrInternalServerError
+// 		}
 
-		idUUID, err := entity.StringToID(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-			return
-		}
+// 		return c.NoContent(http.StatusOK)
+// 	}
+// }
 
-		var input presenter.UpdateProduct
-		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
+// func deleteProduct(service product.UseCase) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		idUUID, err := entity.StringToID(c.Param("id"))
+// 		if err != nil {
+// 			return echo.ErrBadRequest
+// 		}
 
-		if err := service.UpdateProduct(&entity.Product{
-			ID:            idUUID,
-			Name:          input.Name,
-			BaseProductID: input.BaseProductID,
-		}); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
+// 		err = service.DeleteProduct(idUUID)
+// 		if errors.Is(err, entity.ErrNotFound) {
+// 			return echo.ErrNotFound
+// 		}
+// 		if err != nil {
+// 			return echo.ErrInternalServerError
+// 		}
 
-		c.JSON(http.StatusOK, gin.H{"status": "product udpated"})
-	}
-}
-
-func deleteProduct(service product.UseCase) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-		if id == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
-			return
-		}
-
-		idUUID, err := entity.StringToID(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-			return
-		}
-
-		if err := service.DeleteProduct(idUUID); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "deleting product"})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"status": "product deleted"})
-	}
-}
+// 		return c.NoContent(http.StatusOK)
+// 	}
+// }

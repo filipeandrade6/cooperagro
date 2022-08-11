@@ -7,30 +7,41 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func AdminRequired(next echo.HandlerFunc) echo.HandlerFunc {
+func UserRoleContextSetter(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		roles := c.Get("roles").([]string)
+		user := c.Get("user").(*jwt.Token)
+		c.Set("claims", user.Claims.(*auth.Claims))
 
-		for _, want := range entity.Roles {
-			for _, has := range roles {
-				if has == want {
-					return next(c)
-				}
-			}
-		}
-
-		return echo.ErrForbidden
+		return next(c)
 	}
 }
 
-func Logado(next echo.HandlerFunc) echo.HandlerFunc {
+func AdminRequired(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user := c.Get("user").(*jwt.Token)
-		claims := user.Claims.(*auth.Claims)
+		claims := c.Get("claims").(*auth.Claims)
+		if !claims.Authorized(entity.RoleAdmin) {
+			return echo.ErrForbidden
+		}
+		return next(c)
+	}
+}
 
-		c.Set("userID", claims.UserID)
-		c.Set("roles", claims.Roles)
+func ProducerRequired(next echo.HandlerFunc) echo.HandlerFunc { // TODO deletar se não tiver uso
+	return func(c echo.Context) error {
+		claims := c.Get("claims").(*auth.Claims)
+		if !claims.Authorized(entity.RoleProducer) {
+			return echo.ErrForbidden
+		}
+		return next(c)
+	}
+}
 
+func BuyerRequired(next echo.HandlerFunc) echo.HandlerFunc { // TODO deletar se não tiver uso
+	return func(c echo.Context) error {
+		claims := c.Get("claims").(*auth.Claims)
+		if !claims.Authorized(entity.RoleBuyer) {
+			return echo.ErrForbidden
+		}
 		return next(c)
 	}
 }

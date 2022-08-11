@@ -83,7 +83,7 @@ func (r *Repo) CreateUnitOfMeasure(e *entity.UnitOfMeasure) (entity.ID, error) {
 		UpdatedAt: e.UpdatedAt,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
 		return e.ID, entity.ErrEntityAlreadyExists
 	}
 
@@ -103,7 +103,7 @@ func (r *Repo) UpdateUnitOfMeasure(e *entity.UnitOfMeasure) error {
 		ID:        e.ID,
 	})
 
-	if pgErr, ok := err.(*pgconn.PgError); !ok || pgErr.Code == "23505" {
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
 		return entity.ErrEntityAlreadyExists
 	}
 
