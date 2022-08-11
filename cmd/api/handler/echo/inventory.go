@@ -4,24 +4,27 @@ package echo
 // 	"errors"
 // 	"net/http"
 
+// 	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
 // 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 // 	"github.com/filipeandrade6/cooperagro/domain/entity"
 // 	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
+// 	"github.com/filipeandrade6/cooperagro/infra/auth"
+
+// 	"github.com/golang-jwt/jwt"
 // 	"github.com/labstack/echo/v4"
 // )
 
 // func MakeInventoryHandlers(e *echo.Group, service inventory.UseCase) {
-// 	e.POST("/inventories", createInventory(service))
+// 	e.POST("/inventories", createInventory(service), mid.AdminRequired, mid.NeedUserID)
 // 	e.GET("/inventories", readInventory(service))
 // 	e.GET("/inventories/:id", getInventory(service))
-// 	e.PUT("/inventories/:id", updateInventory(service))
-// 	e.DELETE("/inventories/:id", deleteInventory(service))
+// 	e.PUT("/inventories/:id", updateInventory(service), mid.AdminRequired, mid.NeedUserID)
+// 	e.DELETE("/inventories/:id", deleteInventory(service), mid.AdminRequired, mid.NeedUserID)
 // }
 
 // func createInventory(service inventory.UseCase) echo.HandlerFunc {
 // 	return func(c echo.Context) error {
-// 		var input presenter.EchoInventory
-
+// 		var input presenter.Inventory
 // 		if err := c.Bind(&input); err != nil {
 // 			return c.JSON(
 // 				http.StatusBadRequest,
@@ -29,38 +32,12 @@ package echo
 // 			)
 // 		}
 
-// 		userUIID, err := entity.StringToID(input.UserID)
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "invalid id"},
-// 			)
-// 		}
-// 		productUIID, err := entity.StringToID(input.UserID)
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "invalid id"},
-// 			)
-// 		}
-// 		unitOfMeasureUIID, err := entity.StringToID(input.UnitOfMeasureID)
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "invalid id"},
-// 			)
-// 		}
+// 		id, err := service.CreateInventory()
 
-// 		id, err := service.CreateInventory(
-// 			userUIID,
-// 			productUIID,
-// 			input.Quantity,
-// 			unitOfMeasureUIID,
-// 		)
 // 		if errors.Is(entity.ErrEntityAlreadyExists, err) {
 // 			return c.JSON(
 // 				http.StatusConflict,
-// 				echo.Map{"status": "inventory already exists"},
+// 				echo.Map{"status": "base product already exists"},
 // 			)
 // 		}
 // 		if errors.Is(entity.ErrInvalidEntity, err) {
@@ -105,7 +82,7 @@ package echo
 // 		if errors.Is(err, entity.ErrNotFound) {
 // 			return c.JSON(
 // 				http.StatusNotFound,
-// 				echo.Map{"status": "inventory not found"},
+// 				echo.Map{"status": "base product not found"},
 // 			)
 // 		}
 // 		if err != nil {
@@ -115,7 +92,7 @@ package echo
 // 			)
 // 		}
 
-// 		return c.JSON(http.StatusOK, &presenter.EchoInventory{
+// 		return c.JSON(http.StatusOK, &presenter.Inventory{
 // 			ID:   data.ID,
 // 			Name: data.Name,
 // 		})
@@ -137,7 +114,7 @@ package echo
 // 		if errors.Is(err, entity.ErrNotFound) {
 // 			return c.JSON(
 // 				http.StatusNotFound,
-// 				echo.Map{"status": "inventorys not found"},
+// 				echo.Map{"status": "base products not found"},
 // 			)
 // 		}
 // 		if err != nil {
@@ -147,9 +124,9 @@ package echo
 // 			)
 // 		}
 
-// 		var out []*presenter.EchoInventory
+// 		var out []*presenter.Inventory
 // 		for _, d := range data {
-// 			out = append(out, &presenter.EchoInventory{
+// 			out = append(out, &presenter.Inventory{
 // 				ID:   d.ID,
 // 				Name: d.Name,
 // 			})
@@ -161,6 +138,13 @@ package echo
 
 // func updateInventory(service inventory.UseCase) echo.HandlerFunc {
 // 	return func(c echo.Context) error {
+// 		user := c.Get("user").(*jwt.Token)
+// 		claims := user.Claims.(*auth.Claims)
+
+// 		if !claims.Authorized("admin") {
+// 			return echo.ErrForbidden
+// 		}
+
 // 		id := c.Param("id")
 
 // 		if id == "" {
@@ -178,7 +162,7 @@ package echo
 // 			)
 // 		}
 
-// 		var input presenter.EchoInventory
+// 		var input presenter.Inventory
 // 		if err := c.Bind(&input); err != nil {
 // 			return c.JSON(
 // 				http.StatusInternalServerError,
@@ -196,12 +180,19 @@ package echo
 // 			)
 // 		}
 
-// 		return c.JSON(http.StatusOK, echo.Map{"status": "inventory udpated"})
+// 		return c.JSON(http.StatusOK, echo.Map{"status": "base product udpated"})
 // 	}
 // }
 
 // func deleteInventory(service inventory.UseCase) echo.HandlerFunc {
 // 	return func(c echo.Context) error {
+// 		user := c.Get("user").(*jwt.Token)
+// 		claims := user.Claims.(*auth.Claims)
+
+// 		if !claims.Authorized("admin") {
+// 			return echo.ErrForbidden
+// 		}
+
 // 		id := c.Param("id")
 
 // 		if id == "" {
@@ -226,6 +217,6 @@ package echo
 // 			)
 // 		}
 
-// 		return c.JSON(http.StatusOK, echo.Map{"status": "inventory deleted"})
+// 		return c.JSON(http.StatusOK, echo.Map{"status": "base product deleted"})
 // 	}
 // }

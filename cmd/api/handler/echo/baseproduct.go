@@ -24,12 +24,9 @@ func MakeBaseProductHandlers(e *echo.Group, service baseproduct.UseCase) {
 
 func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input presenter.BaseProduct
+		var input presenter.EchoBaseProduct
 		if err := c.Bind(&input); err != nil {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "could not get values from the request"},
-			)
+			return echo.ErrBadRequest
 		}
 
 		id, err := service.CreateBaseProduct(input.Name)
@@ -40,16 +37,10 @@ func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			)
 		}
 		if errors.Is(entity.ErrInvalidEntity, err) {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "invalid parameters"},
-			)
+			return echo.ErrBadRequest
 		}
 		if err != nil {
-			return c.JSON(
-				http.StatusInternalServerError,
-				echo.Map{"status": err.Error()},
-			)
+			return echo.ErrInternalServerError
 		}
 
 		return c.JSON(
@@ -63,32 +54,20 @@ func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
 		if id == "" {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "empty id"},
-			)
+			return echo.ErrBadRequest
 		}
 
 		idUUID, err := entity.StringToID(id)
 		if err != nil {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "invalid id"},
-			)
+			return echo.ErrBadRequest
 		}
 
 		data, err := service.GetBaseProductByID(idUUID)
 		if errors.Is(err, entity.ErrNotFound) {
-			return c.JSON(
-				http.StatusNotFound,
-				echo.Map{"status": "base product not found"},
-			)
+			return echo.ErrNotFound
 		}
 		if err != nil {
-			return c.JSON(
-				http.StatusInternalServerError,
-				echo.Map{"status": err.Error()}, // TODO - não expor o erro ao usuŕio?
-			)
+			return echo.ErrInternalServerError
 		}
 
 		return c.JSON(http.StatusOK, &presenter.BaseProduct{
@@ -111,16 +90,10 @@ func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		}
 
 		if errors.Is(err, entity.ErrNotFound) {
-			return c.JSON(
-				http.StatusNotFound,
-				echo.Map{"status": "base products not found"},
-			)
+			return echo.ErrNotFound
 		}
 		if err != nil {
-			return c.JSON(
-				http.StatusInternalServerError,
-				echo.Map{"status": err.Error()},
-			)
+			return echo.ErrInternalServerError
 		}
 
 		var out []*presenter.BaseProduct
@@ -147,39 +120,27 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		id := c.Param("id")
 
 		if id == "" {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "empty id"},
-			)
+			return echo.ErrBadRequest
 		}
 
 		idUUID, err := entity.StringToID(id)
 		if err != nil {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "invalid id"},
-			)
+			return echo.ErrBadRequest
 		}
 
 		var input presenter.BaseProduct
 		if err := c.Bind(&input); err != nil {
-			return c.JSON(
-				http.StatusInternalServerError,
-				echo.Map{"status": "could not get values from the request"},
-			)
+			return echo.ErrInternalServerError
 		}
 
 		if err := service.UpdateBaseProduct(&entity.BaseProduct{
 			ID:   idUUID,
 			Name: input.Name,
 		}); err != nil {
-			return c.JSON(
-				http.StatusInternalServerError,
-				echo.Map{"status": err.Error()},
-			)
+			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, echo.Map{"status": "base product udpated"})
+		return c.NoContent(http.StatusOK)
 	}
 }
 
@@ -195,27 +156,18 @@ func deleteBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 		id := c.Param("id")
 
 		if id == "" {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "empty id"},
-			)
+			return echo.ErrBadRequest
 		}
 
 		idUUID, err := entity.StringToID(id)
 		if err != nil {
-			return c.JSON(
-				http.StatusBadRequest,
-				echo.Map{"status": "invalid id"},
-			)
+			return echo.ErrBadRequest
 		}
 
 		if err := service.DeleteBaseProduct(idUUID); err != nil {
-			return c.JSON(
-				http.StatusInternalServerError,
-				echo.Map{"status": err.Error()},
-			)
+			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, echo.Map{"status": "base product deleted"})
+		return c.NoContent(http.StatusOK)
 	}
 }

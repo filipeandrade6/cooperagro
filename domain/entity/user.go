@@ -12,6 +12,8 @@ const (
 	RoleBuyer    = "buyer"
 )
 
+var Roles = [3]string{RoleAdmin, RoleProducer, RoleBuyer}
+
 // User data
 type User struct {
 	ID        ID

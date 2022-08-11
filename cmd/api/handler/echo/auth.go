@@ -2,7 +2,9 @@ package echo
 
 import (
 	"errors"
+	"io"
 	"net/http"
+	"text/template"
 	"time"
 
 	"github.com/filipeandrade6/cooperagro/domain/entity"
@@ -14,7 +16,22 @@ import (
 )
 
 func MakeAuthHandlers(e *echo.Echo, service user.UseCase) {
+	e.GET("/login/", loginPage)
 	e.POST("/login", login(service))
+}
+
+type Template struct {
+	Templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.Templates.ExecuteTemplate(w, name, data)
+}
+
+// TODO remover abaixo
+
+func loginPage(c echo.Context) error {
+	return c.Render(http.StatusOK, "login", nil)
 }
 
 func login(service user.UseCase) echo.HandlerFunc {
