@@ -1,10 +1,10 @@
-package echo
+package handler
 
 import (
 	"errors"
 	"net/http"
 
-	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
+	"github.com/filipeandrade6/cooperagro/cmd/api/middleware"
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
@@ -13,16 +13,16 @@ import (
 )
 
 func MakeBaseProductHandlers(e *echo.Group, service baseproduct.UseCase) {
-	e.POST("/baseproducts", createBaseProduct(service), mid.AdminRequired)
+	e.POST("/baseproducts", createBaseProduct(service), middleware.AdminRequired)
 	e.GET("/baseproducts", readBaseProduct(service))
 	e.GET("/baseproducts/:id", getBaseProduct(service))
-	e.PUT("/baseproducts/:id", updateBaseProduct(service), mid.AdminRequired)
-	e.DELETE("/baseproducts/:id", deleteBaseProduct(service), mid.AdminRequired)
+	e.PUT("/baseproducts/:id", updateBaseProduct(service), middleware.AdminRequired)
+	e.DELETE("/baseproducts/:id", deleteBaseProduct(service), middleware.AdminRequired)
 }
 
 func createBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input presenter.EchoBaseProduct
+		var input presenter.BaseProduct
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrBadRequest
 		}
@@ -60,7 +60,7 @@ func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, &presenter.EchoBaseProduct{
+		return c.JSON(http.StatusOK, &presenter.BaseProduct{
 			ID:   data.ID.String(),
 			Name: data.Name,
 		})
@@ -86,9 +86,9 @@ func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		var out []*presenter.EchoBaseProduct
+		var out []*presenter.BaseProduct
 		for _, d := range data {
-			out = append(out, &presenter.EchoBaseProduct{
+			out = append(out, &presenter.BaseProduct{
 				ID:   d.ID.String(),
 				Name: d.Name,
 			})
@@ -105,7 +105,7 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			return echo.ErrBadRequest
 		}
 
-		var input presenter.EchoBaseProduct
+		var input presenter.BaseProduct
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrInternalServerError
 		}
@@ -115,14 +115,14 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			Name: input.Name,
 		})
 		switch {
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
+
 		case errors.Is(entity.ErrInvalidEntity, err):
 			return echo.ErrBadRequest
 
 		case errors.Is(entity.ErrNotFound, err):
 			return echo.ErrNotFound
-
-		case errors.Is(entity.ErrEntityAlreadyExists, err):
-			return c.NoContent(http.StatusConflict)
 
 		case err != nil:
 			return echo.ErrInternalServerError

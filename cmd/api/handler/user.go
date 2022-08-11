@@ -1,10 +1,10 @@
-package echo
+package handler
 
 import (
 	"errors"
 	"net/http"
 
-	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
+	"github.com/filipeandrade6/cooperagro/cmd/api/middleware"
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
@@ -12,16 +12,16 @@ import (
 )
 
 func MakeUserHandlers(e *echo.Group, service user.UseCase) {
-	e.POST("/users", createUser(service), mid.AdminRequired)
-	e.GET("/users", readUser(service), mid.AdminRequired) // TODO alterar isso aqui (buyer podem ver producers?)
-	e.GET("/users/:id", getUser(service), mid.AdminRequired)
-	e.PUT("/users/:id", updateUser(service), mid.AdminRequired)
-	e.DELETE("/users/:id", deleteUser(service), mid.AdminRequired)
+	e.POST("/users", createUser(service), middleware.AdminRequired)
+	e.GET("/users", readUser(service), middleware.AdminRequired) // TODO alterar isso aqui (buyer podem ver producers?)
+	e.GET("/users/:id", getUser(service), middleware.AdminRequired)
+	e.PUT("/users/:id", updateUser(service), middleware.AdminRequired)
+	e.DELETE("/users/:id", deleteUser(service), middleware.AdminRequired)
 }
 
 func createUser(service user.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input presenter.EchoUser
+		var input presenter.User
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrBadRequest
 		}
@@ -69,7 +69,7 @@ func getUser(service user.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, &presenter.EchoUser{
+		return c.JSON(http.StatusOK, &presenter.User{
 			FirstName: data.FirstName,
 			LastName:  data.LastName,
 			Address:   data.Address,
@@ -101,9 +101,9 @@ func readUser(service user.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		var out []*presenter.EchoUser
+		var out []*presenter.User
 		for _, d := range data {
-			out = append(out, &presenter.EchoUser{
+			out = append(out, &presenter.User{
 				ID:        d.ID.String(),
 				FirstName: d.FirstName,
 				LastName:  d.LastName,
@@ -127,7 +127,7 @@ func updateUser(service user.UseCase) echo.HandlerFunc {
 			return echo.ErrBadRequest
 		}
 
-		var input presenter.EchoUser
+		var input presenter.User
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrInternalServerError
 		}
@@ -145,14 +145,14 @@ func updateUser(service user.UseCase) echo.HandlerFunc {
 			Password:  input.Password,
 		})
 		switch {
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
+
 		case errors.Is(entity.ErrInvalidEntity, err):
 			return echo.ErrBadRequest
 
 		case errors.Is(entity.ErrNotFound, err):
 			return echo.ErrNotFound
-
-		case errors.Is(entity.ErrEntityAlreadyExists, err):
-			return c.NoContent(http.StatusConflict)
 
 		case err != nil:
 			return echo.ErrInternalServerError

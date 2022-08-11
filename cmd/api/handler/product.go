@@ -1,39 +1,48 @@
-package echo
+package handler
 
 import (
 	"errors"
 	"net/http"
 
-	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
+	"github.com/filipeandrade6/cooperagro/cmd/api/middleware"
 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
 	"github.com/labstack/echo/v4"
 )
 
-func MakeUnitOfMeasureHandlers(e *echo.Group, service unitofmeasure.UseCase) {
-	e.POST("/unitsofmeasure", createUnitOfMeasure(service), mid.AdminRequired)
-	e.GET("/unitsofmeasure", readUnitOfMeasure(service))
-	e.GET("/unitsofmeasure/:id", getUnitOfMeasure(service))
-	e.PUT("/unitsofmeasure/:id", updateUnitOfMeasure(service), mid.AdminRequired)
-	e.DELETE("/unitsofmeasure/:id", deleteUnitOfMeasure(service), mid.AdminRequired)
+func MakeProductHandlers(e *echo.Group, service product.UseCase) {
+	e.POST("/products", createProduct(service), middleware.AdminRequired)
+	e.GET("/products", readProduct(service))
+	e.GET("/products/:id", getProduct(service))
+	e.PUT("/products/:id", updateProduct(service), middleware.AdminRequired)
+	e.DELETE("/products/:id", deleteProduct(service), middleware.AdminRequired)
 }
 
-func createUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+func createProduct(service product.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input presenter.EchoUnitOfMeasure
+		var input presenter.Product
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrBadRequest
 		}
 
-		id, err := service.CreateUnitOfMeasure(input.Name)
-		if errors.Is(entity.ErrEntityAlreadyExists, err) {
-			return c.NoContent(http.StatusConflict)
-		}
-		if errors.Is(entity.ErrInvalidEntity, err) {
+		bpUIID, err := entity.StringToID(input.BaseProductID)
+		if err != nil {
 			return echo.ErrBadRequest
 		}
-		if err != nil {
+
+		id, err := service.CreateProduct(input.Name, bpUIID)
+		switch {
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
+
+		case errors.Is(entity.ErrInvalidEntity, err):
+			return echo.ErrBadRequest
+
+		case errors.Is(entity.ErrNotFound, err):
+			return echo.ErrNotFound
+
+		case err != nil:
 			return echo.ErrInternalServerError
 		}
 
@@ -44,14 +53,14 @@ func createUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 	}
 }
 
-func getUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+func getProduct(service product.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			return echo.ErrBadRequest
 		}
 
-		data, err := service.GetUnitOfMeasureByID(idUUID)
+		data, err := service.GetProductByID(idUUID)
 		if errors.Is(err, entity.ErrNotFound) {
 			return echo.ErrNotFound
 		}
@@ -59,23 +68,23 @@ func getUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, &presenter.EchoUnitOfMeasure{
+		return c.JSON(http.StatusOK, &presenter.Product{
 			ID:   data.ID.String(),
 			Name: data.Name,
 		})
 	}
 }
 
-func readUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+func readProduct(service product.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var data []*entity.UnitOfMeasure
+		var data []*entity.Product
 		var err error
 
 		name := c.QueryParam("name")
 		if name != "" {
-			data, err = service.SearchUnitOfMeasure(name)
+			data, err = service.SearchProduct(name)
 		} else {
-			data, err = service.ListUnitOfMeasure()
+			data, err = service.ListProduct()
 		}
 
 		if errors.Is(err, entity.ErrNotFound) {
@@ -85,9 +94,9 @@ func readUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		var out []*presenter.EchoUnitOfMeasure
+		var out []*presenter.Product
 		for _, d := range data {
-			out = append(out, &presenter.EchoUnitOfMeasure{
+			out = append(out, &presenter.Product{
 				ID:   d.ID.String(),
 				Name: d.Name,
 			})
@@ -97,31 +106,31 @@ func readUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 	}
 }
 
-func updateUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+func updateProduct(service product.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			return echo.ErrBadRequest
 		}
 
-		var input presenter.EchoUnitOfMeasure
+		var input presenter.Product
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrInternalServerError
 		}
 
-		err = service.UpdateUnitOfMeasure(&entity.UnitOfMeasure{
+		err = service.UpdateProduct(&entity.Product{
 			ID:   idUUID,
 			Name: input.Name,
 		})
 		switch {
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
+
 		case errors.Is(entity.ErrInvalidEntity, err):
 			return echo.ErrBadRequest
 
 		case errors.Is(entity.ErrNotFound, err):
 			return echo.ErrNotFound
-
-		case errors.Is(entity.ErrEntityAlreadyExists, err):
-			return c.NoContent(http.StatusConflict)
 
 		case err != nil:
 			return echo.ErrInternalServerError
@@ -131,14 +140,14 @@ func updateUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 	}
 }
 
-func deleteUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
+func deleteProduct(service product.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			return echo.ErrBadRequest
 		}
 
-		err = service.DeleteUnitOfMeasure(idUUID)
+		err = service.DeleteProduct(idUUID)
 		if errors.Is(err, entity.ErrNotFound) {
 			return echo.ErrNotFound
 		}

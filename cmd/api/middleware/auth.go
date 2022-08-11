@@ -1,4 +1,4 @@
-package echo
+package middleware
 
 import (
 	"github.com/filipeandrade6/cooperagro/domain/entity"
@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func UserRoleContextSetter(next echo.HandlerFunc) echo.HandlerFunc {
+func ClaimsContext(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)
 		c.Set("claims", user.Claims.(*auth.Claims))

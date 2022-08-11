@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	handler "github.com/filipeandrade6/cooperagro/cmd/api/handler/echo"
-	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
+	"github.com/filipeandrade6/cooperagro/cmd/api/handler"
+	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
@@ -47,7 +47,7 @@ func main() {
 		SigningKey: []byte("secret"),
 	}
 	v1.Use(middleware.JWTWithConfig(config))
-	v1.Use(mid.UserRoleContextSetter)
+	v1.Use(mid.ClaimsContext)
 
 	handler.MakeBaseProductHandlers(v1, baseProductService)
 
