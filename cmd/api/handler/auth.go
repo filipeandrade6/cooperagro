@@ -59,7 +59,7 @@ func login(service user.UseCase) echo.HandlerFunc {
 			UserID: username,
 			Roles:  user.Roles,
 			RegisteredClaims: jwt.RegisteredClaims{
-				ExpiresAt: &jwt.NumericDate{time.Now().Add(time.Hour * 72)},
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
 			},
 		}
 
