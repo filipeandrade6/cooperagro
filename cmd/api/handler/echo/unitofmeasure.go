@@ -59,8 +59,8 @@ func getUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, &presenter.UnitOfMeasure{
-			ID:   data.ID,
+		return c.JSON(http.StatusOK, &presenter.EchoUnitOfMeasure{
+			ID:   data.ID.String(),
 			Name: data.Name,
 		})
 	}
@@ -85,10 +85,10 @@ func readUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		var out []*presenter.UnitOfMeasure
+		var out []*presenter.EchoUnitOfMeasure
 		for _, d := range data {
-			out = append(out, &presenter.UnitOfMeasure{
-				ID:   d.ID,
+			out = append(out, &presenter.EchoUnitOfMeasure{
+				ID:   d.ID.String(),
 				Name: d.Name,
 			})
 		}
@@ -104,7 +104,7 @@ func updateUnitOfMeasure(service unitofmeasure.UseCase) echo.HandlerFunc {
 			return echo.ErrBadRequest
 		}
 
-		var input presenter.UnitOfMeasure
+		var input presenter.EchoUnitOfMeasure
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrInternalServerError
 		}

@@ -1,195 +1,182 @@
 package echo
 
-// import (
-// 	"errors"
-// 	"fmt"
-// 	"net/http"
+import (
+	"errors"
+	"net/http"
 
-// 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-// 	"github.com/filipeandrade6/cooperagro/domain/entity"
-// 	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
-// 	"github.com/gin-gonic/gin"
-// )
+	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
+	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
+	"github.com/labstack/echo/v4"
+)
 
-// func MakeUserHandlers(r *gin.Engine, service user.UseCase) {
-// 	r.GET("/user/:id", getUserByID(service))
-// 	r.GET("/user", listUser(service))
-// 	r.POST("/user", createUser(service))
-// 	r.PUT("/user/:id", updateUser(service))
-// 	r.DELETE("/user/:id", deleteUser(service))
-// }
+func MakeUserHandlers(e *echo.Group, service user.UseCase) {
+	e.POST("/users", createUser(service), mid.AdminRequired)
+	e.GET("/users", readUser(service), mid.AdminRequired) // TODO alterar isso aqui (buyer podem ver producers?)
+	e.GET("/users/:id", getUser(service), mid.AdminRequired)
+	e.PUT("/users/:id", updateUser(service), mid.AdminRequired)
+	e.DELETE("/users/:id", deleteUser(service), mid.AdminRequired)
+}
 
-// func getUserByID(service user.UseCase) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		errorMessage := "error reading user"
+func createUser(service user.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input presenter.EchoUser
+		if err := c.Bind(&input); err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		id, err := entity.StringToID(c.Param("id"))
-// 		if err != nil {
-// 			c.JSON(http.StatusBadRequest, gin.H{"status": "invalid id"})
-// 			return
-// 		}
+		id, err := service.CreateUser(
+			input.FirstName,
+			input.LastName,
+			input.Address,
+			input.Phone,
+			input.Email,
+			input.Latitude,
+			input.Longitude,
+			input.Roles,
+			input.Password,
+		)
+		if errors.Is(entity.ErrEntityAlreadyExists, err) {
+			return c.NoContent(http.StatusConflict)
+		}
+		if errors.Is(entity.ErrInvalidEntity, err) {
+			return echo.ErrBadRequest
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		data, err := service.GetUserByID(id)
+		return c.JSON(
+			http.StatusCreated,
+			echo.Map{"id": id.String()},
+		)
+	}
+}
 
-// 		if err != nil && !errors.Is(err, entity.ErrNotFound) {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
-// 			return
-// 		}
+func getUser(service user.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		if data == nil {
-// 			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
-// 			return
-// 		}
+		data, err := service.GetUserByID(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		c.JSON(http.StatusOK, &presenter.User{
-// 			ID:        data.ID,
-// 			FirstName: data.FirstName,
-// 			LastName:  data.LastName,
-// 			Address:   data.Address,
-// 			Phone:     data.Phone,
-// 			Email:     data.Email,
-// 			Latitude:  data.Latitude,
-// 			Longitude: data.Longitude,
-// 			Roles:     data.Roles,
-// 		})
+		return c.JSON(http.StatusOK, &presenter.EchoUser{
+			FirstName: data.FirstName,
+			LastName:  data.LastName,
+			Address:   data.Address,
+			Phone:     data.Phone,
+			Email:     data.Email,
+			Latitude:  data.Latitude,
+			Longitude: data.Longitude,
+			Roles:     data.Roles,
+		})
+	}
+}
 
-// 		// Se der erro de marshalling no JSON?
-// 	}
-// }
+func readUser(service user.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var data []*entity.User
+		var err error
 
-// func listUser(service user.UseCase) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		errorMessage := "error reading user"
+		firstName := c.QueryParam("first_name")
+		if firstName != "" {
+			data, err = service.SearchUser(firstName)
+		} else {
+			data, err = service.ListUser()
+		}
 
-// 		var data []*entity.User
-// 		var err error
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		firstName := c.Query("first_name")
-// 		switch {
-// 		case firstName == "":
-// 			data, err = service.ListUser()
-// 		default:
-// 			data, err = service.SearchUser(firstName)
-// 		}
+		var out []*presenter.EchoUser
+		for _, d := range data {
+			out = append(out, &presenter.EchoUser{
+				ID:        d.ID.String(),
+				FirstName: d.FirstName,
+				LastName:  d.LastName,
+				Address:   d.Address,
+				Phone:     d.Phone,
+				Email:     d.Email,
+				Latitude:  d.Latitude,
+				Longitude: d.Longitude,
+				Roles:     d.Roles,
+			})
+		}
 
-// 		if err != nil && !errors.Is(err, entity.ErrNotFound) {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"status": errorMessage})
-// 			return
-// 		}
+		return c.JSON(http.StatusOK, out)
+	}
+}
 
-// 		if data == nil {
-// 			c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
-// 			return
-// 		}
+func updateUser(service user.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		var toJ []*presenter.User
-// 		for _, d := range data {
-// 			toJ = append(toJ, &presenter.User{
-// 				ID:        d.ID,
-// 				FirstName: d.FirstName,
-// 				LastName:  d.LastName,
-// 				Address:   d.Address,
-// 				Phone:     d.Phone,
-// 				Email:     d.Email,
-// 				Latitude:  d.Latitude,
-// 				Longitude: d.Longitude,
-// 				Roles:     d.Roles,
-// 			})
-// 		}
-// 		c.JSON(http.StatusOK, toJ)
+		var input presenter.EchoUser
+		if err := c.Bind(&input); err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		// Se der erro de marshalling no JSON?
-// 	}
-// }
+		err = service.UpdateUser(&entity.User{
+			ID:        idUUID,
+			FirstName: input.FirstName,
+			LastName:  input.LastName,
+			Address:   input.Address,
+			Phone:     input.Phone,
+			Email:     input.Email,
+			Latitude:  input.Latitude,
+			Longitude: input.Longitude,
+			Roles:     input.Roles,
+			Password:  input.Password,
+		})
+		switch {
+		case errors.Is(entity.ErrInvalidEntity, err):
+			return echo.ErrBadRequest
 
-// func createUser(service user.UseCase) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		var input presenter.CreateUser
-// 		if err := c.ShouldBindJSON(&input); err != nil {
-// 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // TODO aplicar para outros
-// 			return
-// 		}
+		case errors.Is(entity.ErrNotFound, err):
+			return echo.ErrNotFound
 
-// 		id, err := service.CreateUser(
-// 			input.FirstName,
-// 			input.LastName,
-// 			input.Address,
-// 			input.Phone,
-// 			input.Email,
-// 			input.Latitude,
-// 			input.Longitude,
-// 			input.Roles,
-// 		)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "creating user"})
-// 			return
-// 		}
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
 
-// 		c.JSON(http.StatusCreated, gin.H{"id": id})
-// 		// Se der erro de marshalling no JSON?
-// 	}
-// }
+		case err != nil:
+			return echo.ErrInternalServerError
+		}
 
-// func updateUser(service user.UseCase) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		id := c.Param("id")
+		return c.NoContent(http.StatusOK)
+	}
+}
 
-// 		if id == "" {
-// 			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
-// 			return
-// 		}
+func deleteUser(service user.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		idUUID, err := entity.StringToID(id)
-// 		if err != nil {
-// 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-// 			return
-// 		}
+		err = service.DeleteUser(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		var input presenter.UpdateUser
-// 		if err := c.ShouldBindJSON(&input); err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 			return
-// 		}
-
-// 		if err := service.UpdateUser(&entity.User{
-// 			ID:        idUUID,
-// 			FirstName: input.FirstName,
-// 			LastName:  input.LastName,
-// 			Address:   input.Address,
-// 			Phone:     input.Phone,
-// 			Email:     input.Email,
-// 			Latitude:  input.Latitude,
-// 			Longitude: input.Longitude,
-// 			Roles:     input.Roles,
-// 		}); err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 			return
-// 		}
-
-// 		c.JSON(http.StatusOK, gin.H{"status": "user udpated"})
-// 	}
-// }
-
-// func deleteUser(service user.UseCase) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		id := c.Param("id")
-// 		if id == "" {
-// 			c.JSON(http.StatusBadRequest, gin.H{"error": "empty id"})
-// 			return
-// 		}
-
-// 		idUUID, err := entity.StringToID(id)
-// 		if err != nil {
-// 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-// 			return
-// 		}
-
-// 		if err := service.DeleteUser(idUUID); err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "deleting user"})
-// 			return
-// 		}
-
-// 		c.JSON(http.StatusOK, gin.H{"status": "user deleted"})
-// 	}
-// }
+		return c.NoContent(http.StatusOK)
+	}
+}

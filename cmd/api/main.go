@@ -52,7 +52,7 @@ func main() {
 	handler.MakeBaseProductHandlers(v1, baseProductService)
 
 	// gin.MakeBaseProductHandlers(r, baseProductService)
-	// gin.MakeUserHandlers(r, userService)
+	handler.MakeUserHandlers(v1, userService)
 	// gin.MakeInventoryHandlers(r, inventoryService)
 	// gin.MakeProductHandlers(r, productService)
 	handler.MakeUnitOfMeasureHandlers(v1, unitOfMeasureService)

@@ -87,6 +87,9 @@ func (s *Service) UpdateUser(e *entity.User) error {
 		return err
 	}
 
+	// TODO: update tem que criptografar a senha novamente
+	// TODO: tem que estar nos testes
+
 	e.UpdatedAt = time.Now()
 
 	return s.repo.UpdateUser(e)

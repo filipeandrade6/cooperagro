@@ -60,8 +60,8 @@ func getBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, &presenter.BaseProduct{
-			ID:   data.ID,
+		return c.JSON(http.StatusOK, &presenter.EchoBaseProduct{
+			ID:   data.ID.String(),
 			Name: data.Name,
 		})
 	}
@@ -86,10 +86,10 @@ func readBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		var out []*presenter.BaseProduct
+		var out []*presenter.EchoBaseProduct
 		for _, d := range data {
-			out = append(out, &presenter.BaseProduct{
-				ID:   d.ID,
+			out = append(out, &presenter.EchoBaseProduct{
+				ID:   d.ID.String(),
 				Name: d.Name,
 			})
 		}
@@ -105,7 +105,7 @@ func updateBaseProduct(service baseproduct.UseCase) echo.HandlerFunc {
 			return echo.ErrBadRequest
 		}
 
-		var input presenter.BaseProduct
+		var input presenter.EchoBaseProduct
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrInternalServerError
 		}
