@@ -1,5 +1,6 @@
 TODO:
 
+ - [ ] melhorar os testes
  - [ ] criar um error no echo para centralizar o log
  - [ ] adicionar um contexto personalizado para carregar o userID e Roles?
  - [ ] utilizar echo.Map ao invez de reponse

@@ -1,19 +1,23 @@
 package product
 
 import (
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
 )
 
 type Service struct {
-	repo Repository
+	baseProductService baseproduct.UseCase
+	repo               Repository
 }
 
-func NewService(r Repository) *Service {
+func NewService(b baseproduct.UseCase, r Repository) *Service {
 	return &Service{
-		repo: r,
+		baseProductService: b,
+		repo:               r,
 	}
 }
 
@@ -54,6 +58,11 @@ func (s *Service) ListProduct() ([]*entity.Product, error) {
 }
 
 func (s *Service) CreateProduct(name string, baseProductID entity.ID) (entity.ID, error) {
+	_, err := s.baseProductService.GetBaseProductByID(baseProductID)
+	if errors.Is(err, entity.ErrNotFound) {
+		return entity.NewID(), err
+	}
+
 	p, err := entity.NewProduct(name, baseProductID)
 	if err != nil {
 		return entity.NewID(), err
@@ -63,6 +72,11 @@ func (s *Service) CreateProduct(name string, baseProductID entity.ID) (entity.ID
 }
 
 func (s *Service) UpdateProduct(e *entity.Product) error {
+	_, err := s.baseProductService.GetBaseProductByID(e.BaseProductID)
+	if errors.Is(err, entity.ErrNotFound) {
+		return err
+	}
+
 	if err := e.Validate(); err != nil {
 		return err
 	}
