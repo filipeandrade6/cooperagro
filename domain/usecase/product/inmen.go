@@ -28,7 +28,7 @@ func (i *inmem) GetProductByID(id entity.ID) (*entity.Product, error) {
 func (i *inmem) SearchProduct(query string) ([]*entity.Product, error) {
 	var d []*entity.Product
 	for _, j := range i.m {
-		if strings.Contains(strings.ToLower(j.Name), query) {
+		if strings.Contains(strings.ToLower(j.Name), strings.ToLower(query)) {
 			d = append(d, j)
 		}
 	}

@@ -28,7 +28,7 @@ func (i *inmem) GetUserByID(id entity.ID) (*entity.User, error) {
 func (i *inmem) SearchUser(query string) ([]*entity.User, error) {
 	var d []*entity.User
 	for _, j := range i.m {
-		if strings.Contains(strings.ToLower(j.FirstName), query) {
+		if strings.Contains(strings.ToLower(j.FirstName), strings.ToLower(query)) {
 			d = append(d, j)
 		}
 	}

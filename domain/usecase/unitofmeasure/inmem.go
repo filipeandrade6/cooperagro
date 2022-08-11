@@ -28,7 +28,7 @@ func (i *inmem) GetUnitOfMeasureByID(id entity.ID) (*entity.UnitOfMeasure, error
 func (i *inmem) SearchUnitOfMeasure(query string) ([]*entity.UnitOfMeasure, error) {
 	var d []*entity.UnitOfMeasure
 	for _, j := range i.m {
-		if strings.Contains(strings.ToLower(j.Name), query) {
+		if strings.Contains(strings.ToLower(j.Name), strings.ToLower(query)) {
 			d = append(d, j)
 		}
 	}

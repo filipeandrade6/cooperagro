@@ -512,11 +512,11 @@ func (q *Queries) ListUser(ctx context.Context) ([]User, error) {
 }
 
 const searchBaseProduct = `-- name: SearchBaseProduct :many
-SELECT id, name, created_at, updated_at FROM base_products WHERE name = $1
+SELECT id, name, created_at, updated_at FROM base_products WHERE LOWER(name) = LOWER($1)
 `
 
-func (q *Queries) SearchBaseProduct(ctx context.Context, name string) ([]BaseProduct, error) {
-	rows, err := q.db.Query(ctx, searchBaseProduct, name)
+func (q *Queries) SearchBaseProduct(ctx context.Context, lower string) ([]BaseProduct, error) {
+	rows, err := q.db.Query(ctx, searchBaseProduct, lower)
 	if err != nil {
 		return nil, err
 	}
@@ -541,11 +541,11 @@ func (q *Queries) SearchBaseProduct(ctx context.Context, name string) ([]BasePro
 }
 
 const searchProduct = `-- name: SearchProduct :many
-SELECT id, name, base_product_id, created_at, updated_at FROM products WHERE name = $1
+SELECT id, name, base_product_id, created_at, updated_at FROM products WHERE LOWER(name) = LOWER($1)
 `
 
-func (q *Queries) SearchProduct(ctx context.Context, name string) ([]Product, error) {
-	rows, err := q.db.Query(ctx, searchProduct, name)
+func (q *Queries) SearchProduct(ctx context.Context, lower string) ([]Product, error) {
+	rows, err := q.db.Query(ctx, searchProduct, lower)
 	if err != nil {
 		return nil, err
 	}
@@ -571,11 +571,11 @@ func (q *Queries) SearchProduct(ctx context.Context, name string) ([]Product, er
 }
 
 const searchUnitOfMeasure = `-- name: SearchUnitOfMeasure :many
-SELECT id, name, created_at, updated_at FROM units_of_measure WHERE name = $1
+SELECT id, name, created_at, updated_at FROM units_of_measure WHERE LOWER(name) = LOWER($1)
 `
 
-func (q *Queries) SearchUnitOfMeasure(ctx context.Context, name string) ([]UnitsOfMeasure, error) {
-	rows, err := q.db.Query(ctx, searchUnitOfMeasure, name)
+func (q *Queries) SearchUnitOfMeasure(ctx context.Context, lower string) ([]UnitsOfMeasure, error) {
+	rows, err := q.db.Query(ctx, searchUnitOfMeasure, lower)
 	if err != nil {
 		return nil, err
 	}
@@ -600,11 +600,11 @@ func (q *Queries) SearchUnitOfMeasure(ctx context.Context, name string) ([]Units
 }
 
 const searchUser = `-- name: SearchUser :many
-SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at FROM users WHERE first_name = $1
+SELECT id, first_name, last_name, address, phone, email, latitude, longitude, roles, password, created_at, updated_at FROM users WHERE LOWER(first_name) = LOWER($1)
 `
 
-func (q *Queries) SearchUser(ctx context.Context, firstName string) ([]User, error) {
-	rows, err := q.db.Query(ctx, searchUser, firstName)
+func (q *Queries) SearchUser(ctx context.Context, lower string) ([]User, error) {
+	rows, err := q.db.Query(ctx, searchUser, lower)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@
 SELECT * FROM base_products WHERE id = $1 LIMIT 1;
 
 -- name: SearchBaseProduct :many
-SELECT * FROM base_products WHERE name = $1;
+SELECT * FROM base_products WHERE LOWER(name) = LOWER($1);
 
 -- name: ListBaseProduct :many
 SELECT * FROM base_products ORDER BY name;
@@ -53,7 +53,7 @@ DELETE FROM inventories WHERE id = $1;
 SELECT * FROM products WHERE id = $1 LIMIT 1;
 
 -- name: SearchProduct :many
-SELECT * FROM products WHERE name = $1;
+SELECT * FROM products WHERE LOWER(name) = LOWER($1);
 
 -- name: ListProduct :many
 SELECT * FROM products ORDER BY name;
@@ -79,7 +79,7 @@ DELETE FROM products WHERE id = $1;
 SELECT * FROM units_of_measure WHERE id = $1 LIMIT 1;
 
 -- name: SearchUnitOfMeasure :many
-SELECT * FROM units_of_measure WHERE name = $1;
+SELECT * FROM units_of_measure WHERE LOWER(name) = LOWER($1);
 
 -- name: ListUnitOfMeasure :many
 SELECT * FROM units_of_measure ORDER BY name;
@@ -105,7 +105,7 @@ DELETE FROM units_of_measure WHERE id = $1;
 SELECT * FROM users WHERE id = $1 LIMIT 1;
 
 -- name: SearchUser :many
-SELECT * FROM users WHERE first_name = $1;
+SELECT * FROM users WHERE LOWER(first_name) = LOWER($1);
 
 -- name: ListUser :many
 SELECT * FROM users ORDER BY first_name;
