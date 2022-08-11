@@ -1,9 +1,13 @@
 TODO:
 
+ - [ ] search users não está funcionando
+ - [ ] melhorar respostas da API com echo.NewHTTPError(http.StatusBadRequest, "mensagem")
+ - [ ] arrumar testes de inventory (criar o mock de service separado e importar?)
  - [ ] melhorar os testes
+ - [ ] echo.Bind despadronizado, alguns InternalServer e outro BadRequest (padronizar)
+ - [ ] middleware de binding?
+ - [ ] validation (email, password, required, etc)
  - [ ] criar um error no echo para centralizar o log
- - [ ] adicionar um contexto personalizado para carregar o userID e Roles?
- - [ ] utilizar echo.Map ao invez de reponse
  - [ ] deletar repo.go?
  - [ ] utilizar echo.ErrUnauthorized .ErrBadRequest etc?
  - [ ] adicionar salt no password
@@ -13,7 +17,6 @@ TODO:
  - [ ] adicionar logger
  - [ ] search by name
  - [ ] search customers -> first name para todas colunas
- - [ ] unique constraints no DB, validação
  - [ ] padronizar as repostas de erro ao usuário da api
  - [ ] arrumar created_at e update_at
  - [ ] adicionar contratos/inventorios na entidade user?

@@ -1,222 +1,187 @@
 package handler
 
-// import (
-// 	"errors"
-// 	"net/http"
+import (
+	"errors"
+	"net/http"
 
-// 	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware/echo"
-// 	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
-// 	"github.com/filipeandrade6/cooperagro/domain/entity"
-// 	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
-// 	"github.com/filipeandrade6/cooperagro/infra/auth"
+	"github.com/filipeandrade6/cooperagro/cmd/api/middleware"
+	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
+	"github.com/filipeandrade6/cooperagro/domain/entity"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
 
-// 	"github.com/golang-jwt/jwt"
-// 	"github.com/labstack/echo/v4"
-// )
+	"github.com/labstack/echo/v4"
+)
 
-// func MakeInventoryHandlers(e *echo.Group, service inventory.UseCase) {
-// 	e.POST("/inventories", createInventory(service), mid.AdminRequired, mid.NeedUserID)
-// 	e.GET("/inventories", readInventory(service))
-// 	e.GET("/inventories/:id", getInventory(service))
-// 	e.PUT("/inventories/:id", updateInventory(service), mid.AdminRequired, mid.NeedUserID)
-// 	e.DELETE("/inventories/:id", deleteInventory(service), mid.AdminRequired, mid.NeedUserID)
-// }
+func MakeInventoryHandlers(e *echo.Group, service inventory.UseCase) {
+	e.POST("/inventories", createInventory(service), middleware.AdminRequired)
+	e.GET("/inventories", readInventory(service))
+	e.GET("/inventories/:id", getInventory(service))
+	e.PUT("/inventories/:id", updateInventory(service), middleware.AdminRequired)
+	e.DELETE("/inventories/:id", deleteInventory(service), middleware.AdminRequired)
+}
 
-// func createInventory(service inventory.UseCase) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		var input presenter.Inventory
-// 		if err := c.Bind(&input); err != nil {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "could not get values from the request"},
-// 			)
-// 		}
+func createInventory(service inventory.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input presenter.Inventory
+		if err := c.Bind(&input); err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		id, err := service.CreateInventory()
+		pUIID, err := entity.StringToID(input.ProductID)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		if errors.Is(entity.ErrEntityAlreadyExists, err) {
-// 			return c.JSON(
-// 				http.StatusConflict,
-// 				echo.Map{"status": "base product already exists"},
-// 			)
-// 		}
-// 		if errors.Is(entity.ErrInvalidEntity, err) {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "invalid parameters"},
-// 			)
-// 		}
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusInternalServerError,
-// 				echo.Map{"status": err.Error()},
-// 			)
-// 		}
+		umUIID, err := entity.StringToID(input.UnitOfMeasureID)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		return c.JSON(
-// 			http.StatusCreated,
-// 			echo.Map{"id": id.String()},
-// 		)
-// 	}
-// }
+		uUIID, err := entity.StringToID(input.UserID)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// func getInventory(service inventory.UseCase) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		id := c.Param("id")
-// 		if id == "" {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "empty id"},
-// 			)
-// 		}
+		id, err := service.CreateInventory(uUIID, pUIID, input.Quantity, umUIID)
+		switch {
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
 
-// 		idUUID, err := entity.StringToID(id)
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "invalid id"},
-// 			)
-// 		}
+		case errors.Is(entity.ErrInvalidEntity, err):
+			return echo.ErrBadRequest
 
-// 		data, err := service.GetInventoryByID(idUUID)
-// 		if errors.Is(err, entity.ErrNotFound) {
-// 			return c.JSON(
-// 				http.StatusNotFound,
-// 				echo.Map{"status": "base product not found"},
-// 			)
-// 		}
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusInternalServerError,
-// 				echo.Map{"status": err.Error()}, // TODO - não expor o erro ao usuŕio?
-// 			)
-// 		}
+		case errors.Is(entity.ErrNotFound, err):
+			return echo.ErrNotFound
 
-// 		return c.JSON(http.StatusOK, &presenter.Inventory{
-// 			ID:   data.ID,
-// 			Name: data.Name,
-// 		})
-// 	}
-// }
+		case err != nil:
+			return echo.ErrInternalServerError
+		}
 
-// func readInventory(service inventory.UseCase) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		var data []*entity.Inventory
-// 		var err error
+		return c.JSON(
+			http.StatusCreated,
+			echo.Map{"id": id.String()},
+		)
+	}
+}
 
-// 		name := c.QueryParam("name")
-// 		if name != "" {
-// 			data, err = service.SearchInventory(name)
-// 		} else {
-// 			data, err = service.ListInventory()
-// 		}
+func getInventory(service inventory.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		if errors.Is(err, entity.ErrNotFound) {
-// 			return c.JSON(
-// 				http.StatusNotFound,
-// 				echo.Map{"status": "base products not found"},
-// 			)
-// 		}
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusInternalServerError,
-// 				echo.Map{"status": err.Error()},
-// 			)
-// 		}
+		data, err := service.GetInventoryByID(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		var out []*presenter.Inventory
-// 		for _, d := range data {
-// 			out = append(out, &presenter.Inventory{
-// 				ID:   d.ID,
-// 				Name: d.Name,
-// 			})
-// 		}
+		return c.JSON(http.StatusOK, &presenter.Inventory{
+			ID:              data.ID.String(),
+			UserID:          data.UserID.String(),
+			ProductID:       data.ProductID.String(),
+			Quantity:        data.Quantity,
+			UnitOfMeasureID: data.UnitOfMeasureID.String(),
+		})
+	}
+}
 
-// 		return c.JSON(http.StatusOK, out)
-// 	}
-// }
+func readInventory(service inventory.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		data, err := service.ListInventory()
 
-// func updateInventory(service inventory.UseCase) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		user := c.Get("user").(*jwt.Token)
-// 		claims := user.Claims.(*auth.Claims)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		if !claims.Authorized("admin") {
-// 			return echo.ErrForbidden
-// 		}
+		var out []*presenter.Inventory
+		for _, d := range data {
+			out = append(out, &presenter.Inventory{
+				ID:              d.ID.String(),
+				UserID:          d.UserID.String(),
+				ProductID:       d.ProductID.String(),
+				Quantity:        d.Quantity,
+				UnitOfMeasureID: d.UnitOfMeasureID.String(),
+			})
+		}
 
-// 		id := c.Param("id")
+		return c.JSON(http.StatusOK, out)
+	}
+}
 
-// 		if id == "" {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "empty id"},
-// 			)
-// 		}
+func updateInventory(service inventory.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		idUUID, err := entity.StringToID(id)
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "invalid id"},
-// 			)
-// 		}
+		var input presenter.Inventory
+		if err := c.Bind(&input); err != nil {
+			return echo.ErrInternalServerError
+		}
 
-// 		var input presenter.Inventory
-// 		if err := c.Bind(&input); err != nil {
-// 			return c.JSON(
-// 				http.StatusInternalServerError,
-// 				echo.Map{"status": "could not get values from the request"},
-// 			)
-// 		}
+		pUIID, err := entity.StringToID(input.ProductID)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		if err := service.UpdateInventory(&entity.Inventory{
-// 			ID:   idUUID,
-// 			Name: input.Name,
-// 		}); err != nil {
-// 			return c.JSON(
-// 				http.StatusInternalServerError,
-// 				echo.Map{"status": err.Error()},
-// 			)
-// 		}
+		umUIID, err := entity.StringToID(input.UnitOfMeasureID)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		return c.JSON(http.StatusOK, echo.Map{"status": "base product udpated"})
-// 	}
-// }
+		uUIID, err := entity.StringToID(input.UserID)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// func deleteInventory(service inventory.UseCase) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		user := c.Get("user").(*jwt.Token)
-// 		claims := user.Claims.(*auth.Claims)
+		err = service.UpdateInventory(&entity.Inventory{
+			ID:              idUUID,
+			UserID:          uUIID,
+			ProductID:       pUIID,
+			Quantity:        input.Quantity,
+			UnitOfMeasureID: umUIID,
+		})
+		switch {
+		case errors.Is(entity.ErrEntityAlreadyExists, err):
+			return c.NoContent(http.StatusConflict)
 
-// 		if !claims.Authorized("admin") {
-// 			return echo.ErrForbidden
-// 		}
+		case errors.Is(entity.ErrInvalidEntity, err):
+			return echo.ErrBadRequest
 
-// 		id := c.Param("id")
+		case errors.Is(entity.ErrNotFound, err):
+			return echo.ErrNotFound
 
-// 		if id == "" {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "empty id"},
-// 			)
-// 		}
+		case err != nil:
+			return echo.ErrInternalServerError
+		}
 
-// 		idUUID, err := entity.StringToID(id)
-// 		if err != nil {
-// 			return c.JSON(
-// 				http.StatusBadRequest,
-// 				echo.Map{"status": "invalid id"},
-// 			)
-// 		}
+		return c.NoContent(http.StatusOK)
+	}
+}
 
-// 		if err := service.DeleteInventory(idUUID); err != nil {
-// 			return c.JSON(
-// 				http.StatusInternalServerError,
-// 				echo.Map{"status": err.Error()},
-// 			)
-// 		}
+func deleteInventory(service inventory.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUUID, err := entity.StringToID(c.Param("id"))
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-// 		return c.JSON(http.StatusOK, echo.Map{"status": "base product deleted"})
-// 	}
-// }
+		err = service.DeleteInventory(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+
+		return c.NoContent(http.StatusOK)
+	}
+}

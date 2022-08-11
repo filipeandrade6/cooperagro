@@ -7,12 +7,13 @@ import (
 	"github.com/filipeandrade6/cooperagro/cmd/api/handler"
 	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
+	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
 	"github.com/filipeandrade6/cooperagro/infra/auth"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres"
 
-	//"github.com/gin-gonic/gin"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -25,16 +26,21 @@ func main() {
 	}
 
 	baseProductService := baseproduct.NewService(db)
+	productService := product.NewService(baseProductService, db)
 	unitOfMeasureService := unitofmeasure.NewService(db)
 	userService := user.NewService(db)
+	inventoryService := inventory.NewService(
+		productService,
+		unitOfMeasureService,
+		userService,
+		db,
+	)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	handler.MakeAuthHandlers(e, userService)
-
-	// e.Use(middleware.JWTWithConfig(config))
 
 	e.GET("/ping", func(c echo.Context) error {
 		return c.String(http.StatusOK, "pong")
@@ -50,14 +56,10 @@ func main() {
 	v1.Use(mid.ClaimsContext)
 
 	handler.MakeBaseProductHandlers(v1, baseProductService)
-
-	// gin.MakeBaseProductHandlers(r, baseProductService)
-	handler.MakeUserHandlers(v1, userService)
-	// gin.MakeInventoryHandlers(r, inventoryService)
-	// gin.MakeProductHandlers(r, productService)
+	handler.MakeProductHandlers(v1, productService)
 	handler.MakeUnitOfMeasureHandlers(v1, unitOfMeasureService)
-
-	// r.Run()
+	handler.MakeUserHandlers(v1, userService)
+	handler.MakeInventoryHandlers(v1, inventoryService)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

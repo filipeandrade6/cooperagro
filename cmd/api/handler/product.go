@@ -69,8 +69,9 @@ func getProduct(service product.UseCase) echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, &presenter.Product{
-			ID:   data.ID.String(),
-			Name: data.Name,
+			ID:            data.ID.String(),
+			Name:          data.Name,
+			BaseProductID: data.BaseProductID.String(),
 		})
 	}
 }
@@ -97,8 +98,9 @@ func readProduct(service product.UseCase) echo.HandlerFunc {
 		var out []*presenter.Product
 		for _, d := range data {
 			out = append(out, &presenter.Product{
-				ID:   d.ID.String(),
-				Name: d.Name,
+				ID:            d.ID.String(),
+				Name:          d.Name,
+				BaseProductID: d.BaseProductID.String(),
 			})
 		}
 
@@ -118,9 +120,15 @@ func updateProduct(service product.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
+		bpUIID, err := entity.StringToID(input.BaseProductID)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
+
 		err = service.UpdateProduct(&entity.Product{
-			ID:   idUUID,
-			Name: input.Name,
+			ID:            idUUID,
+			Name:          input.Name,
+			BaseProductID: bpUIID,
 		})
 		switch {
 		case errors.Is(entity.ErrEntityAlreadyExists, err):
