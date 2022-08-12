@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/filipeandrade6/cooperagro/cmd/api/middleware"
-	"github.com/filipeandrade6/cooperagro/cmd/api/presenter"
+	"github.com/filipeandrade6/cooperagro/cmd/api/v1/middleware"
+	"github.com/filipeandrade6/cooperagro/cmd/api/v1/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
 

@@ -1,17 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
-	"github.com/filipeandrade6/cooperagro/cmd/api/handler"
-	mid "github.com/filipeandrade6/cooperagro/cmd/api/middleware"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/baseproduct"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/product"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/unitofmeasure"
-	"github.com/filipeandrade6/cooperagro/domain/usecase/user"
-	"github.com/filipeandrade6/cooperagro/infra/auth"
+	v1 "github.com/filipeandrade6/cooperagro/cmd/api/v1"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres"
 
 	"github.com/labstack/echo/v4"
@@ -19,47 +16,42 @@ import (
 )
 
 func main() {
+	// =================================================================================
+	// configuration
+
+	// =================================================================================
+	// database
+
 	dataSourceName := "postgresql://postgres:postgres@localhost:5432/cooperagro"
 	db, err := postgres.NewPostgresRepo(dataSourceName)
 	if err != nil {
 		log.Panic(err.Error())
 	}
 
-	baseProductService := baseproduct.NewService(db)
-	productService := product.NewService(baseProductService, db)
-	unitOfMeasureService := unitofmeasure.NewService(db)
-	userService := user.NewService(db)
-	inventoryService := inventory.NewService(
-		productService,
-		unitOfMeasureService,
-		userService,
-		db,
-	)
+	// =================================================================================
+	// API service
 
 	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	e.Use(middleware.Logger(), middleware.Recover())
+	v1.RegisterHandlers(e, db)
 
-	handler.MakeAuthHandlers(e, userService)
+	// =================================================================================
+	// graceful shutdown
 
-	e.GET("/ping", func(c echo.Context) error {
-		return c.String(http.StatusOK, "pong")
-	})
+	go func() {
+		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
+		}
+	}()
 
-	v1 := e.Group("/api/v1")
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
 
-	config := middleware.JWTConfig{
-		Claims:     &auth.Claims{},
-		SigningKey: []byte("secret"),
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
 	}
-	v1.Use(middleware.JWTWithConfig(config))
-	v1.Use(mid.ClaimsContext)
-
-	handler.MakeBaseProductHandlers(v1, baseProductService)
-	handler.MakeProductHandlers(v1, productService)
-	handler.MakeUnitOfMeasureHandlers(v1, unitOfMeasureService)
-	handler.MakeUserHandlers(v1, userService)
-	handler.MakeInventoryHandlers(v1, inventoryService)
-
-	e.Logger.Fatal(e.Start(":8080"))
 }
