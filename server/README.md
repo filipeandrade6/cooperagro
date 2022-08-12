@@ -1,5 +1,6 @@
 TODO:
 
+ - [ ] adicionar pprof ou prometheus
  - [ ] .gitignore config.yaml
  - [ ] adicionar mais coisas no logger?
  - [ ] search users não está funcionando
