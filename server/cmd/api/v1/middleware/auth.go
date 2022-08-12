@@ -25,23 +25,3 @@ func AdminRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
-
-func ProducerRequired(next echo.HandlerFunc) echo.HandlerFunc { // TODO deletar se não tiver uso
-	return func(c echo.Context) error {
-		claims := c.Get("claims").(*auth.Claims)
-		if !claims.Authorized(entity.RoleProducer) {
-			return echo.ErrForbidden
-		}
-		return next(c)
-	}
-}
-
-func BuyerRequired(next echo.HandlerFunc) echo.HandlerFunc { // TODO deletar se não tiver uso
-	return func(c echo.Context) error {
-		claims := c.Get("claims").(*auth.Claims)
-		if !claims.Authorized(entity.RoleBuyer) {
-			return echo.ErrForbidden
-		}
-		return next(c)
-	}
-}

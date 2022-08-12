@@ -38,7 +38,7 @@ func (r *Repo) GetUserByID(id entity.ID) (*entity.User, error) {
 
 func (r *Repo) SearchUser(query string) ([]*entity.User, error) {
 	ctx := context.Background()
-	users, err := r.db.SearchUser(ctx, query) // TODO SearchUser faz busca na coluna first_name -> alterar depois
+	users, err := r.db.SearchUser(ctx, query)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, entity.ErrNotFound
 	}

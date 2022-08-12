@@ -61,7 +61,7 @@ func (r *Repo) CreateInventory(e *entity.Inventory) (entity.ID, error) {
 	ctx := context.Background()
 	_, err := r.db.CreateInventory(ctx, data.CreateInventoryParams{
 		ID:              e.ID,
-		UserID:          e.UserID, // TODO uns estao User outros User, decidir
+		UserID:          e.UserID,
 		ProductID:       e.ProductID,
 		Quantity:        int32(e.Quantity),
 		UnitOfMeasureID: e.UnitOfMeasureID,

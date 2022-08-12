@@ -82,7 +82,7 @@ func (u *User) Validate() error {
 		fallthrough
 	case u.Phone == "":
 		fallthrough
-	case u.Email == "": // TODO validar e-mail
+	case u.Email == "":
 		fallthrough
 	case u.Latitude == 0.0:
 		fallthrough
