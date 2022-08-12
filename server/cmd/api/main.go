@@ -2,17 +2,20 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	v1 "github.com/filipeandrade6/cooperagro/cmd/api/v1"
+	"github.com/filipeandrade6/cooperagro/infra/config"
+	"github.com/filipeandrade6/cooperagro/infra/logger"
 	"github.com/filipeandrade6/cooperagro/infra/repository/postgres"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -34,13 +37,23 @@ func run(log *zap.SugaredLogger) error {
 	// =================================================================================
 	// configuration
 
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return fmt.Errorf("getting config: %w", err)
+	}
+
 	// =================================================================================
 	// database
 
-	dataSourceName := "postgresql://postgres:postgres@localhost:5432/cooperagro"
-	db, err := postgres.NewPostgresRepo(dataSourceName)
+	db, err := postgres.NewPostgresRepo(postgres.Config{
+		Host:     cfg.DB.Host,
+		User:     cfg.DB.User,
+		Password: cfg.DB.Password,
+		Name:     cfg.DB.Name,
+		TLS:      cfg.DB.TLS,
+	})
 	if err != nil {
-		log.Panic(err.Error())
+		return fmt.Errorf("database: %w", err)
 	}
 
 	// =================================================================================
@@ -69,4 +82,6 @@ func run(log *zap.SugaredLogger) error {
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
+
+	return nil
 }
