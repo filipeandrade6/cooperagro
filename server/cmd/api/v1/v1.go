@@ -18,6 +18,7 @@ import (
 func RegisterHandlers(e *echo.Echo, db repository.Repository) {
 	// =================================================================================
 	// services
+
 	baseProductService := baseproduct.NewService(db)
 	productService := product.NewService(baseProductService, db)
 	unitOfMeasureService := unitofmeasure.NewService(db)

@@ -4,20 +4,20 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/filipeandrade6/cooperagro/cmd/api/v1/middleware"
 	"github.com/filipeandrade6/cooperagro/cmd/api/v1/presenter"
 	"github.com/filipeandrade6/cooperagro/domain/entity"
 	"github.com/filipeandrade6/cooperagro/domain/usecase/inventory"
+	"github.com/filipeandrade6/cooperagro/infra/auth"
 
 	"github.com/labstack/echo/v4"
 )
 
 func MakeInventoryHandlers(e *echo.Group, service inventory.UseCase) {
-	e.POST("/inventories", createInventory(service), middleware.AdminRequired)
+	e.POST("/inventories", createInventory(service))
 	e.GET("/inventories", readInventory(service))
 	e.GET("/inventories/:id", getInventory(service))
-	e.PUT("/inventories/:id", updateInventory(service), middleware.AdminRequired)
-	e.DELETE("/inventories/:id", deleteInventory(service), middleware.AdminRequired)
+	e.PUT("/inventories/:id", updateInventory(service))
+	e.DELETE("/inventories/:id", deleteInventory(service))
 }
 
 func createInventory(service inventory.UseCase) echo.HandlerFunc {
@@ -25,6 +25,11 @@ func createInventory(service inventory.UseCase) echo.HandlerFunc {
 		var input presenter.Inventory
 		if err := c.Bind(&input); err != nil {
 			return echo.ErrBadRequest
+		}
+
+		claims := c.Get("claims").(*auth.Claims)
+		if claims.UserID != input.UserID && !claims.Authorized("admin") {
+			return echo.ErrForbidden
 		}
 
 		pUIID, err := entity.StringToID(input.ProductID)
@@ -127,6 +132,11 @@ func updateInventory(service inventory.UseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
+		claims := c.Get("claims").(*auth.Claims)
+		if claims.UserID != input.UserID && !claims.Authorized("admin") {
+			return echo.ErrForbidden
+		}
+
 		pUIID, err := entity.StringToID(input.ProductID)
 		if err != nil {
 			return echo.ErrBadRequest
@@ -172,6 +182,19 @@ func deleteInventory(service inventory.UseCase) echo.HandlerFunc {
 		idUUID, err := entity.StringToID(c.Param("id"))
 		if err != nil {
 			return echo.ErrBadRequest
+		}
+
+		i, err := service.GetInventoryByID(idUUID)
+		if errors.Is(err, entity.ErrNotFound) {
+			return echo.ErrNotFound
+		}
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+
+		claims := c.Get("claims").(*auth.Claims)
+		if claims.UserID != i.UserID.String() && !claims.Authorized("admin") {
+			return echo.ErrForbidden
 		}
 
 		err = service.DeleteInventory(idUUID)
