@@ -1,5 +1,7 @@
 TODO:
 
+ - [ ] .gitignore config.yaml
+ - [ ] adicionar mais coisas no logger?
  - [ ] search users não está funcionando
  - [ ] melhorar respostas da API com echo.NewHTTPError(http.StatusBadRequest, "mensagem")
  - [ ] arrumar testes de inventory (criar o mock de service separado e importar?)
