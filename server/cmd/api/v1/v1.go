@@ -16,6 +16,8 @@ import (
 )
 
 func RegisterHandlers(e *echo.Echo, db repository.Repository) {
+	// =================================================================================
+	// services
 	baseProductService := baseproduct.NewService(db)
 	productService := product.NewService(baseProductService, db)
 	unitOfMeasureService := unitofmeasure.NewService(db)
@@ -27,7 +29,11 @@ func RegisterHandlers(e *echo.Echo, db repository.Repository) {
 		db,
 	)
 
+	// login endpoint without JWT middleware
 	handler.MakeAuthHandlers(e, userService)
+
+	// =================================================================================
+	// v1
 
 	v1 := e.Group("/v1")
 	v1.Use(
