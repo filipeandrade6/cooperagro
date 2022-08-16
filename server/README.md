@@ -21,7 +21,6 @@ TODO:
  - [ ] search by name
  - [ ] search customers -> first name para todas colunas
  - [ ] padronizar as repostas de erro ao usuário da api
- - [ ] arrumar created_at e update_at
  - [ ] adicionar contratos/inventorios na entidade user?
 
 reference:
