@@ -1,5 +1,6 @@
 TODO:
 
+ - [ ] BDD
  - [ ] adicionar serviço como serveless functions? separar API em diferentes funções
  - [ ] adicionar pprof ou prometheus
  - [ ] .gitignore config.yaml
