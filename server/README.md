@@ -2,7 +2,7 @@ TODO:
 
  - [ ] BDD
  - [ ] adicionar serviço como serveless functions? separar API em diferentes funções
- - [ ] adicionar pprof ou prometheus
+ - [ ] adicionar monitoramento (pprof ou prometheus)
  - [ ] .gitignore config.yaml
  - [ ] adicionar mais coisas no logger?
  - [ ] melhorar respostas da API com echo.NewHTTPError(http.StatusBadRequest, "mensagem")
